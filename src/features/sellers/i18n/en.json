@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "memberSince": "Member since {{date}}",
+    "followers_one": "{{count}} follower",
+    "followers_other": "{{count}} followers",
+    "rating": "{{average}} ({{count}} reviews)",
+    "noRating": "No reviews yet",
+    "stores": "Stores",
+    "notFound": "Seller not found."
+  },
+  "follow": {
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following"
+  },
+  "followingPage": {
+    "title": "Sellers you follow",
+    "empty": "You're not following any sellers yet."
+  },
+  "toast": {
+    "followed": "Now following this seller.",
+    "unfollowed": "Unfollowed."
+  },
+  "errors": {
+    "CANNOT_FOLLOW_SELF": "You can't follow yourself."
+  }
+}

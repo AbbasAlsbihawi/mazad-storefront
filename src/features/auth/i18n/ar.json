@@ -1,0 +1,36 @@
+{
+  "fields": {
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "+9647xxxxxxxx",
+    "password": "كلمة المرور",
+    "fullName": "الاسم الكامل"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "submit": "تسجيل الدخول",
+    "noAccount": "ليس لديك حساب؟",
+    "createAccount": "إنشاء حساب"
+  },
+  "register": {
+    "title": "إنشاء حساب",
+    "submit": "إنشاء حساب",
+    "haveAccount": "لديك حساب بالفعل؟",
+    "signIn": "تسجيل الدخول"
+  },
+  "account": {
+    "title": "الحساب",
+    "verified": "حساب موثّق",
+    "quickLinks": "روابط الحساب",
+    "addresses": "عناوين التوصيل",
+    "myBids": "مزايداتي",
+    "watchlist": "المفضلة",
+    "signOut": "تسجيل الخروج"
+  },
+  "errors": {
+    "field": {
+      "phoneInvalid": "أدخل رقم هاتف صحيحًا.",
+      "passwordMin": "يجب ألا تقل كلمة المرور عن 8 أحرف.",
+      "fullNameMin": "أدخل اسمك الكامل."
+    }
+  }
+}

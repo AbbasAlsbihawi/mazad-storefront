@@ -1,0 +1,94 @@
+@import 'tailwindcss';
+
+/*
+ * Dark is the :root default; [data-theme='light'] overrides it (ADR-011). The pre-hydration
+ * script in the root layout stamps data-theme before React mounts, so there's no flash.
+ * System fonts only — no next/font/google fetch, so a network-isolated build can't fail on it,
+ * and the stack covers Arabic (the default locale) via each platform's own Arabic system font.
+ */
+:root {
+  --color-background: oklch(0.16 0.02 260);
+  --color-surface: oklch(0.21 0.02 260);
+  --color-surface-raised: oklch(0.26 0.02 260);
+  --color-foreground: oklch(0.96 0.01 260);
+  --color-foreground-soft: oklch(0.82 0.01 260);
+  --color-muted-foreground: oklch(0.62 0.02 260);
+  --color-border: oklch(1 0 0 / 12%);
+  --color-primary: oklch(0.78 0.14 85);
+  --color-primary-foreground: oklch(0.18 0.02 260);
+  --color-accent: oklch(0.78 0.14 85);
+  --color-live: oklch(0.72 0.19 145);
+  --color-live-foreground: oklch(0.16 0.05 145);
+  --color-info: oklch(0.7 0.14 240);
+  --color-info-foreground: oklch(0.16 0.05 240);
+  --color-warning: oklch(0.78 0.16 70);
+  --color-warning-foreground: oklch(0.16 0.05 70);
+  --color-destructive: oklch(0.62 0.21 25);
+  --color-destructive-foreground: oklch(0.97 0.01 25);
+  --color-ring: oklch(0.78 0.14 85);
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Arabic', Arial,
+    sans-serif;
+}
+
+[data-theme='light'] {
+  --color-background: oklch(0.98 0.005 260);
+  --color-surface: oklch(1 0 0);
+  --color-surface-raised: oklch(0.96 0.005 260);
+  --color-foreground: oklch(0.18 0.02 260);
+  --color-foreground-soft: oklch(0.32 0.02 260);
+  --color-muted-foreground: oklch(0.5 0.02 260);
+  --color-border: oklch(0 0 0 / 10%);
+  --color-primary: oklch(0.6 0.15 85);
+  --color-primary-foreground: oklch(0.99 0.005 85);
+  --color-accent: oklch(0.55 0.15 85);
+  --color-live: oklch(0.52 0.17 145);
+  --color-live-foreground: oklch(0.98 0.01 145);
+  --color-info: oklch(0.52 0.14 240);
+  --color-info-foreground: oklch(0.98 0.01 240);
+  --color-warning: oklch(0.55 0.16 70);
+  --color-warning-foreground: oklch(0.98 0.01 70);
+  --color-destructive: oklch(0.55 0.21 25);
+  --color-destructive-foreground: oklch(0.98 0.01 25);
+  --color-ring: oklch(0.55 0.15 85);
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-foreground: var(--color-foreground);
+  --color-foreground-soft: var(--color-foreground-soft);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-border: var(--color-border);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-accent: var(--color-accent);
+  --color-live: var(--color-live);
+  --color-live-foreground: var(--color-live-foreground);
+  --color-info: var(--color-info);
+  --color-info-foreground: var(--color-info-foreground);
+  --color-warning: var(--color-warning);
+  --color-warning-foreground: var(--color-warning-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-ring: var(--color-ring);
+  --font-sans: var(--font-sans);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}

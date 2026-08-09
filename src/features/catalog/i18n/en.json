@@ -1,0 +1,39 @@
+{
+  "browse": {
+    "title": "Auctions",
+    "empty": "No auctions match your filters.",
+    "filters": {
+      "all": "All",
+      "live": "Live",
+      "upcoming": "Upcoming",
+      "ended": "Ended"
+    }
+  },
+  "detail": {
+    "startingPrice": "Starting price",
+    "currentBid": "Current bid",
+    "bids_one": "{{count}} bid",
+    "bids_other": "{{count}} bids",
+    "endsIn": "Ends in",
+    "ended": "Ended",
+    "seller": "Seller",
+    "store": "Store",
+    "deliveryFee": "Delivery fee",
+    "condition": "Condition",
+    "bidHistory": "Bid history",
+    "noBids": "No bids yet.",
+    "similar": "Similar auctions",
+    "notFound": "Auction not found."
+  },
+  "condition": {
+    "NEW": "New",
+    "LIKE_NEW": "Like new",
+    "OPEN_BOX": "Open box",
+    "USED": "Used"
+  },
+  "store": {
+    "deliveryFee": "Delivery fee",
+    "activeAuctions": "Auctions from this store",
+    "notFound": "Store not found."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "app": { "name": "Mazad" },
+  "nav": {
+    "auctions": "Auctions",
+    "signIn": "Sign in",
+    "register": "Register",
+    "account": "Account",
+    "signOut": "Sign out"
+  },
+  "theme": { "light": "Light", "dark": "Dark" },
+  "locale": { "en": "English", "ar": "العربية" },
+  "auctionStatus": {
+    "live": "Live",
+    "endingSoon": "Ending soon",
+    "upcoming": "Upcoming",
+    "ended": "Ended"
+  },
+  "state": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "retry": "Try again",
+    "empty": "Nothing here yet."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "INVALID_CREDENTIALS": "Incorrect phone number or password.",
+    "USER_BANNED": "This account has been suspended.",
+    "PHONE_EXISTS": "That phone number is already registered.",
+    "USER_NOT_FOUND": "No account found for that phone number."
+  }
+}

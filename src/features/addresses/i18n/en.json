@@ -1,0 +1,40 @@
+{
+  "page": {
+    "title": "Delivery addresses",
+    "subtitle": "You need at least one saved address before you can bid.",
+    "addNew": "Add address"
+  },
+  "fields": {
+    "label": "Label",
+    "city": "City",
+    "area": "Area",
+    "street": "Street",
+    "details": "Details",
+    "contactPhone": "Contact phone",
+    "isDefault": "Use as default address"
+  },
+  "form": {
+    "add": "Add address",
+    "save": "Save changes",
+    "cancel": "Cancel"
+  },
+  "list": {
+    "empty": "No saved addresses yet.",
+    "default": "Default",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Confirm delete"
+  },
+  "toast": {
+    "created": "Address added.",
+    "updated": "Address updated.",
+    "deleted": "Address removed."
+  },
+  "errors": {
+    "field": {
+      "labelRequired": "Give this address a label.",
+      "cityRequired": "City is required."
+    },
+    "ADDRESS_NOT_FOUND": "That address no longer exists."
+  }
+}

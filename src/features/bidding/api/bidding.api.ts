@@ -1,0 +1,50 @@
+import { httpClient } from '@shared/api';
+import {
+  bidResponseSchema,
+  autoBidResponseSchema,
+  autoBidCancelResponseSchema,
+  auctionPricingSchema,
+  myBidsListSchema,
+} from '../schemas/bidding.schema';
+import type {
+  BidResponse,
+  AutoBidResponse,
+  AutoBidCancelResponse,
+  AuctionPricing,
+  MyBidsList,
+  MyBidsParams,
+} from '../types/bidding.types';
+
+export const biddingApi = {
+  getAuctionPricing: async (auctionId: string): Promise<AuctionPricing> => {
+    const response = await httpClient.get<unknown>(`/auctions/${auctionId}`);
+    return auctionPricingSchema.parse(response.data);
+  },
+
+  placeBid: async (auctionId: string, amount: number): Promise<BidResponse> => {
+    const response = await httpClient.post<unknown>(`/auctions/${auctionId}/bids`, { amount });
+    return bidResponseSchema.parse(response.data);
+  },
+
+  buyNow: async (auctionId: string): Promise<BidResponse> => {
+    const response = await httpClient.post<unknown>(`/auctions/${auctionId}/buy-now`);
+    return bidResponseSchema.parse(response.data);
+  },
+
+  setAutoBid: async (auctionId: string, maxAmount: number): Promise<AutoBidResponse> => {
+    const response = await httpClient.put<unknown>(`/auctions/${auctionId}/auto-bid`, {
+      maxAmount,
+    });
+    return autoBidResponseSchema.parse(response.data);
+  },
+
+  cancelAutoBid: async (auctionId: string): Promise<AutoBidCancelResponse> => {
+    const response = await httpClient.delete<unknown>(`/auctions/${auctionId}/auto-bid`);
+    return autoBidCancelResponseSchema.parse(response.data);
+  },
+
+  listMyBids: async (params: MyBidsParams): Promise<MyBidsList> => {
+    const response = await httpClient.get<unknown>('/me/bids', { params });
+    return myBidsListSchema.parse(response.data);
+  },
+};

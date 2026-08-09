@@ -1,0 +1,14 @@
+{
+  "toggle": {
+    "add": "Add to watchlist",
+    "remove": "Remove from watchlist"
+  },
+  "page": {
+    "title": "Watchlist",
+    "empty": "You haven't saved any auctions yet."
+  },
+  "toast": {
+    "added": "Added to watchlist.",
+    "removed": "Removed from watchlist."
+  }
+}

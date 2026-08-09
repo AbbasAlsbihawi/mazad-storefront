@@ -1,0 +1,39 @@
+{
+  "browse": {
+    "title": "المزادات",
+    "empty": "لا توجد مزادات مطابقة لعوامل التصفية.",
+    "filters": {
+      "all": "الكل",
+      "live": "مباشر",
+      "upcoming": "قادم",
+      "ended": "منتهٍ"
+    }
+  },
+  "detail": {
+    "startingPrice": "سعر البدء",
+    "currentBid": "أعلى مزايدة",
+    "bids_one": "{{count}} مزايدة",
+    "bids_other": "{{count}} مزايدات",
+    "endsIn": "ينتهي خلال",
+    "ended": "انتهى",
+    "seller": "البائع",
+    "store": "المتجر",
+    "deliveryFee": "رسوم التوصيل",
+    "condition": "الحالة",
+    "bidHistory": "سجل المزايدات",
+    "noBids": "لا توجد مزايدات بعد.",
+    "similar": "مزادات مشابهة",
+    "notFound": "المزاد غير موجود."
+  },
+  "condition": {
+    "NEW": "جديد",
+    "LIKE_NEW": "شبه جديد",
+    "OPEN_BOX": "مفتوح غير مستخدم",
+    "USED": "مستعمل"
+  },
+  "store": {
+    "deliveryFee": "رسوم التوصيل",
+    "activeAuctions": "مزادات هذا المتجر",
+    "notFound": "المتجر غير موجود."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Live now",
+  "sections": {
+    "live": "Live now",
+    "endingSoon": "Ending soon",
+    "upcoming": "Starting soon"
+  },
+  "empty": {
+    "live": "No live auctions right now.",
+    "endingSoon": "Nothing ending in the next hour.",
+    "upcoming": "No upcoming auctions scheduled."
+  }
+}

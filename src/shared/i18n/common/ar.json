@@ -1,0 +1,31 @@
+{
+  "app": { "name": "مزاد" },
+  "nav": {
+    "auctions": "المزادات",
+    "signIn": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "account": "الحساب",
+    "signOut": "تسجيل الخروج"
+  },
+  "theme": { "light": "فاتح", "dark": "داكن" },
+  "locale": { "en": "English", "ar": "العربية" },
+  "auctionStatus": {
+    "live": "مباشر",
+    "endingSoon": "ينتهي قريبًا",
+    "upcoming": "قادم",
+    "ended": "منتهٍ"
+  },
+  "state": {
+    "loading": "جارٍ التحميل…",
+    "error": "حدث خطأ ما.",
+    "retry": "إعادة المحاولة",
+    "empty": "لا يوجد شيء هنا بعد."
+  },
+  "errors": {
+    "generic": "حدث خطأ ما. حاول مرة أخرى.",
+    "INVALID_CREDENTIALS": "رقم الهاتف أو كلمة المرور غير صحيحة.",
+    "USER_BANNED": "تم إيقاف هذا الحساب.",
+    "PHONE_EXISTS": "رقم الهاتف هذا مسجّل بالفعل.",
+    "USER_NOT_FOUND": "لا يوجد حساب مرتبط بهذا الرقم."
+  }
+}

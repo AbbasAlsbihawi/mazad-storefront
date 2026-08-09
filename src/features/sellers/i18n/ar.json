@@ -1,0 +1,27 @@
+{
+  "profile": {
+    "memberSince": "عضو منذ {{date}}",
+    "followers_one": "{{count}} متابع",
+    "followers_other": "{{count}} متابعين",
+    "rating": "{{average}} ({{count}} تقييم)",
+    "noRating": "لا توجد تقييمات بعد",
+    "stores": "المتاجر",
+    "notFound": "البائع غير موجود."
+  },
+  "follow": {
+    "follow": "متابعة",
+    "unfollow": "إلغاء المتابعة",
+    "following": "متابَع"
+  },
+  "followingPage": {
+    "title": "البائعون الذين تتابعهم",
+    "empty": "أنت لا تتابع أي بائع بعد."
+  },
+  "toast": {
+    "followed": "أصبحت تتابع هذا البائع.",
+    "unfollowed": "تم إلغاء المتابعة."
+  },
+  "errors": {
+    "CANNOT_FOLLOW_SELF": "لا يمكنك متابعة نفسك."
+  }
+}

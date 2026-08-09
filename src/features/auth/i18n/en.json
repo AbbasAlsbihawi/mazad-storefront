@@ -1,0 +1,36 @@
+{
+  "fields": {
+    "phone": "Phone number",
+    "phonePlaceholder": "+9647xxxxxxxx",
+    "password": "Password",
+    "fullName": "Full name"
+  },
+  "login": {
+    "title": "Sign in",
+    "submit": "Sign in",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Register"
+  },
+  "register": {
+    "title": "Create account",
+    "submit": "Create account",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  "account": {
+    "title": "Account",
+    "verified": "Verified account",
+    "quickLinks": "Account links",
+    "addresses": "Delivery addresses",
+    "myBids": "My bids",
+    "watchlist": "Watchlist",
+    "signOut": "Sign out"
+  },
+  "errors": {
+    "field": {
+      "phoneInvalid": "Enter a valid phone number.",
+      "passwordMin": "Password must be at least 8 characters.",
+      "fullNameMin": "Enter your full name."
+    }
+  }
+}
