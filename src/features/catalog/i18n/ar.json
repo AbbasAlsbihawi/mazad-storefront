@@ -12,8 +12,12 @@
   "detail": {
     "startingPrice": "سعر البدء",
     "currentBid": "أعلى مزايدة",
+    "bids_zero": "{{count}} مزايدات",
     "bids_one": "{{count}} مزايدة",
-    "bids_other": "{{count}} مزايدات",
+    "bids_two": "{{count}} مزايدتان",
+    "bids_few": "{{count}} مزايدات",
+    "bids_many": "{{count}} مزايدة",
+    "bids_other": "{{count}} مزايدة",
     "endsIn": "ينتهي خلال",
     "ended": "انتهى",
     "seller": "البائع",

@@ -26,9 +26,15 @@ export interface AuctionDetailPageProps {
   id: string;
   biddingPanel?: ReactNode;
   watchlistToggle?: ReactNode;
+  renderSellerFollowToggle?: (sellerId: string) => ReactNode;
 }
 
-export function AuctionDetailPage({ id, biddingPanel, watchlistToggle }: AuctionDetailPageProps) {
+export function AuctionDetailPage({
+  id,
+  biddingPanel,
+  watchlistToggle,
+  renderSellerFollowToggle,
+}: AuctionDetailPageProps) {
   const { t, isReady } = useCatalogTranslation();
   const { t: tCommon } = useTranslation('common');
   const { locale } = useLocale();
@@ -91,7 +97,20 @@ export function AuctionDetailPage({ id, biddingPanel, watchlistToggle }: Auction
           <Card>
             <CardContent className="flex flex-col gap-2 text-sm">
               <Row label={t('detail.condition')} value={t(`condition.${data.product.condition}`)} />
-              <Row label={t('detail.seller')} value={data.seller.fullName} />
+              <Row
+                label={t('detail.seller')}
+                value={
+                  <span className="flex items-center gap-2">
+                    <Link
+                      href={ROUTES.sellerProfile(data.seller.id)}
+                      className="text-accent hover:underline"
+                    >
+                      {data.seller.fullName}
+                    </Link>
+                    {renderSellerFollowToggle?.(data.seller.id)}
+                  </span>
+                }
+              />
               <Row
                 label={t('detail.store')}
                 value={

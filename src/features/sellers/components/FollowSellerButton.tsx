@@ -22,8 +22,7 @@ export function FollowSellerButton({ sellerId }: FollowSellerButtonProps) {
   const following = useFollowing();
   const toggle = useToggleFollow(sellerId);
 
-  const isKnownFollowing =
-    following.data?.data.some((item) => item.sellerId === sellerId) ?? false;
+  const isKnownFollowing = following.data?.data.some((item) => item.sellerId === sellerId) ?? false;
   const [optimisticOverride, setOptimisticOverride] = useState<boolean | null>(null);
   const isFollowing = optimisticOverride ?? isKnownFollowing;
   const errorCode = getErrorCode(toggle.error);

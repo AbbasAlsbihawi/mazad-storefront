@@ -17,8 +17,7 @@ export function WatchlistToggle({ auctionId }: WatchlistToggleProps) {
   const watchlist = useWatchlist();
   const toggle = useToggleWatch(auctionId);
 
-  const isKnownWatched =
-    watchlist.data?.data.some((item) => item.auctionId === auctionId) ?? false;
+  const isKnownWatched = watchlist.data?.data.some((item) => item.auctionId === auctionId) ?? false;
   // Set only on click, cleared only on error (back to the pre-click value) — never synced from
   // isKnownWatched via an effect. On success there's nothing to revert to: this value already
   // matches what the server now has, and what isKnownWatched will read once its query refetches.

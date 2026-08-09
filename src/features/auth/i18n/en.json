@@ -24,6 +24,7 @@
     "addresses": "Delivery addresses",
     "myBids": "My bids",
     "watchlist": "Watchlist",
+    "following": "Sellers you follow",
     "signOut": "Sign out"
   },
   "errors": {

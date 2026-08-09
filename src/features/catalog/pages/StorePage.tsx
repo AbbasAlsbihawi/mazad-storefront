@@ -1,7 +1,10 @@
 'use client';
 
+import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { PageLoader, ErrorState, EmptyState } from '@shared/components/feedback';
 import { Card, CardContent, CardTitle } from '@shared/components/ui';
+import { ROUTES } from '@shared/constants';
 import { useLocale } from '@shared/hooks';
 import { formatMoney, pickLocalizedName } from '@shared/lib';
 import { useCatalogTranslation } from '../hooks/useCatalogTranslation';
@@ -9,7 +12,12 @@ import { useStore } from '../hooks/useStore';
 import { useStoreAuctions } from '../hooks/useStoreAuctions';
 import { AuctionGrid } from '@shared/components/cards';
 
-export function StorePage({ id }: { id: string }) {
+export interface StorePageProps {
+  id: string;
+  renderSellerFollowToggle?: (sellerId: string) => ReactNode;
+}
+
+export function StorePage({ id, renderSellerFollowToggle }: StorePageProps) {
   const { t, isReady } = useCatalogTranslation();
   const { locale } = useLocale();
   const store = useStore(id);
@@ -35,7 +43,15 @@ export function StorePage({ id }: { id: string }) {
           <p>
             {t('store.deliveryFee')}: {formatMoney(data.deliveryFee)}
           </p>
-          <p className="text-muted-foreground">{data.seller.fullName}</p>
+          <div className="flex items-center gap-2">
+            <Link
+              href={ROUTES.sellerProfile(data.seller.id)}
+              className="text-accent hover:underline"
+            >
+              {data.seller.fullName}
+            </Link>
+            {renderSellerFollowToggle?.(data.seller.id)}
+          </div>
         </CardContent>
       </Card>
 

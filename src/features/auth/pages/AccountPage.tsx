@@ -43,6 +43,9 @@ export function AccountPage() {
         >
           {t('account.watchlist')}
         </Link>
+        <Link href={ROUTES.following} className="text-sm font-medium text-accent hover:underline">
+          {t('account.following')}
+        </Link>
       </nav>
 
       <Button variant="outline" isLoading={logout.isPending} onClick={() => logout.mutate()}>

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { AuctionDetailPage } from '@features/catalog';
 import { BidPanel } from '@features/bidding';
 import { WatchlistToggle } from '@features/watchlist';
+import { FollowSellerButton } from '@features/sellers';
 
 export default function Page() {
   const params = useParams<{ id: string }>();
@@ -12,6 +13,7 @@ export default function Page() {
       id={params.id}
       biddingPanel={<BidPanel auctionId={params.id} />}
       watchlistToggle={<WatchlistToggle auctionId={params.id} />}
+      renderSellerFollowToggle={(sellerId) => <FollowSellerButton sellerId={sellerId} />}
     />
   );
 }

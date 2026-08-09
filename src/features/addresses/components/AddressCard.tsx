@@ -63,7 +63,9 @@ export function AddressCard({ address }: AddressCardProps) {
                 variant="destructive"
                 size="sm"
                 isLoading={deleteAddress.isPending}
-                onClick={() => deleteAddress.mutate(address.id, { onSuccess: () => setMode('view') })}
+                onClick={() =>
+                  deleteAddress.mutate(address.id, { onSuccess: () => setMode('view') })
+                }
               >
                 {t('list.confirmDelete')}
               </Button>

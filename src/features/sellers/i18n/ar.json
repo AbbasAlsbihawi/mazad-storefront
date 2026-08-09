@@ -1,9 +1,18 @@
 {
   "profile": {
     "memberSince": "عضو منذ {{date}}",
+    "followers_zero": "{{count}} متابعين",
     "followers_one": "{{count}} متابع",
-    "followers_other": "{{count}} متابعين",
-    "rating": "{{average}} ({{count}} تقييم)",
+    "followers_two": "{{count}} متابعان",
+    "followers_few": "{{count}} متابعين",
+    "followers_many": "{{count}} متابع",
+    "followers_other": "{{count}} متابع",
+    "rating_zero": "{{average}} ({{count}} تقييمات)",
+    "rating_one": "{{average}} ({{count}} تقييم)",
+    "rating_two": "{{average}} ({{count}} تقييمان)",
+    "rating_few": "{{average}} ({{count}} تقييمات)",
+    "rating_many": "{{average}} ({{count}} تقييم)",
+    "rating_other": "{{average}} ({{count}} تقييم)",
     "noRating": "لا توجد تقييمات بعد",
     "stores": "المتاجر",
     "notFound": "البائع غير موجود."
