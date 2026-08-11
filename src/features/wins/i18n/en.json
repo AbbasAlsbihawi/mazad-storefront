@@ -1,0 +1,46 @@
+{
+  "page": {
+    "title": "My wins",
+    "emptyTitle": "No wins yet",
+    "empty": "When you win an auction it shows up here to confirm."
+  },
+  "sections": {
+    "pending": "Awaiting confirmation",
+    "settled": "Confirmed and closed"
+  },
+  "card": {
+    "amount": "Amount",
+    "deadline": "Confirm within",
+    "expired": "Confirmation window closed",
+    "viewOrder": "View order"
+  },
+  "confirm": {
+    "title": "Confirm your wins",
+    "description": "Pick a delivery address. One order is created per store.",
+    "address": "Delivery address",
+    "note": "Note for the seller",
+    "notePlaceholder": "Optional",
+    "submit": "Confirm",
+    "decline": "Decline",
+    "declineConfirm": "This gives up your win on this auction. Are you sure?",
+    "noAddress": "You need a saved delivery address before confirming.",
+    "addAddress": "Add an address",
+    "selected_one": "{{formattedCount}} auction selected",
+    "selected_other": "{{formattedCount}} auctions selected"
+  },
+  "status": {
+    "PENDING_CONFIRMATION": "Awaiting confirmation",
+    "CONFIRMED": "Confirmed",
+    "DECLINED": "Declined",
+    "EXPIRED": "Expired"
+  },
+  "toast": {
+    "confirmed": "Win confirmed",
+    "declined": "Win declined"
+  },
+  "errors": {
+    "WIN_EXPIRED": "The confirmation window for this auction has closed.",
+    "WIN_NOT_FOUND": "That win is no longer available.",
+    "ADDRESS_NOT_FOUND": "That address no longer exists."
+  }
+}

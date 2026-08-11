@@ -10,11 +10,12 @@ export interface CategoryChipsProps {
 
 // Category names arrive already localized (mazad-api picks nameEn/nameAr server-side from
 // Accept-Language for /categories, unlike /auctions) — render `category.name` directly.
+// Scrolls horizontally rather than wrapping so the filter block keeps a fixed height.
 export function CategoryChips({ categories, selectedId, onSelect }: CategoryChipsProps) {
   const { t } = useCatalogTranslation();
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="no-scrollbar -mx-gutter flex gap-2 overflow-x-auto px-gutter">
       <Chip isActive={!selectedId} onClick={() => onSelect(undefined)}>
         {t('browse.filters.all')}
       </Chip>

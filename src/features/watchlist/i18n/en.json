@@ -5,7 +5,8 @@
   },
   "page": {
     "title": "Watchlist",
-    "empty": "You haven't saved any auctions yet."
+    "empty": "Tap the heart on an auction to follow it from here.",
+    "emptyTitle": "Nothing saved"
   },
   "toast": {
     "added": "Added to watchlist.",

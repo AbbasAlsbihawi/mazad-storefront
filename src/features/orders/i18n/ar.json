@@ -1,0 +1,56 @@
+{
+  "page": {
+    "title": "طلباتي",
+    "emptyTitle": "لا طلبات بعد",
+    "empty": "بعد تأكيد فوزك بمزاد سيظهر الطلب هنا."
+  },
+  "detail": {
+    "title": "الطلب",
+    "notFound": "الطلب غير موجود.",
+    "items": "المنتجات",
+    "summary": "الملخص",
+    "subtotal": "المجموع",
+    "deliveryFee": "رسوم التوصيل",
+    "total": "الإجمالي",
+    "delivery": "التوصيل",
+    "store": "المتجر",
+    "note": "ملاحظة",
+    "placedAt": "تاريخ الطلب",
+    "cancelReason": "سبب الإلغاء"
+  },
+  "status": {
+    "CREATED": "قيد الانتظار",
+    "CONFIRMED": "مؤكد",
+    "OUT_FOR_DELIVERY": "قيد التوصيل",
+    "DELIVERED": "تم التسليم",
+    "CANCELLED": "ملغى"
+  },
+  "actions": {
+    "cancel": "إلغاء الطلب",
+    "cancelConfirm": "سيُلغى هذا الطلب بالكامل. متأكد؟",
+    "openReturn": "طلب إرجاع",
+    "returnReason": "سبب الإرجاع",
+    "returnSubmit": "إرسال طلب الإرجاع",
+    "returnCancel": "إلغاء"
+  },
+  "returnStatus": {
+    "REQUESTED": "طلب إرجاع مقدَّم",
+    "APPROVED": "تمت الموافقة على الإرجاع",
+    "REJECTED": "رُفض الإرجاع",
+    "PRODUCT_RETURNED": "تم استلام المنتج",
+    "REFUNDED": "تم رد المبلغ",
+    "CANCELLED": "أُلغي طلب الإرجاع"
+  },
+  "returnWindow": "يمكن طلب الإرجاع خلال ٧ أيام من التسليم.",
+  "toast": {
+    "cancelled": "تم إلغاء الطلب",
+    "returnOpened": "تم إرسال طلب الإرجاع"
+  },
+  "errors": {
+    "ORDER_NOT_FOUND": "الطلب غير موجود.",
+    "ORDER_FORBIDDEN": "لا يمكنك عرض هذا الطلب.",
+    "ORDER_STATUS_INVALID": "لا يمكن إلغاء الطلب في حالته الحالية.",
+    "RETURN_WINDOW_CLOSED": "انتهت مهلة الإرجاع البالغة ٧ أيام.",
+    "RETURN_ALREADY_EXISTS": "يوجد طلب إرجاع لهذا المنتج بالفعل."
+  }
+}

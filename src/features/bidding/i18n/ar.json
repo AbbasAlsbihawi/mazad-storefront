@@ -9,7 +9,10 @@
     "amountWithMinimum": "مزايدتك (الحد الأدنى {{amount}})",
     "placeBid": "تقديم مزايدة",
     "buyNow": "شراء الآن بسعر {{amount}}",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "decrease": "إنقاص المبلغ",
+    "increase": "زيادة المبلغ",
+    "minimumHint": "الحد الأدنى للمزايدة {{amount}}"
   },
   "autoBid": {
     "setUp": "إعداد المزايدة التلقائية",
@@ -20,10 +23,16 @@
   },
   "myBids": {
     "title": "مزايداتي",
-    "empty": "لم تزايد على أي مزاد بعد.",
+    "empty": "ابدأ بالمزايدة على مزاد لتتابعه من هنا.",
     "yourBid": "مزايدتك: {{amount}}",
     "filters": {
       "all": "الكل"
+    },
+    "emptyTitle": "لا مزايدات بعد",
+    "segments": {
+      "active": "نشطة",
+      "won": "الأعلى",
+      "ended": "منتهية"
     }
   },
   "standing": {
@@ -34,7 +43,7 @@
     "LOST": "خاسر"
   },
   "toast": {
-    "bidPlaced": "تم تقديم المزايدة.",
+    "bidPlaced": "تمت المزايدة",
     "boughtNow": "تم تأكيد الشراء.",
     "autoBidSet": "تم ضبط المزايدة التلقائية.",
     "autoBidCancelled": "تم إيقاف المزايدة التلقائية."

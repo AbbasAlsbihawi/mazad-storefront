@@ -3,7 +3,10 @@ import { create } from 'zustand';
 export interface Toast {
   id: string;
   message: string;
-  variant: 'success' | 'error' | 'info';
+  /** Second line — typically the amount that was just committed. */
+  detail?: string;
+  /** `bid` is the brand-accented confirmation for the app's defining action. */
+  variant: 'success' | 'error' | 'info' | 'bid';
 }
 
 interface ToastState {

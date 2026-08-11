@@ -1,7 +1,7 @@
 'use client';
 
 import { Component, type ReactNode } from 'react';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@shared/components/ui';
 
 interface ErrorBoundaryProps {

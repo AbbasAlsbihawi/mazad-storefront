@@ -4,22 +4,29 @@ import { cn } from '@shared/lib';
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  /** Shown under the field when there's no error — the two never appear together. */
+  hint?: string;
   isLabelHidden?: boolean;
 }
 
+/** Input — iOS text field: label above, 50pt field, inline error or hint below. */
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, error, isLabelHidden = false, id, className, ...props },
+  { label, error, hint, isLabelHidden = false, id, className, ...props },
   ref,
 ) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const errorId = `${inputId}-error`;
+  const hintId = `${inputId}-hint`;
 
   return (
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={inputId}
-        className={cn('text-sm font-medium text-foreground-soft', isLabelHidden && 'sr-only')}
+        className={cn(
+          'text-footnote font-semibold text-foreground-soft',
+          isLabelHidden && 'sr-only',
+        )}
       >
         {label}
       </label>
@@ -27,19 +34,24 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         ref={ref}
         id={inputId}
         aria-invalid={!!error}
-        aria-describedby={error ? errorId : undefined}
+        aria-describedby={error ? errorId : hint ? hintId : undefined}
         className={cn(
-          'h-10 rounded-md border border-border bg-surface px-3 text-sm text-foreground',
+          'h-[50px] rounded-md border border-border bg-surface px-3.5 text-body text-foreground',
           'placeholder:text-muted-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'transition-colors duration-fast ease-ios focus:border-primary',
+          'disabled:bg-fill disabled:text-foreground-disabled',
           error && 'border-destructive',
           className,
         )}
         {...props}
       />
       {error ? (
-        <p id={errorId} role="alert" className="text-sm text-destructive">
+        <p id={errorId} role="alert" className="text-footnote text-destructive">
           {error}
+        </p>
+      ) : hint ? (
+        <p id={hintId} className="text-footnote text-muted-foreground">
+          {hint}
         </p>
       ) : null}
     </div>

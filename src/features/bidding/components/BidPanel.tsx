@@ -2,7 +2,9 @@
 
 import Link from 'next/link';
 import { ROUTES } from '@shared/constants';
-import { PageLoader, ErrorState } from '@shared/components/feedback';
+import { ErrorState } from '@shared/components/feedback';
+import { Card, Skeleton, buttonVariants } from '@shared/components/ui';
+import { BottomActionBar } from '@shared/components/ios';
 import { useIsAuthenticated } from '@shared/hooks';
 import { useAuctionPricing } from '../hooks/useAuctionPricing';
 import { useBiddingTranslation } from '../hooks/useBiddingTranslation';
@@ -19,30 +21,41 @@ export function BidPanel({ auctionId }: BidPanelProps) {
   const isAuthenticated = useIsAuthenticated();
   const pricing = useAuctionPricing(auctionId);
 
-  if (!isReady || pricing.isPending) return <PageLoader />;
+  // A skeleton the size of the real bid card, so the CTA doesn't jump into place under the
+  // user's thumb once pricing resolves.
+  if (!isReady || pricing.isPending) return <Skeleton radius="lg" className="h-28 w-full" />;
+
   if (pricing.isError || !pricing.data) {
     return <ErrorState message={t('panel.loadError')} onRetry={() => void pricing.refetch()} />;
   }
 
   if (pricing.data.status !== 'LIVE') {
-    return <p className="text-sm text-muted-foreground">{t('panel.notLive')}</p>;
+    return (
+      <BottomActionBar>
+        <span className="w-full py-3 text-center text-subhead text-muted-foreground">
+          {t('panel.notLive')}
+        </span>
+      </BottomActionBar>
+    );
   }
 
   if (!isAuthenticated) {
     return (
-      <p className="text-sm text-muted-foreground">
-        <Link href={ROUTES.login} className="text-accent hover:underline">
+      <BottomActionBar>
+        <Link href={ROUTES.login} className={buttonVariants({ size: 'lg', isFullWidth: true })}>
           {t('panel.signInToBid')}
         </Link>
-      </p>
+      </BottomActionBar>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+    <div className="flex flex-col gap-3">
       <BidForm auction={pricing.data} />
       {pricing.data.buyNowPrice ? (
-        <BuyNowButton auctionId={auctionId} buyNowPrice={pricing.data.buyNowPrice} />
+        <Card isInset>
+          <BuyNowButton auctionId={auctionId} buyNowPrice={pricing.data.buyNowPrice} />
+        </Card>
       ) : null}
       <AutoBidControl auctionId={auctionId} />
     </div>

@@ -1,56 +1,93 @@
 'use client';
 
-import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@shared/constants';
 import { PageLoader, ErrorState } from '@shared/components/feedback';
-import { Button, Card, CardContent, CardTitle } from '@shared/components/ui';
+import { ScreenHeader } from '@shared/components/layout';
+import { Badge, Button, Card, Icon } from '@shared/components/ui';
+import { ListRow } from '@shared/components/ios';
+import { useLocale, useTheme } from '@shared/hooks';
 import { useAuthTranslation } from '../hooks/useAuthTranslation';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useLogout } from '../hooks/useLogout';
 
 export function AccountPage() {
   const { t, isReady } = useAuthTranslation();
+  const { t: tCommon } = useTranslation('common');
   const { data: user, isPending, isError, refetch } = useCurrentUser();
+  const { locale, changeLocale } = useLocale();
+  const { theme, setTheme } = useTheme();
   const logout = useLogout();
 
   if (!isReady || isPending) return <PageLoader />;
   if (isError || !user) return <ErrorState onRetry={() => void refetch()} />;
 
   return (
-    <div className="mx-auto flex max-w-sm flex-col gap-4 py-12">
-      <h1 className="text-2xl font-bold text-foreground">{t('account.title')}</h1>
-      <Card>
-        <CardTitle>{user.fullName}</CardTitle>
-        <CardContent className="flex flex-col gap-1 text-sm text-foreground-soft">
-          <p>{user.phone}</p>
-          {user.isVerified ? <p className="text-live">{t('account.verified')}</p> : null}
-        </CardContent>
-      </Card>
+    <>
+      <ScreenHeader title={t('account.title')} isRoot />
 
-      <nav aria-label={t('account.quickLinks')} className="flex flex-col gap-1">
-        <Link
-          href={ROUTES.addressesList}
-          className="text-sm font-medium text-accent hover:underline"
-        >
-          {t('account.addresses')}
-        </Link>
-        <Link href={ROUTES.myBids} className="text-sm font-medium text-accent hover:underline">
-          {t('account.myBids')}
-        </Link>
-        <Link
-          href={ROUTES.watchlistList}
-          className="text-sm font-medium text-accent hover:underline"
-        >
-          {t('account.watchlist')}
-        </Link>
-        <Link href={ROUTES.following} className="text-sm font-medium text-accent hover:underline">
-          {t('account.following')}
-        </Link>
-      </nav>
+      <div className="flex flex-col gap-4 px-gutter pb-6">
+        <Card isInset className="flex items-center gap-3">
+          <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary">
+            <Icon name="user-round" size={26} />
+          </span>
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <p className="truncate text-title-3 font-bold text-foreground">{user.fullName}</p>
+            <p className="text-footnote text-muted-foreground tabular-nums">{user.phone}</p>
+          </div>
+          {user.isVerified ? (
+            <Badge tone="live" className="shrink-0">
+              {t('account.verified')}
+            </Badge>
+          ) : null}
+        </Card>
 
-      <Button variant="outline" isLoading={logout.isPending} onClick={() => logout.mutate()}>
-        {t('account.signOut')}
-      </Button>
-    </div>
+        <Card hasShadow className="overflow-hidden">
+          <ListRow icon="gavel" title={t('account.myBids')} href={ROUTES.myBids} />
+          <ListRow icon="badge-check" title={t('account.wins')} href={ROUTES.wins} />
+          <ListRow icon="package" title={t('account.orders')} href={ROUTES.orders} />
+          <ListRow icon="heart" title={t('account.watchlist')} href={ROUTES.watchlistList} />
+          <ListRow icon="store" title={t('account.following')} href={ROUTES.following} />
+          <ListRow icon="map-pin" title={t('account.addresses')} href={ROUTES.addressesList} />
+          <ListRow
+            icon="bell"
+            title={tCommon('nav.notifications')}
+            href={ROUTES.notifications}
+            isLast
+          />
+        </Card>
+
+        {/* Preferences toggle in place rather than pushing a screen — one tap, no navigation. */}
+        <Card hasShadow className="overflow-hidden">
+          <ListRow
+            icon={theme === 'dark' ? 'moon' : 'sun'}
+            iconTone="fill"
+            title={tCommon('theme.label')}
+            value={theme === 'dark' ? tCommon('theme.dark') : tCommon('theme.light')}
+            hasChevron={false}
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          />
+          <ListRow
+            icon="eye"
+            iconTone="fill"
+            title={tCommon('locale.label')}
+            value={locale === 'ar' ? tCommon('locale.ar') : tCommon('locale.en')}
+            hasChevron={false}
+            isLast
+            onClick={() => changeLocale(locale === 'ar' ? 'en' : 'ar')}
+          />
+        </Card>
+
+        <Button
+          variant="gray"
+          size="lg"
+          isFullWidth
+          isLoading={logout.isPending}
+          onClick={() => logout.mutate()}
+        >
+          {t('account.signOut')}
+        </Button>
+      </div>
+    </>
   );
 }

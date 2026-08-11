@@ -28,6 +28,17 @@ export const QUERY_KEYS = {
   watchlist: {
     list: ['watchlist', 'list'] as const,
   },
+  wins: {
+    list: ['wins', 'list'] as const,
+  },
+  orders: {
+    list: ['orders', 'list'] as const,
+    detail: (id: string) => ['orders', 'detail', id] as const,
+  },
+  notifications: {
+    list: ['notifications', 'list'] as const,
+    unreadCount: ['notifications', 'unreadCount'] as const,
+  },
   sellers: {
     profile: (id: string) => ['sellers', 'profile', id] as const,
     // A static key, not a filters factory — GET /me/following has no pagination UI in this pass,

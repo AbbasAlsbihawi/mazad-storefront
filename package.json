@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "next dev -p 5173",
     "build": "next build",
+    "icons:generate": "node scripts/generate-icons.mjs",
     "start": "next start",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",

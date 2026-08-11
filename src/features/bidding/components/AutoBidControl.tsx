@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@shared/components/ui';
 import { getErrorCode } from '@shared/lib';
 import { autoBidFormSchema } from '../schemas/bidding.schema';
@@ -50,7 +50,7 @@ export function AutoBidControl({ auctionId }: AutoBidControlProps) {
           {t('autoBid.active', { amount: active.maxAmount })}
         </span>
         <Button
-          variant="ghost"
+          variant="plain"
           size="sm"
           isLoading={cancelAutoBid.isPending}
           onClick={() => cancelAutoBid.mutate(undefined, { onSuccess: () => setActive(null) })}
@@ -63,7 +63,7 @@ export function AutoBidControl({ auctionId }: AutoBidControlProps) {
 
   if (!isExpanded) {
     return (
-      <Button variant="ghost" size="sm" onClick={() => setIsExpanded(true)}>
+      <Button variant="plain" size="sm" onClick={() => setIsExpanded(true)}>
         {t('autoBid.setUp')}
       </Button>
     );
@@ -87,7 +87,7 @@ export function AutoBidControl({ auctionId }: AutoBidControlProps) {
         <Button type="submit" size="sm" isLoading={setAutoBid.isPending}>
           {t('autoBid.submit')}
         </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={() => setIsExpanded(false)}>
+        <Button type="button" variant="plain" size="sm" onClick={() => setIsExpanded(false)}>
           {t('form.cancel')}
         </Button>
       </div>

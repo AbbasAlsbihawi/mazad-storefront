@@ -1,5 +1,5 @@
 import i18next from 'i18next';
-import { initReactI18next } from 'node_modules/react-i18next';
+import { initReactI18next } from 'react-i18next';
 import commonEn from './common/en.json';
 import commonAr from './common/ar.json';
 

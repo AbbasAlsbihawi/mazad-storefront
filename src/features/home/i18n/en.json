@@ -1,13 +1,20 @@
 {
-  "title": "Live now",
+  "title": "Mazad",
   "sections": {
     "live": "Live now",
     "endingSoon": "Ending soon",
-    "upcoming": "Starting soon"
+    "upcoming": "Starting soon",
+    "categories": "Categories"
   },
   "empty": {
     "live": "No live auctions right now.",
     "endingSoon": "Nothing ending in the next hour.",
     "upcoming": "No upcoming auctions scheduled."
+  },
+  "viewAll": "View all",
+  "promo": {
+    "title": "Bid on what you want",
+    "subtitle": "Live auctions from verified sellers across Iraq",
+    "cta": "Browse auctions"
   }
 }

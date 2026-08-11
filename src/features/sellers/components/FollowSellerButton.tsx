@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@shared/components/ui';
 import { useIsAuthenticated } from '@shared/hooks';
 import { getErrorCode } from '@shared/lib';
@@ -39,7 +39,7 @@ export function FollowSellerButton({ sellerId }: FollowSellerButtonProps) {
     <div className="flex flex-col gap-1">
       <Button
         type="button"
-        variant={isFollowing ? 'outline' : 'default'}
+        variant={isFollowing ? 'outline' : 'filled'}
         size="sm"
         isLoading={toggle.isPending}
         onClick={handleClick}

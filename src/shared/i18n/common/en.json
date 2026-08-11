@@ -5,10 +5,26 @@
     "signIn": "Sign in",
     "register": "Register",
     "account": "Account",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "back": "Back",
+    "main": "Main navigation",
+    "notifications": "Notifications"
   },
-  "theme": { "light": "Light", "dark": "Dark" },
-  "locale": { "en": "English", "ar": "العربية" },
+  "tabs": {
+    "home": "Home",
+    "browse": "Browse",
+    "bids": "My bids",
+    "watchlist": "Watchlist",
+    "account": "Account"
+  },
+  "search": {
+    "label": "Search auctions",
+    "placeholder": "Search…",
+    "clear": "Clear search",
+    "filter": "Filters"
+  },
+  "theme": { "light": "Light", "dark": "Dark", "label": "Appearance" },
+  "locale": { "en": "English", "ar": "العربية", "label": "Language" },
   "auctionStatus": {
     "live": "Live",
     "endingSoon": "Ending soon",
@@ -18,6 +34,7 @@
   "state": {
     "loading": "Loading…",
     "error": "Something went wrong.",
+    "errorDetail": "That content wouldn't load. Try again.",
     "retry": "Try again",
     "empty": "Nothing here yet."
   },

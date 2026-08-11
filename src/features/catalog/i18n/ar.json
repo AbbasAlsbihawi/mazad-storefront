@@ -2,6 +2,14 @@
   "browse": {
     "title": "المزادات",
     "empty": "لا توجد مزادات مطابقة لعوامل التصفية.",
+    "emptyTitle": "لا نتائج",
+    "clearFilters": "مسح التصفية",
+    "results_zero": "{{formattedCount}} نتيجة",
+    "results_one": "نتيجة واحدة",
+    "results_two": "نتيجتان",
+    "results_few": "{{formattedCount}} نتائج",
+    "results_many": "{{formattedCount}} نتيجة",
+    "results_other": "{{formattedCount}} نتيجة",
     "filters": {
       "all": "الكل",
       "live": "مباشر",
@@ -12,12 +20,12 @@
   "detail": {
     "startingPrice": "سعر البدء",
     "currentBid": "أعلى مزايدة",
-    "bids_zero": "{{count}} مزايدات",
-    "bids_one": "{{count}} مزايدة",
-    "bids_two": "{{count}} مزايدتان",
-    "bids_few": "{{count}} مزايدات",
-    "bids_many": "{{count}} مزايدة",
-    "bids_other": "{{count}} مزايدة",
+    "bids_zero": "{{formattedCount}} مزايدات",
+    "bids_one": "{{formattedCount}} مزايدة",
+    "bids_two": "{{formattedCount}} مزايدتان",
+    "bids_few": "{{formattedCount}} مزايدات",
+    "bids_many": "{{formattedCount}} مزايدة",
+    "bids_other": "{{formattedCount}} مزايدة",
     "endsIn": "ينتهي خلال",
     "ended": "انتهى",
     "seller": "البائع",
@@ -27,7 +35,15 @@
     "bidHistory": "سجل المزايدات",
     "noBids": "لا توجد مزايدات بعد.",
     "similar": "مزادات مشابهة",
-    "notFound": "المزاد غير موجود."
+    "notFound": "المزاد غير موجود.",
+    "title": "تفاصيل المزاد",
+    "share": "مشاركة",
+    "tabs": {
+      "details": "التفاصيل",
+      "bids": "المزايدات",
+      "seller": "البائع"
+    },
+    "yourBid": "مزايدتك"
   },
   "condition": {
     "NEW": "جديد",
@@ -38,6 +54,7 @@
   "store": {
     "deliveryFee": "رسوم التوصيل",
     "activeAuctions": "مزادات هذا المتجر",
-    "notFound": "المتجر غير موجود."
+    "notFound": "المتجر غير موجود.",
+    "title": "المتجر"
   }
 }

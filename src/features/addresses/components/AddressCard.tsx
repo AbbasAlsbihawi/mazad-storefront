@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, CardContent, Badge } from '@shared/components/ui';
 import { getErrorCode } from '@shared/lib';
 import { useDeleteAddress } from '../hooks/useDeleteAddress';
@@ -69,12 +69,12 @@ export function AddressCard({ address }: AddressCardProps) {
               >
                 {t('list.confirmDelete')}
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => setMode('view')}>
+              <Button variant="plain" size="sm" onClick={() => setMode('view')}>
                 {t('form.cancel')}
               </Button>
             </>
           ) : (
-            <Button variant="ghost" size="sm" onClick={() => setMode('confirmDelete')}>
+            <Button variant="plain" size="sm" onClick={() => setMode('confirmDelete')}>
               {t('list.delete')}
             </Button>
           )}

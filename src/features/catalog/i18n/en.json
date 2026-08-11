@@ -2,6 +2,10 @@
   "browse": {
     "title": "Auctions",
     "empty": "No auctions match your filters.",
+    "emptyTitle": "No results",
+    "clearFilters": "Clear filters",
+    "results_one": "{{formattedCount}} result",
+    "results_other": "{{formattedCount}} results",
     "filters": {
       "all": "All",
       "live": "Live",
@@ -12,8 +16,8 @@
   "detail": {
     "startingPrice": "Starting price",
     "currentBid": "Current bid",
-    "bids_one": "{{count}} bid",
-    "bids_other": "{{count}} bids",
+    "bids_one": "{{formattedCount}} bid",
+    "bids_other": "{{formattedCount}} bids",
     "endsIn": "Ends in",
     "ended": "Ended",
     "seller": "Seller",
@@ -23,7 +27,15 @@
     "bidHistory": "Bid history",
     "noBids": "No bids yet.",
     "similar": "Similar auctions",
-    "notFound": "Auction not found."
+    "notFound": "Auction not found.",
+    "title": "Auction",
+    "share": "Share",
+    "tabs": {
+      "details": "Details",
+      "bids": "Bids",
+      "seller": "Seller"
+    },
+    "yourBid": "Your bid"
   },
   "condition": {
     "NEW": "New",
@@ -34,6 +46,7 @@
   "store": {
     "deliveryFee": "Delivery fee",
     "activeAuctions": "Auctions from this store",
-    "notFound": "Store not found."
+    "notFound": "Store not found.",
+    "title": "Store"
   }
 }

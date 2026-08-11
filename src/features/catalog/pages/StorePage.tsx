@@ -3,14 +3,15 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { PageLoader, ErrorState, EmptyState } from '@shared/components/feedback';
-import { Card, CardContent, CardTitle } from '@shared/components/ui';
+import { ScreenHeader } from '@shared/components/layout';
+import { Card, CardContent, Icon, SectionHeader } from '@shared/components/ui';
 import { ROUTES } from '@shared/constants';
-import { useLocale } from '@shared/hooks';
-import { formatMoney, pickLocalizedName } from '@shared/lib';
+import { useLocale, useMoney } from '@shared/hooks';
+import { pickLocalizedName } from '@shared/lib';
 import { useCatalogTranslation } from '../hooks/useCatalogTranslation';
 import { useStore } from '../hooks/useStore';
 import { useStoreAuctions } from '../hooks/useStoreAuctions';
-import { AuctionGrid } from '@shared/components/cards';
+import { AuctionGrid, AuctionGridSkeleton } from '@shared/components/cards';
 
 export interface StorePageProps {
   id: string;
@@ -20,6 +21,7 @@ export interface StorePageProps {
 export function StorePage({ id, renderSellerFollowToggle }: StorePageProps) {
   const { t, isReady } = useCatalogTranslation();
   const { locale } = useLocale();
+  const { money } = useMoney();
   const store = useStore(id);
   const auctions = useStoreAuctions(id);
 
@@ -31,42 +33,61 @@ export function StorePage({ id, renderSellerFollowToggle }: StorePageProps) {
   const data = store.data;
 
   return (
-    <div className="flex flex-col gap-6 py-6">
-      <Card>
-        <CardTitle>{pickLocalizedName(data, locale)}</CardTitle>
-        <CardContent className="flex flex-col gap-1 text-sm text-foreground-soft">
-          <p>
-            {data.city}
-            {data.area ? `, ${data.area}` : ''}
-          </p>
-          {data.contactPhone ? <p>{data.contactPhone}</p> : null}
-          <p>
-            {t('store.deliveryFee')}: {formatMoney(data.deliveryFee)}
-          </p>
-          <div className="flex items-center gap-2">
-            <Link
-              href={ROUTES.sellerProfile(data.seller.id)}
-              className="text-accent hover:underline"
-            >
-              {data.seller.fullName}
-            </Link>
-            {renderSellerFollowToggle?.(data.seller.id)}
-          </div>
-        </CardContent>
-      </Card>
+    <>
+      <ScreenHeader title={t('store.title')} backHref={ROUTES.auctions} />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-foreground">{t('store.activeAuctions')}</h2>
-        {auctions.isPending ? (
-          <PageLoader />
-        ) : auctions.isError ? (
-          <ErrorState onRetry={() => void auctions.refetch()} />
-        ) : auctions.data.data.length === 0 ? (
-          <EmptyState message={t('browse.empty')} />
-        ) : (
-          <AuctionGrid auctions={auctions.data.data} />
-        )}
-      </section>
-    </div>
+      <div className="flex flex-col gap-5 px-gutter pb-6">
+        <Card isInset className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-primary">
+              <Icon name="store" size={24} />
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <p className="truncate text-title-3 font-bold text-foreground">
+                {pickLocalizedName(data, locale)}
+              </p>
+              <p className="truncate text-footnote text-muted-foreground">
+                {data.city}
+                {data.area ? `, ${data.area}` : ''}
+              </p>
+            </div>
+          </div>
+
+          <CardContent className="flex flex-col gap-2 p-0 text-subhead">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">{t('store.deliveryFee')}</span>
+              <span className="font-medium text-foreground tabular-nums">
+                {money(data.deliveryFee)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground">{t('detail.seller')}</span>
+              <span className="flex items-center gap-2">
+                <Link
+                  href={ROUTES.sellerProfile(data.seller.id)}
+                  className="font-semibold text-primary-text"
+                >
+                  {data.seller.fullName}
+                </Link>
+                {renderSellerFollowToggle?.(data.seller.id)}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <section>
+          <SectionHeader title={t('store.activeAuctions')} />
+          {auctions.isPending ? (
+            <AuctionGridSkeleton count={4} />
+          ) : auctions.isError ? (
+            <ErrorState onRetry={() => void auctions.refetch()} />
+          ) : auctions.data.data.length === 0 ? (
+            <EmptyState icon="gavel" message={t('browse.empty')} />
+          ) : (
+            <AuctionGrid auctions={auctions.data.data} />
+          )}
+        </section>
+      </div>
+    </>
   );
 }

@@ -1,0 +1,50 @@
+{
+  "page": {
+    "title": "مزاداتي الفائزة",
+    "emptyTitle": "لا مزادات فائزة",
+    "empty": "عندما تفوز بمزاد سيظهر هنا لتأكيده."
+  },
+  "sections": {
+    "pending": "بانتظار التأكيد",
+    "settled": "مؤكدة ومنتهية"
+  },
+  "card": {
+    "amount": "المبلغ",
+    "deadline": "يجب التأكيد خلال",
+    "expired": "انتهت مهلة التأكيد",
+    "viewOrder": "عرض الطلب"
+  },
+  "confirm": {
+    "title": "تأكيد الاستلام",
+    "description": "اختر عنوان التوصيل. سيُنشأ طلب منفصل لكل متجر.",
+    "address": "عنوان التوصيل",
+    "note": "ملاحظة للبائع",
+    "notePlaceholder": "اختياري",
+    "submit": "تأكيد",
+    "decline": "رفض",
+    "declineConfirm": "سيُلغى فوزك بهذا المزاد. متأكد؟",
+    "noAddress": "تحتاج إلى عنوان توصيل محفوظ قبل التأكيد.",
+    "addAddress": "إضافة عنوان",
+    "selected_zero": "{{formattedCount}} مزادات مختارة",
+    "selected_one": "مزاد واحد مختار",
+    "selected_two": "مزادان مختاران",
+    "selected_few": "{{formattedCount}} مزادات مختارة",
+    "selected_many": "{{formattedCount}} مزادًا مختارًا",
+    "selected_other": "{{formattedCount}} مزاد مختار"
+  },
+  "status": {
+    "PENDING_CONFIRMATION": "بانتظار التأكيد",
+    "CONFIRMED": "مؤكد",
+    "DECLINED": "مرفوض",
+    "EXPIRED": "منتهٍ"
+  },
+  "toast": {
+    "confirmed": "تم تأكيد الفوز",
+    "declined": "تم رفض الفوز"
+  },
+  "errors": {
+    "WIN_EXPIRED": "انتهت مهلة التأكيد لهذا المزاد.",
+    "WIN_NOT_FOUND": "لم يعد هذا الفوز متاحًا.",
+    "ADDRESS_NOT_FOUND": "العنوان المختار غير موجود."
+  }
+}

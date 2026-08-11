@@ -5,10 +5,26 @@
     "signIn": "تسجيل الدخول",
     "register": "إنشاء حساب",
     "account": "الحساب",
-    "signOut": "تسجيل الخروج"
+    "signOut": "تسجيل الخروج",
+    "back": "رجوع",
+    "main": "التنقل الرئيسي",
+    "notifications": "الإشعارات"
   },
-  "theme": { "light": "فاتح", "dark": "داكن" },
-  "locale": { "en": "English", "ar": "العربية" },
+  "tabs": {
+    "home": "الرئيسية",
+    "browse": "تصفّح",
+    "bids": "مزايداتي",
+    "watchlist": "المفضلة",
+    "account": "الحساب"
+  },
+  "search": {
+    "label": "ابحث في المزادات",
+    "placeholder": "ابحث…",
+    "clear": "مسح البحث",
+    "filter": "تصفية"
+  },
+  "theme": { "light": "فاتح", "dark": "داكن", "label": "المظهر" },
+  "locale": { "en": "English", "ar": "العربية", "label": "اللغة" },
   "auctionStatus": {
     "live": "مباشر",
     "endingSoon": "ينتهي قريبًا",
@@ -17,7 +33,8 @@
   },
   "state": {
     "loading": "جارٍ التحميل…",
-    "error": "حدث خطأ ما.",
+    "error": "حدث خطأ ما",
+    "errorDetail": "تعذّر تحميل المحتوى. حاول مرة أخرى.",
     "retry": "إعادة المحاولة",
     "empty": "لا يوجد شيء هنا بعد."
   },

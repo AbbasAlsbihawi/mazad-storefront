@@ -1,29 +1,34 @@
 'use client';
 
-import { PageLoader, ErrorState, EmptyState } from '@shared/components/feedback';
+import { ErrorState, EmptyState, PageLoader } from '@shared/components/feedback';
+import { ScreenHeader } from '@shared/components/layout';
+import { AuctionGrid, AuctionGridSkeleton } from '@shared/components/cards';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { useWatchlistTranslation } from '../hooks/useWatchlistTranslation';
-import { WatchlistItemRow } from '../components/WatchlistItemRow';
 
 export function WatchlistPage() {
   const { t, isReady } = useWatchlistTranslation();
   const { data, isPending, isError, refetch } = useWatchlist();
 
-  if (!isReady || isPending) return <PageLoader />;
-  if (isError || !data) return <ErrorState onRetry={() => void refetch()} />;
+  if (!isReady) return <PageLoader />;
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-4 py-12">
-      <h1 className="text-2xl font-bold text-foreground">{t('page.title')}</h1>
-      {data.data.length === 0 ? (
-        <EmptyState message={t('page.empty')} />
-      ) : (
-        <div className="flex flex-col gap-3">
-          {data.data.map((item) => (
-            <WatchlistItemRow key={item.auctionId} item={item} />
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <ScreenHeader title={t('page.title')} isRoot />
+
+      <div className="px-gutter pb-6">
+        {isPending ? (
+          <AuctionGridSkeleton count={4} />
+        ) : isError || !data ? (
+          <ErrorState onRetry={() => void refetch()} />
+        ) : data.data.length === 0 ? (
+          <EmptyState icon="heart" title={t('page.emptyTitle')} message={t('page.empty')} />
+        ) : (
+          // The same card as everywhere else, so the heart that removes an item is the same
+          // control that added it.
+          <AuctionGrid auctions={data.data.map((item) => item.auction)} />
+        )}
+      </div>
+    </>
   );
 }

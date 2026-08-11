@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Button, Input } from '@shared/components/ui';
 import { getErrorCode } from '@shared/lib';
 import { loginSchema } from '../schemas/auth.schema';

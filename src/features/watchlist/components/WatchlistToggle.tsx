@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, type MouseEvent } from 'react';
-import { Button } from '@shared/components/ui';
+import { Icon } from '@shared/components/ui';
 import { useIsAuthenticated } from '@shared/hooks';
+import { cn } from '@shared/lib';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { useToggleWatch } from '../hooks/useToggleWatch';
 import { useWatchlistTranslation } from '../hooks/useWatchlistTranslation';
@@ -35,36 +36,26 @@ export function WatchlistToggle({ auctionId }: WatchlistToggleProps) {
     toggle.mutate(next, { onError: () => setOptimisticOverride(!next) });
   };
 
+  // A 32pt glass control inside a 44pt transparent hit area: the touch target clears the
+  // minimum without the visual crowding the card art (design system, AuctionCard anatomy).
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="icon"
       aria-pressed={isWatching}
       aria-label={isWatching ? t('toggle.remove') : t('toggle.add')}
       onClick={handleClick}
-      className="bg-surface/80 backdrop-blur-sm hover:bg-surface"
+      className="inline-flex size-touch items-center justify-center"
     >
-      <HeartIcon filled={isWatching} />
-    </Button>
-  );
-}
-
-function HeartIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth="2"
-      className="h-4 w-4 text-accent"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 21s-7.5-4.6-10-9.3C.5 8 2 4.5 5.5 4A5.5 5.5 0 0112 7a5.5 5.5 0 016.5-3c3.5.5 5 4 3.5 7.7C19.5 16.4 12 21 12 21z"
-      />
-    </svg>
+      <span
+        className={cn(
+          'inline-flex size-8 items-center justify-center rounded-full',
+          'bg-surface/82 shadow-card backdrop-blur-chrome',
+          'transition-opacity duration-fast ease-ios active:opacity-72',
+          isWatching ? 'text-primary' : 'text-foreground-soft',
+        )}
+      >
+        <Icon name="heart" size={16} isFilled={isWatching} />
+      </span>
+    </button>
   );
 }

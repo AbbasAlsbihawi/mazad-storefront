@@ -1,0 +1,8 @@
+{
+  "page": {
+    "title": "Notifications",
+    "emptyTitle": "No notifications",
+    "empty": "Bid and order alerts will arrive here.",
+    "markAllRead": "Mark all as read"
+  }
+}

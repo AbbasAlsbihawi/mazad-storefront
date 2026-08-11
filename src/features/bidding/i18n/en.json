@@ -9,7 +9,10 @@
     "amountWithMinimum": "Your bid (min. {{amount}})",
     "placeBid": "Place bid",
     "buyNow": "Buy now for {{amount}}",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "decrease": "Decrease amount",
+    "increase": "Increase amount",
+    "minimumHint": "Minimum bid {{amount}}"
   },
   "autoBid": {
     "setUp": "Set up auto-bid",
@@ -20,10 +23,16 @@
   },
   "myBids": {
     "title": "My bids",
-    "empty": "You haven't bid on any auctions yet.",
+    "empty": "Bid on an auction and it will show up here.",
     "yourBid": "Your bid: {{amount}}",
     "filters": {
       "all": "All"
+    },
+    "emptyTitle": "No bids yet",
+    "segments": {
+      "active": "Active",
+      "won": "Winning",
+      "ended": "Ended"
     }
   },
   "standing": {
@@ -34,7 +43,7 @@
     "LOST": "Lost"
   },
   "toast": {
-    "bidPlaced": "Bid placed.",
+    "bidPlaced": "Bid placed",
     "boughtNow": "Purchase confirmed.",
     "autoBidSet": "Auto-bid set.",
     "autoBidCancelled": "Auto-bid turned off."

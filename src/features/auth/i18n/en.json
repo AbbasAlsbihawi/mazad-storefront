@@ -25,7 +25,9 @@
     "myBids": "My bids",
     "watchlist": "Watchlist",
     "following": "Sellers you follow",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "wins": "My wins",
+    "orders": "My orders"
   },
   "errors": {
     "field": {

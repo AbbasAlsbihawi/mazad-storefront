@@ -20,6 +20,30 @@ Inlined at build time, so a change needs a rebuild:
 
 Local development reads `.env.local`; `.env.example` documents what is required.
 
+## PWA
+
+The app is installable. Three pieces make that work:
+
+| File                  | Role                                                                                                                                      |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/manifest.ts` | Served as `/manifest.webmanifest`. Name, `display: standalone`, portrait, RTL, theme colours, icon set.                                   |
+| `public/sw.js`        | Service worker. Registered in production only, by `ServiceWorkerRegistrar` in `AppProviders`.                                             |
+| `public/offline.html` | Standalone fallback page — no app CSS, no webfont, no `localStorage` theme, since none of that is guaranteed to be there when it renders. |
+
+**The service worker never caches API responses, and that is deliberate.** In a live auction, a cached price, bid count or countdown is not a stale convenience — it can show a closed lot as open, or a losing bid as winning. Only two things are cached: `/_next/static/**`, which is content-hashed and cannot go stale, and the offline page. Navigations are network-first and fall back to the offline notice. Keep it that way when extending it.
+
+After changing `sw.js`, bump `CACHE` (`mazad-static-v1` → `-v2`). The `activate` handler deletes every cache that isn't the current name, so old entries clear themselves on the next visit.
+
+Icons are generated from the Mazad mark, not hand-drawn:
+
+```bash
+npm run icons:generate
+```
+
+`scripts/generate-icons.mjs` rasterises the mark into `public/` (favicon, 192, 512, maskable 512, apple-touch 180). It duplicates the geometry in `shared/components/ui/Logo.tsx` — re-run it if the mark or `--color-primary` changes, and commit the PNGs.
+
+`viewport-fit=cover` is set in `src/app/layout.tsx`. It is what makes `env(safe-area-inset-*)` report real values; without it the floating tab bar sits on top of the home indicator.
+
 ## Vercel (Recommended)
 
 1. Connect the GitHub repo to Vercel.

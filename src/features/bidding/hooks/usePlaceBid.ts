@@ -2,22 +2,24 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@shared/constants';
-import { useToast } from '@shared/hooks';
+import { useLocale, useToast } from '@shared/hooks';
+import { formatMoney } from '@shared/lib';
 import { biddingApi } from '../api/bidding.api';
 import { useBiddingTranslation } from './useBiddingTranslation';
 
 export function usePlaceBid(auctionId: string) {
   const queryClient = useQueryClient();
   const toast = useToast();
+  const { locale } = useLocale();
   const { t } = useBiddingTranslation();
 
   return useMutation({
     mutationFn: (amount: number) => biddingApi.placeBid(auctionId, amount),
-    onSuccess: () => {
+    onSuccess: (_data, submittedAmount) => {
       // The response's own id/amount can silently belong to another bidder's auto-bid
-      // counter-offer (see bidding.schema.ts) — show a neutral toast and reconcile from fresh
-      // fetches rather than rendering "your bid of X" from the mutation payload.
-      toast.success(t('toast.bidPlaced'));
+      // counter-offer (see bidding.schema.ts), so the confirmation echoes what *this* user
+      // submitted and the real standing is reconciled from the refetches below.
+      toast.bid(t('toast.bidPlaced'), formatMoney(String(submittedAmount), locale));
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.catalog.auction(auctionId) });
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.catalog.auctionBids(auctionId) });
       void queryClient.invalidateQueries({

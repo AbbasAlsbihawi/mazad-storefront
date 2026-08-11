@@ -24,7 +24,7 @@ export function FollowingListRow({ item }: FollowingListRowProps) {
         {item.seller.fullName}
       </Link>
       <Button
-        variant="ghost"
+        variant="plain"
         size="sm"
         isLoading={toggle.isPending}
         onClick={() => toggle.mutate(false)}

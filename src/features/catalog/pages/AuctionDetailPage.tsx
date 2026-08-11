@@ -2,25 +2,29 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
-import { useTranslation } from 'node_modules/react-i18next';
+import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@shared/constants';
 import { PageLoader, ErrorState } from '@shared/components/feedback';
-import { Badge, Card, CardContent } from '@shared/components/ui';
-import { useLocale, useServerClock } from '@shared/hooks';
+import { Badge, Card, CardContent, Icon, IconButton, SectionHeader } from '@shared/components/ui';
+import { SegmentedControl } from '@shared/components/ios';
+import { AuctionRail } from '@shared/components/cards';
+import { useLocale, useMoney, useServerClock } from '@shared/hooks';
 import {
-  formatMoney,
-  pickLocalizedName,
-  getAuctionStatusTone,
+  formatDuration,
   getAuctionStatusLabelKey,
+  getAuctionStatusTone,
+  getImageTintStyle,
+  pickLocalizedName,
+  resolveAssetUrl,
 } from '@shared/lib';
 import { useCatalogTranslation } from '../hooks/useCatalogTranslation';
 import { useAuction } from '../hooks/useAuction';
 import { useAuctionBids } from '../hooks/useAuctionBids';
 import { useSimilarAuctions } from '../hooks/useSimilarAuctions';
-import { Countdown } from '../components/Countdown';
 import { BidHistoryList } from '../components/BidHistoryList';
-import { AuctionGrid } from '@shared/components/cards';
+
+type DetailTab = 'details' | 'bids' | 'seller';
 
 export interface AuctionDetailPageProps {
   id: string;
@@ -39,6 +43,9 @@ export function AuctionDetailPage({
   const { t: tCommon } = useTranslation('common');
   const { locale } = useLocale();
   const { now } = useServerClock();
+  const { money, number } = useMoney();
+  const [tab, setTab] = useState<DetailTab>('details');
+
   const auction = useAuction(id);
   const bids = useAuctionBids(id, auction.data?.status === 'LIVE');
   const similar = useSimilarAuctions(id);
@@ -50,101 +57,174 @@ export function AuctionDetailPage({
 
   const data = auction.data;
   const name = pickLocalizedName(data.product, locale);
+  const coverImage = resolveAssetUrl(data.product.coverImage);
   const price = data.currentPrice ?? data.startingPrice;
   const endsInMs = new Date(data.endsAt).getTime() - now();
   const tone = getAuctionStatusTone(data.status, endsInMs);
+  const isLive = data.status === 'LIVE';
 
   return (
-    <div className="flex flex-col gap-8 py-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-surface-raised">
-          {data.product.coverImage ? (
-            <Image
-              src={data.product.coverImage}
-              alt={name}
-              fill
-              sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover"
-            />
-          ) : null}
-        </div>
+    // Clears the pinned bottom action bar the bidding panel renders.
+    <div className="pb-28">
+      {/* Image well — full-bleed pastel tint with the glass controls floating over it. */}
+      <div
+        className="relative h-52 w-full"
+        style={coverImage ? undefined : getImageTintStyle(data.product.id)}
+      >
+        {coverImage ? (
+          <Image src={coverImage} alt={name} fill sizes="100vw" className="object-cover" priority />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center text-foreground/22">
+            <Icon name="package" size={92} />
+          </span>
+        )}
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-start justify-between gap-2">
-            <h1 className="text-2xl font-bold text-foreground">{name}</h1>
+        <div className="absolute inset-x-3 top-3 flex items-center justify-between">
+          <BackButton label={tCommon('nav.back')} />
+          <div className="flex items-center gap-2">
+            <ShareButton label={t('detail.share')} />
             {watchlistToggle}
           </div>
-
-          <div className="flex items-center gap-2">
-            <Badge tone={tone}>{tCommon(getAuctionStatusLabelKey(data.status, endsInMs))}</Badge>
-            {data.status === 'LIVE' ? (
-              <Countdown endsAt={data.endsAt} className="text-sm text-muted-foreground" />
-            ) : null}
-          </div>
-
-          <div>
-            <p className="text-sm text-muted-foreground">
-              {data.currentPrice ? t('detail.currentBid') : t('detail.startingPrice')}
-            </p>
-            <p className="text-3xl font-bold text-accent">{formatMoney(price)}</p>
-            <p className="text-sm text-muted-foreground">
-              {t('detail.bids', { count: data.bidCount })}
-            </p>
-          </div>
-
-          {biddingPanel}
-
-          <Card>
-            <CardContent className="flex flex-col gap-2 text-sm">
-              <Row label={t('detail.condition')} value={t(`condition.${data.product.condition}`)} />
-              <Row
-                label={t('detail.seller')}
-                value={
-                  <span className="flex items-center gap-2">
-                    <Link
-                      href={ROUTES.sellerProfile(data.seller.id)}
-                      className="text-accent hover:underline"
-                    >
-                      {data.seller.fullName}
-                    </Link>
-                    {renderSellerFollowToggle?.(data.seller.id)}
-                  </span>
-                }
-              />
-              <Row
-                label={t('detail.store')}
-                value={
-                  <Link href={ROUTES.store(data.store.id)} className="text-accent hover:underline">
-                    {pickLocalizedName(data.store, locale)}
-                  </Link>
-                }
-              />
-              <Row label={t('detail.deliveryFee')} value={formatMoney(data.store.deliveryFee)} />
-            </CardContent>
-          </Card>
         </div>
       </div>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-foreground">{t('detail.bidHistory')}</h2>
-        {bids.data ? <BidHistoryList bids={bids.data} /> : <PageLoader />}
-      </section>
+      {/* Content sheet — lifted over the image well with 28pt top corners. */}
+      <div className="relative -mt-6 rounded-t-[28px] bg-background px-gutter pt-5">
+        <div className="flex items-center gap-2">
+          <Badge tone={tone} hasDot={tone === 'live'}>
+            {tCommon(getAuctionStatusLabelKey(data.status, endsInMs))}
+          </Badge>
+          {isLive && endsInMs > 0 ? (
+            <span className="inline-flex items-center gap-1 text-footnote text-muted-foreground tabular-nums">
+              <Icon name="clock" size={14} />
+              {formatDuration(endsInMs)}
+            </span>
+          ) : null}
+        </div>
 
-      {similar.data && similar.data.length > 0 ? (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold text-foreground">{t('detail.similar')}</h2>
-          <AuctionGrid auctions={similar.data} />
-        </section>
-      ) : null}
+        <h1 className="mt-3 text-title-2 font-extrabold text-foreground">{name}</h1>
+
+        <div className="mt-4 flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-caption text-muted-foreground">
+              {data.currentPrice ? t('detail.currentBid') : t('detail.startingPrice')}
+            </p>
+            {/* Prices are bold near-black, never the accent. */}
+            <p className="text-large-title font-extrabold text-foreground tabular-nums">
+              {money(price)}
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 pb-1 text-footnote text-muted-foreground">
+            <Icon name="gavel" size={16} />
+            {t('detail.bids', { count: data.bidCount, formattedCount: number(data.bidCount) })}
+          </span>
+        </div>
+
+        {biddingPanel ? <div className="mt-4">{biddingPanel}</div> : null}
+
+        <SegmentedControl
+          className="mt-5"
+          label={t('detail.title')}
+          value={tab}
+          onChange={setTab}
+          segments={[
+            { id: 'details', label: t('detail.tabs.details') },
+            { id: 'bids', label: t('detail.tabs.bids') },
+            { id: 'seller', label: t('detail.tabs.seller') },
+          ]}
+        />
+
+        <Card className="mt-3">
+          <CardContent className="flex flex-col gap-3 text-subhead">
+            {tab === 'details' ? (
+              <>
+                <DetailRow
+                  label={t('detail.condition')}
+                  value={t(`condition.${data.product.condition}`)}
+                />
+                <DetailRow
+                  label={t('detail.deliveryFee')}
+                  value={money(data.store.deliveryFee)}
+                />
+              </>
+            ) : tab === 'bids' ? (
+              bids.data ? (
+                <BidHistoryList bids={bids.data} />
+              ) : (
+                <PageLoader />
+              )
+            ) : (
+              <>
+                <DetailRow
+                  label={t('detail.seller')}
+                  value={
+                    <span className="flex items-center gap-2">
+                      <Link
+                        href={ROUTES.sellerProfile(data.seller.id)}
+                        className="font-semibold text-primary-text"
+                      >
+                        {data.seller.fullName}
+                      </Link>
+                      {renderSellerFollowToggle?.(data.seller.id)}
+                    </span>
+                  }
+                />
+                <DetailRow
+                  label={t('detail.store')}
+                  value={
+                    <Link
+                      href={ROUTES.store(data.store.id)}
+                      className="font-semibold text-primary-text"
+                    >
+                      {pickLocalizedName(data.store, locale)}
+                    </Link>
+                  }
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
+
+        {similar.data && similar.data.length > 0 ? (
+          <section className="mt-6">
+            <SectionHeader title={t('detail.similar')} />
+            <AuctionRail auctions={similar.data} />
+          </section>
+        ) : null}
+      </div>
     </div>
   );
 }
 
-function Row({ label, value }: { label: string; value: ReactNode }) {
+function DetailRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium text-foreground">{value}</span>
     </div>
   );
+}
+
+function BackButton({ label }: { label: string }) {
+  return (
+    <IconButton
+      name="chevron-left"
+      className="rtl:[&>svg]:-scale-x-100"
+      label={label}
+      tone="glass"
+      onClick={() => window.history.back()}
+    />
+  );
+}
+
+function ShareButton({ label }: { label: string }) {
+  const handleShare = () => {
+    if (typeof navigator !== 'undefined' && 'share' in navigator) {
+      void navigator.share({ url: window.location.href }).catch(() => {
+        // The user dismissing the sheet rejects the promise — not an error worth surfacing.
+      });
+    }
+  };
+
+  return <IconButton name="share-2" label={label} tone="glass" onClick={handleShare} />;
 }

@@ -11,4 +11,8 @@ export const ROUTES = {
   watchlistList: '/account/watchlist',
   following: '/account/following',
   sellerProfile: (id: string) => `/sellers/${id}`,
+  notifications: '/account/notifications',
+  wins: '/account/wins',
+  orders: '/account/orders',
+  orderDetail: (id: string) => `/account/orders/${id}`,
 } as const;

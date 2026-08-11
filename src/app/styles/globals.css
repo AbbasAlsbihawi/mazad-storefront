@@ -1,69 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
 /*
- * Dark is the :root default; [data-theme='light'] overrides it (ADR-011). The pre-hydration
- * script in the root layout stamps data-theme before React mounts, so there's no flash.
- * System fonts only — no next/font/google fetch, so a network-isolated build can't fail on it,
- * and the stack covers Arabic (the default locale) via each platform's own Arabic system font.
+ * Light is the :root default; [data-theme='dark'] overrides it. Ported from the Mazad Design
+ * System — periwinkle-blue brand accent, Cairo typeface, full radius/shadow/motion scale,
+ * replacing the earlier dark-first/gold/system-font palette. The pre-hydration script in the
+ * root layout stamps data-theme before React mounts, so there's no flash either way (ADR-011
+ * still holds, only the default flipped).
+ *
+ * Cairo loads from Google Fonts at build/runtime — a deliberate, known trade-off against the
+ * project's earlier system-font-only choice (made so network-isolated builds couldn't fail on a
+ * font fetch). Self-hosting the .woff2 files removes that risk if it matters later.
  */
 :root {
-  --color-background: oklch(0.16 0.02 260);
-  --color-surface: oklch(0.21 0.02 260);
-  --color-surface-raised: oklch(0.26 0.02 260);
-  --color-foreground: oklch(0.96 0.01 260);
-  --color-foreground-soft: oklch(0.82 0.01 260);
-  --color-muted-foreground: oklch(0.62 0.02 260);
-  --color-border: oklch(1 0 0 / 12%);
-  --color-primary: oklch(0.78 0.14 85);
-  --color-primary-foreground: oklch(0.18 0.02 260);
-  --color-accent: oklch(0.78 0.14 85);
-  --color-live: oklch(0.72 0.19 145);
-  --color-live-foreground: oklch(0.16 0.05 145);
-  --color-info: oklch(0.7 0.14 240);
-  --color-info-foreground: oklch(0.16 0.05 240);
-  --color-warning: oklch(0.78 0.16 70);
-  --color-warning-foreground: oklch(0.16 0.05 70);
-  --color-destructive: oklch(0.62 0.21 25);
-  --color-destructive-foreground: oklch(0.97 0.01 25);
-  --color-ring: oklch(0.78 0.14 85);
+  /* brand */
+  --color-primary: #678af5;
+  --color-primary-pressed: #4a6fe0;
+  --color-primary-foreground: #ffffff;
+  --color-primary-tint: #edf1fe;
+  --color-primary-text: #3d5fcc;
+  --color-accent: #678af5;
+  --color-gold: oklch(0.76 0.13 80);
+
+  /* backgrounds + surfaces */
+  --color-background: oklch(0.976 0.003 260);
+  --color-surface: oklch(1 0 0);
+  --color-surface-raised: oklch(0.955 0.004 260);
+  --color-surface-sunken: oklch(0.93 0.005 260);
+  --color-scrim: oklch(0 0 0 / 45%);
+
+  /* labels */
+  --color-foreground: oklch(0.16 0.008 265);
+  --color-foreground-soft: oklch(0.42 0.01 265);
+  --color-muted-foreground: oklch(0.6 0.012 265);
+  --color-foreground-disabled: oklch(0.76 0.008 265);
+
+  /* lines + fills */
+  --color-border: oklch(0.16 0.008 265 / 10%);
+  --color-separator: oklch(0.16 0.008 265 / 8%);
+  --color-fill: oklch(0.16 0.008 265 / 5%);
+  --color-ring: #678af5;
+
+  /* semantic status */
+  /* Image wells. There is no product photography yet, so a missing photo falls back to a flat
+     pastel tint keyed on the product id (see lib/image-tint.ts) plus a muted glyph. Lightness and
+     chroma are tokens so dark mode can dim the whole family without touching the hues. */
+  --image-well-l: 0.93;
+  --image-well-c: 0.05;
+
+  /* semantic status */
+  --color-live: oklch(0.62 0.17 148);
+  --color-live-foreground: oklch(1 0 0);
+  --color-info: oklch(0.6 0.16 250);
+  --color-info-foreground: oklch(1 0 0);
+  --color-warning: oklch(0.72 0.17 60);
+  --color-warning-foreground: oklch(0.2 0.05 60);
+  --color-destructive: oklch(0.6 0.21 25);
+  --color-destructive-foreground: oklch(1 0 0);
+
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Arabic', Arial,
+    'Cairo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Arabic', Arial,
     sans-serif;
 }
 
-[data-theme='light'] {
-  --color-background: oklch(0.98 0.005 260);
-  --color-surface: oklch(1 0 0);
-  --color-surface-raised: oklch(0.96 0.005 260);
-  --color-foreground: oklch(0.18 0.02 260);
-  --color-foreground-soft: oklch(0.32 0.02 260);
-  --color-muted-foreground: oklch(0.5 0.02 260);
-  --color-border: oklch(0 0 0 / 10%);
-  --color-primary: oklch(0.6 0.15 85);
-  --color-primary-foreground: oklch(0.99 0.005 85);
-  --color-accent: oklch(0.55 0.15 85);
-  --color-live: oklch(0.52 0.17 145);
-  --color-live-foreground: oklch(0.98 0.01 145);
-  --color-info: oklch(0.52 0.14 240);
-  --color-info-foreground: oklch(0.98 0.01 240);
-  --color-warning: oklch(0.55 0.16 70);
-  --color-warning-foreground: oklch(0.98 0.01 70);
-  --color-destructive: oklch(0.55 0.21 25);
-  --color-destructive-foreground: oklch(0.98 0.01 25);
-  --color-ring: oklch(0.55 0.15 85);
+[data-theme='dark'] {
+  --color-primary: #8ba6f8;
+  --color-primary-pressed: #6e8dee;
+  --color-primary-foreground: #101b33;
+  --color-primary-tint: #28324f;
+  --color-primary-text: #a9befb;
+  --color-accent: #8ba6f8;
+  --color-gold: oklch(0.8 0.12 80);
+
+  --color-background: oklch(0.11 0.004 265);
+  --color-surface: oklch(0.17 0.006 265);
+  --color-surface-raised: oklch(0.22 0.007 265);
+  --color-surface-sunken: oklch(0.08 0.004 265);
+  --color-scrim: oklch(0 0 0 / 60%);
+
+  --color-foreground: oklch(0.98 0.002 265);
+  --color-foreground-soft: oklch(0.82 0.006 265);
+  --color-muted-foreground: oklch(0.63 0.01 265);
+  --color-foreground-disabled: oklch(0.45 0.008 265);
+
+  --color-border: oklch(1 0 0 / 14%);
+  --color-separator: oklch(1 0 0 / 10%);
+  --color-fill: oklch(1 0 0 / 8%);
+  --color-ring: #8ba6f8;
+
+  --image-well-l: 0.28;
+  --image-well-c: 0.04;
+
+  --color-live: oklch(0.74 0.18 148);
+  --color-live-foreground: oklch(0.14 0.04 148);
+  --color-info: oklch(0.72 0.14 250);
+  --color-info-foreground: oklch(0.14 0.04 250);
+  --color-warning: oklch(0.8 0.15 65);
+  --color-warning-foreground: oklch(0.16 0.05 65);
+  --color-destructive: oklch(0.68 0.2 25);
+  --color-destructive-foreground: oklch(0.14 0.04 25);
 }
 
 @theme inline {
   --color-background: var(--color-background);
   --color-surface: var(--color-surface);
   --color-surface-raised: var(--color-surface-raised);
+  --color-surface-sunken: var(--color-surface-sunken);
+  --color-scrim: var(--color-scrim);
   --color-foreground: var(--color-foreground);
   --color-foreground-soft: var(--color-foreground-soft);
   --color-muted-foreground: var(--color-muted-foreground);
+  --color-foreground-disabled: var(--color-foreground-disabled);
   --color-border: var(--color-border);
+  --color-separator: var(--color-separator);
+  --color-fill: var(--color-fill);
   --color-primary: var(--color-primary);
+  --color-primary-pressed: var(--color-primary-pressed);
   --color-primary-foreground: var(--color-primary-foreground);
+  --color-primary-tint: var(--color-primary-tint);
+  --color-primary-text: var(--color-primary-text);
   --color-accent: var(--color-accent);
+  --color-gold: var(--color-gold);
   --color-live: var(--color-live);
   --color-live-foreground: var(--color-live-foreground);
   --color-info: var(--color-info);
@@ -74,21 +131,171 @@
   --color-destructive-foreground: var(--color-destructive-foreground);
   --color-ring: var(--color-ring);
   --font-sans: var(--font-sans);
+
+  /* iOS-continuous-corner radii — deliberately overrides Tailwind's built-in rounded-sm/md/lg/xl
+     sizes app-wide, so every existing usage picks up the new geometry with no per-file change. */
+  --radius-xs: 8px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-sheet: 28px;
+
+  /* elevation — soft, warm-neutral, never harsh; cards use shadow instead of a border now */
+  --shadow-card: 0 1px 2px oklch(0.16 0.008 265 / 4%), 0 6px 20px oklch(0.16 0.008 265 / 6%);
+  --shadow-raised: 0 2px 6px oklch(0.16 0.008 265 / 6%), 0 12px 32px oklch(0.16 0.008 265 / 10%);
+  --shadow-bar: 0 -1px 0 oklch(0.16 0.008 265 / 6%), 0 -8px 24px oklch(0.16 0.008 265 / 6%);
+  --shadow-button: 0 4px 14px rgb(103 138 245 / 35%);
+  /* The floating tab bar. A detached capsule has no edge to anchor it, so it carries a deeper,
+     tighter-spread shadow than --shadow-bar to read as hovering rather than pasted on. */
+  --shadow-float: 0 12px 32px -8px oklch(0.16 0.008 265 / 28%);
+
+  /* motion */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 180ms;
+  --duration-medium: 260ms;
+
+  /* Apple HIG text styles. Named rather than t-shirt-sized so a component states the role it is
+     playing ("this is a large title") instead of a size that drifts when the ladder is retuned.
+     Tailwind's own text-xs…text-3xl stay available; new work uses these. */
+  --text-large-title: 34px;
+  --text-large-title--line-height: 1.15;
+  --text-large-title--letter-spacing: -0.4px;
+  --text-title-1: 28px;
+  --text-title-1--line-height: 1.15;
+  --text-title-1--letter-spacing: -0.4px;
+  --text-title-2: 22px;
+  --text-title-2--line-height: 1.3;
+  --text-title-2--letter-spacing: -0.4px;
+  --text-title-3: 20px;
+  --text-title-3--line-height: 1.3;
+  --text-title-3--letter-spacing: -0.4px;
+  --text-headline: 17px;
+  --text-headline--line-height: 1.3;
+  --text-body: 17px;
+  --text-body--line-height: 1.5;
+  --text-callout: 16px;
+  --text-callout--line-height: 1.5;
+  --text-subhead: 15px;
+  --text-subhead--line-height: 1.3;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 1.3;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.3;
+  --text-caption-2: 11px;
+  --text-caption-2--line-height: 1.3;
+
+  /* layout constants — the iOS chrome measures itself against these, and scroll areas pad by
+     them so content never hides behind the nav bar, tab bar or action bar. */
+  --spacing-gutter: 16px;
+  --spacing-touch: 44px;
+  --spacing-nav-bar: 44px;
+  --spacing-tab-bar: 52px;
+  /* The floating tab bar clears more: a 60px capsule (48px buttons + 6px padding) riding 14px
+     above the safe area, plus a little air so the last row does not graze it. Excludes the safe
+     area itself — callers add env(safe-area-inset-bottom) on top. */
+  --spacing-tab-bar-floating: 84px;
+  --spacing-safe-top: 44px;
+  --spacing-safe-bottom: 24px;
+
+  /* the only blur in the system — nav bar, tab bar, action bar, controls over imagery */
+  --blur-chrome: 20px;
+
+  /* The two animations in the system. Both are status indicators, not decoration: the live dot
+     and the skeleton shimmer. Presentation transitions are handled per-component with --ease-ios. */
+  --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* The document is the scroll container, so this is the only place scroll-padding can live.
+     Sized for the floating tab bar — the taller of the two bottom bars — so anything scrolled
+     into view (a focused field, a hash target) clears the chrome under either variant. */
+  html {
+    scroll-padding-bottom: calc(var(--spacing-tab-bar-floating) + env(safe-area-inset-bottom));
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--line-height-normal, 1.5);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.4px;
+    line-height: 1.15;
   }
 
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
+  }
+
+  /* Press feedback may change color or opacity but never layout, so a long-press on a card must
+     not select text or pop the iOS callout. */
+  button,
+  [role='button'] {
+    -webkit-touch-callout: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* The floating tab bar's glass — heavier than --blur-chrome and saturated, because the capsule
+   floats over photography rather than sitting against a page edge: it has to stay legible while
+   still showing what is passing underneath. Written out rather than composed from Tailwind's
+   backdrop utilities so the declaration order and the -webkit- prefix are exactly the ones the
+   design system specifies. */
+@utility backdrop-glass {
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  backdrop-filter: saturate(180%) blur(24px);
+}
+
+/* Hides the scrollbar on horizontal rails (category rail, chip rows, auction rails) — they scroll
+   by touch/trackpad and a visible bar breaks the 76pt tile rhythm. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

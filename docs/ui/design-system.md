@@ -90,6 +90,23 @@ Status pills for auctions: `<Badge tone="live">Live</Badge>`, plus `upcoming`, `
 
 `<Toaster />` is mounted once by `AppProviders`; fire messages with `useToast()`.
 
+### Bottom tab bar
+
+The iOS chrome in `shared/components/ios/` ships two tab bars over one `TabBarItem[]` (five items max, HIG). `AppShell` picks the variant once for the whole app — see `TAB_BAR_VARIANT` there.
+
+|                  | `TabBar` (docked)                                        | `FloatingTabBar`                                                                                        |
+| ---------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Shape            | Flat, pinned to the bottom edge, 1px hairline top border | Detached `rounded-full` capsule, 16px from each edge, riding `env(safe-area-inset-bottom) + 14px`       |
+| Content          | 24px icon with a caption underneath                      | Icon only — `aria-label` + `title` carry the name                                                       |
+| Active           | Tinted icon and caption                                  | Solid `bg-primary` pill behind a `text-primary-foreground` icon                                         |
+| Badge            | Count in a pill                                          | 8px `bg-destructive` dot, no numerals                                                                   |
+| Material         | `bg-surface/88` + `backdrop-blur-chrome`                 | `bg-surface/78` + `backdrop-glass` (`saturate(180%) blur(24px)`), `border-foreground/8`, `shadow-float` |
+| Scroll clearance | `--spacing-tab-bar` + `--spacing-safe-bottom`            | `--spacing-tab-bar-floating` + `env(safe-area-inset-bottom)`                                            |
+
+**Which one.** `FloatingTabBar` is for immersive, media-led screens where the content should read edge to edge underneath it; utility screens keep the docked bar. **Never mix the two inside one flow** — the tab bar is global chrome, so swapping variants between roots makes the chrome look like it is being rebuilt on every tab change.
+
+Only the pill's `background-color` transitions. Never animate its size or position: the bar must not appear to re-lay-out under the thumb.
+
 Dialogs, sheets, and toggle switches aren't built yet — nothing in the current feature set needs them. Add them under `shared/components/ui/` the same way, once a second feature genuinely needs one.
 
 ## Spacing

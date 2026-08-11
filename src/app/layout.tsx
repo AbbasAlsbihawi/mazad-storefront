@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 import { AppProviders, AppShell } from './providers';
@@ -7,6 +7,34 @@ import './styles/globals.css';
 export const metadata: Metadata = {
   title: 'Mazad',
   description: 'Live auctions marketplace',
+  applicationName: 'Mazad',
+  manifest: '/manifest.webmanifest',
+  // iOS ignores the manifest entirely; these are what make an added-to-home-screen Mazad open
+  // without Safari's chrome.
+  appleWebApp: { capable: true, title: 'Mazad', statusBarStyle: 'default' },
+  icons: {
+    icon: [
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  // Lets the layout extend under the notch and the home indicator, which is the only thing that
+  // makes env(safe-area-inset-*) report anything but 0 — the floating tab bar sits on it.
+  viewportFit: 'cover',
+  // The theme is a stored preference rather than a media query, so the browser chrome can only
+  // follow the device. Matching --color-background in each theme keeps the status bar seamless
+  // for the common case where the two agree.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f6f7f9' },
+    { media: '(prefers-color-scheme: dark)', color: '#040405' },
+  ],
 };
 
 // Reads the persisted locale/theme and stamps <html> before hydration, so neither the wrong
@@ -16,7 +44,7 @@ const THEME_LOCALE_INIT_SCRIPT = `
 (function () {
   try {
     var locale = 'ar';
-    var theme = 'dark';
+    var theme = 'light';
     var localeRaw = localStorage.getItem('mazad.locale');
     if (localeRaw) {
       var parsedLocale = JSON.parse(localeRaw);
@@ -33,7 +61,7 @@ const THEME_LOCALE_INIT_SCRIPT = `
     }
     document.documentElement.lang = locale;
     document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
-    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
   } catch (e) {}
 })();
 `;

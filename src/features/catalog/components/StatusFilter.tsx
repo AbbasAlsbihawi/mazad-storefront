@@ -13,7 +13,7 @@ export function StatusFilter({ selected, onSelect }: StatusFilterProps) {
   const { t } = useCatalogTranslation();
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="no-scrollbar -mx-gutter flex gap-2 overflow-x-auto px-gutter">
       <Chip isActive={!selected} onClick={() => onSelect(undefined)}>
         {t('browse.filters.all')}
       </Chip>
