@@ -19,6 +19,7 @@
   },
   "account": {
     "title": "الحساب",
+    "selling": "البيع",
     "verified": "حساب موثّق",
     "quickLinks": "روابط الحساب",
     "addresses": "عناوين التوصيل",

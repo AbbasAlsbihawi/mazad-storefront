@@ -39,6 +39,13 @@ export const QUERY_KEYS = {
     list: ['notifications', 'list'] as const,
     unreadCount: ['notifications', 'unreadCount'] as const,
   },
+  // The seller's own side of the marketplace. Separate from `sellers`, which is the buyer
+  // looking at someone else's storefront.
+  selling: {
+    stores: ['selling', 'stores'] as const,
+    products: ['selling', 'products'] as const,
+    auctions: ['selling', 'auctions'] as const,
+  },
   sellers: {
     profile: (id: string) => ['sellers', 'profile', id] as const,
     // A static key, not a filters factory — GET /me/following has no pagination UI in this pass,

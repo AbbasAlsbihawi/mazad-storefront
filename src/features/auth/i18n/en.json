@@ -19,6 +19,7 @@
   },
   "account": {
     "title": "Account",
+    "selling": "Selling",
     "verified": "Verified account",
     "quickLinks": "Account links",
     "addresses": "Delivery addresses",

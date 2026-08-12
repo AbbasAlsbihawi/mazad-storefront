@@ -42,6 +42,12 @@ export function AccountPage() {
           ) : null}
         </Card>
 
+        {/* Selling gets its own group: every customer can sell, but it's a different job from
+            the buying rows below and shouldn't be buried among them. */}
+        <Card hasShadow className="overflow-hidden">
+          <ListRow icon="store" title={t('account.selling')} href={ROUTES.selling} isLast />
+        </Card>
+
         <Card hasShadow className="overflow-hidden">
           <ListRow icon="gavel" title={t('account.myBids')} href={ROUTES.myBids} />
           <ListRow icon="badge-check" title={t('account.wins')} href={ROUTES.wins} />

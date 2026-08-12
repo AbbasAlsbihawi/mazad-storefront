@@ -15,4 +15,12 @@ export const ROUTES = {
   wins: '/account/wins',
   orders: '/account/orders',
   orderDetail: (id: string) => `/account/orders/${id}`,
+  // The seller's own side, hung off the account screen rather than a sixth tab (five is the
+  // HIG ceiling — see AppTabBar).
+  selling: '/account/selling',
+  sellingStores: '/account/selling/stores',
+  sellingProducts: '/account/selling/products',
+  sellingAuctions: '/account/selling/auctions',
+  sellingAuctionNew: (productId: string) =>
+    `/account/selling/auctions?productId=${encodeURIComponent(productId)}`,
 } as const;
