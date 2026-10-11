@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useToastStore } from '@shared/store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -86,7 +86,9 @@ describe('BidPanel: the server says what happened', () => {
       standing({ leading: true, myHighestBid: '99000.00' }),
     );
     renderPanel(false);
-    expect(await screen.findByTestId('bid-leading')).toBeTruthy();
+    expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
+      "You're the highest bidder",
+    );
     expect(screen.getAllByText(/100,000/).length).toBeGreaterThan(0);
   });
 
@@ -161,7 +163,9 @@ describe('BidPanel: who can bid', () => {
 
   it('offers the seller no bid on their own live auction, and says why', async () => {
     renderPanel(true);
-    expect(await screen.findByText('This is your auction. Buyers bid on it here.')).toBeTruthy();
+    expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
+      'This is your auction',
+    );
     expect(screen.queryByRole('button', { name: /Place bid/ })).toBeNull();
     expect(screen.queryByText(/Buy now/)).toBeNull();
   });
@@ -205,10 +209,124 @@ describe('BidPanel: the winner of a closed auction', () => {
     expect(link.getAttribute('href')).toBe('/account/wins');
   });
 
-  it('tells everyone else that bidding is closed', async () => {
+  it('says "You won this auction" once, with the way to the order', async () => {
+    await sold();
+    renderWinner({ orderId: 'o1' });
+    expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
+      'You won this auction',
+    );
+    expect(screen.getAllByTestId('auction-user-state')).toHaveLength(1);
+  });
+
+  it('tells everyone else it was sold to another bidder', async () => {
     await sold();
     renderWinner(null);
-    expect(await screen.findByText(/Bidding is closed/)).toBeTruthy();
+    expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
+      'Sold to another bidder',
+    );
     expect(screen.queryByTestId('won-view-order')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Place bid/ })).toBeNull();
+  });
+});
+
+describe('BidPanel: the one state line', () => {
+  const pricing = (status: string) =>
+    vi.mocked(biddingApi.getAuctionPricing).mockResolvedValue({
+      id: 'auction-1',
+      status,
+      startingPrice: '100000.00',
+      minIncrement: '5000.00',
+      currentPrice: status === 'SCHEDULED' ? null : '150000.00',
+      buyNowPrice: null,
+      endsAt: '2030-01-01T00:00:00.000Z',
+    });
+
+  const stateLine = async () => {
+    const lines = await screen.findAllByTestId('auction-user-state');
+    expect(lines).toHaveLength(1);
+    return lines[0];
+  };
+
+  it.each([
+    ['ENDED', 'This auction has ended'],
+    ['UNSOLD', 'This auction has ended'],
+    ['CANCELLED', 'This auction has ended'],
+    ['SCHEDULED', "The auction hasn't started yet"],
+  ])('%s: "%s", and nothing to bid', async (status, text) => {
+    pricing(status);
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
+    renderPanel(false);
+    expect(await stateLine()).toHaveTextContent(text);
+    expect(screen.queryByRole('button', { name: /Place bid/ })).toBeNull();
+  });
+
+  it('the seller sees their own auction even once it sold', async () => {
+    pricing('SOLD');
+    renderPanel(true);
+    expect(await stateLine()).toHaveTextContent('This is your auction');
+  });
+
+  it('an active auto-bid, with its limit, ahead of leading', async () => {
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(
+      standing({ leading: true, autoBid: { maxAmount: '200000.00', exhausted: false } }),
+    );
+    renderPanel(false);
+    await waitFor(async () =>
+      expect(await stateLine()).toHaveTextContent('Auto-bid on up to 200,000 IQD'),
+    );
+    expect(screen.queryByText(/highest bidder/)).toBeNull();
+  });
+
+  it('outbid, with no "leading" anywhere else on the panel', async () => {
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing({ myHighestBid: '120000.00' }));
+    renderPanel(false);
+    await waitFor(async () => expect(await stateLine()).toHaveTextContent("You've been outbid"));
+    expect(screen.queryByText(/highest bidder/)).toBeNull();
+  });
+
+  it('a signed-in buyer with no bids can bid', async () => {
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
+    renderPanel(false);
+    expect(await stateLine()).toHaveTextContent('You can bid');
+    expect(await screen.findByRole('button', { name: /Place bid/ })).toBeTruthy();
+  });
+
+  it('a guest gets the sign-in button as the only state', async () => {
+    setSessionTokens(null);
+    renderPanel(false);
+    expect(await screen.findByRole('link', { name: 'Sign in to place a bid' })).toBeTruthy();
+    expect(screen.queryByTestId('auction-user-state')).toBeNull();
+  });
+
+  it('waits for the wins before saying anything about a closed auction', async () => {
+    pricing('SOLD');
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <I18nextProvider i18n={i18n}>
+          <BidPanel auctionId="auction-1" isCheckingWin />
+        </I18nextProvider>
+      </QueryClientProvider>,
+    );
+    // Pricing has arrived; the state still waits for the wins.
+    await waitFor(() =>
+      expect(client.getQueryData(['bidding', 'auctionPricing', 'auction-1'])).toBeTruthy(),
+    );
+    expect(screen.queryByTestId('auction-user-state')).toBeNull();
+  });
+
+  it('in Arabic', async () => {
+    useLocaleStore.getState().setLocale('ar');
+    await i18n.changeLanguage('ar');
+    try {
+      vi.mocked(biddingApi.getMyStanding).mockResolvedValue(
+        standing({ leading: true, myHighestBid: '150000.00' }),
+      );
+      renderPanel(false);
+      await waitFor(async () => expect(await stateLine()).toHaveTextContent('أنت المتصدر حالياً'));
+    } finally {
+      useLocaleStore.getState().setLocale('en');
+      await i18n.changeLanguage('en');
+    }
   });
 });

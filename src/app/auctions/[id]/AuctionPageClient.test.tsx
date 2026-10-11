@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { AuctionBidding } from './AuctionPageClient';
 
 const bidPanel = vi.fn((_props: unknown) => null);
-const wins = { data: undefined as unknown, refetch: vi.fn() };
+const wins = { data: undefined as unknown, isPending: false, refetch: vi.fn() };
 const useWins = vi.fn((_enabled?: boolean) => wins);
 vi.mock('next/navigation', () => ({ useParams: () => ({ id: 'a1' }) }));
 vi.mock('@features/bidding', () => ({ BidPanel: (props: unknown) => bidPanel(props) }));
@@ -21,13 +21,18 @@ const win = (auctionId: string, orderId: string | null, status = 'CONFIRMED') =>
   orderItem: orderId ? { orderId } : null,
 });
 const lastProps = () =>
-  bidPanel.mock.calls.at(-1)?.[0] as { winner: unknown; isOwnAuction: boolean };
+  bidPanel.mock.calls.at(-1)?.[0] as {
+    winner: unknown;
+    isOwnAuction: boolean;
+    isCheckingWin: boolean;
+  };
 
 beforeEach(() => {
   bidPanel.mockClear();
   useWins.mockClear();
   wins.refetch.mockClear();
   auth.signedIn = true;
+  wins.isPending = false;
 });
 
 describe('AuctionBidding (route composition)', () => {
@@ -74,5 +79,17 @@ describe('AuctionBidding (route composition)', () => {
     render(<AuctionBidding auctionId="a1" sellerId="buyer-1" status="LIVE" />);
     expect(lastProps().isOwnAuction).toBe(true);
     expect(lastProps().winner).toBeNull();
+  });
+
+  it('holds the closed-auction state while the wins load (never "sold to another" first)', () => {
+    wins.data = undefined;
+    wins.isPending = true;
+    const view = render(<AuctionBidding auctionId="a1" sellerId="seller-1" status="SOLD" />);
+    expect(lastProps().isCheckingWin).toBe(true);
+    // Not for a live auction, and never for the seller, who can't be the winner.
+    view.rerender(<AuctionBidding auctionId="a1" sellerId="seller-1" status="LIVE" />);
+    expect(lastProps().isCheckingWin).toBe(false);
+    view.rerender(<AuctionBidding auctionId="a1" sellerId="buyer-1" status="SOLD" />);
+    expect(lastProps().isCheckingWin).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { ROUTES } from '@shared/constants';
 import { ErrorState, PageLoader } from '@shared/components/feedback';
@@ -14,8 +15,9 @@ import {
   SectionHeader,
 } from '@shared/components/ui';
 import { useLocale, useMoney, useSubmitGuard } from '@shared/hooks';
-import { formatDateTime, getErrorCode, joinList, pickLocalizedName, telHref } from '@shared/lib';
+import { formatDateTime, getErrorCode, joinList, telHref } from '@shared/lib';
 import { useOrder } from '../hooks/useOrders';
+import { useOrderPaymentLabel } from '../hooks/useOrderPaymentLabel';
 import {
   useAdvanceOrder,
   useCancelOrder,
@@ -23,8 +25,15 @@ import {
   useReturnAction,
 } from '../hooks/useOrderMutations';
 import { useOrdersTranslation } from '../hooks/useOrdersTranslation';
+import { OrderItemImage } from '../components/OrderItemImage';
 import { OrderPaymentSection } from '../components/OrderPaymentSection';
 import { useOrderPayments } from '../hooks/usePayments';
+import {
+  orderItemImage,
+  orderItemListingHref,
+  orderItemName,
+  orderStoreName,
+} from '../lib/order-display';
 import { nextSellerStatus, sellerReturnActions } from '../lib/seller-orders';
 import type { Order, OrderStatus } from '../types/orders.types';
 import type { OrdersMode } from './OrdersPage';
@@ -70,7 +79,7 @@ export function OrderDetailPage({ id, mode = 'buyer' }: { id: string; mode?: Ord
         <Card isInset className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="truncate text-title-3 font-bold text-foreground">
-              {pickLocalizedName(data.store, locale)}
+              {orderStoreName(data, locale)}
             </span>
             <span className="text-footnote text-muted-foreground">
               {t('detail.placedAt')} · {formatDateTime(data.createdAt, locale)}
@@ -114,6 +123,7 @@ export function OrderDetailPage({ id, mode = 'buyer' }: { id: string; mode?: Ord
                   {money(data.total)}
                 </span>
               </div>
+              <PaymentSummaryRow order={data} />
             </CardContent>
           </Card>
         </section>
@@ -192,6 +202,21 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+/** "Cash on delivery · Not paid yet", "Card · Paid": from the order's payment records. */
+function PaymentSummaryRow({ order }: { order: Order }) {
+  const { t } = useOrdersTranslation();
+  const payment = useOrderPaymentLabel(order);
+  if (!payment) return null;
+  return (
+    <div className="flex items-center justify-between gap-3" data-testid="order-payment-summary">
+      <span className="text-muted-foreground">{t('payment.methodLabel')}</span>
+      <span className="text-end font-medium text-foreground">
+        {payment.method} · {payment.status}
+      </span>
+    </div>
+  );
+}
+
 function OrderItemRow({
   orderId,
   item,
@@ -214,16 +239,32 @@ function OrderItemRow({
   const [reason, setReason] = useState('');
 
   const returnError = getErrorCode(openReturn.error);
+  const name = orderItemName(item, locale);
+  const listingHref = orderItemListingHref(item);
 
   return (
     <div className={isLast ? 'p-4' : 'border-b border-separator p-4'}>
-      <div className="flex items-center justify-between gap-3">
-        <span className="min-w-0 flex-1 truncate text-subhead font-medium text-foreground">
-          {pickLocalizedName(item.product, locale)}
-        </span>
-        <span className="shrink-0 text-callout font-bold text-foreground tabular-nums">
-          {money(item.finalPrice)}
-        </span>
+      {/* What was bought, as it was when ordered (the snapshot), with its photo. */}
+      <div className="flex items-start gap-3">
+        <OrderItemImage src={orderItemImage(item, 'full')} alt={name} sizePx={72} />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex items-start justify-between gap-3">
+            <span className="min-w-0 flex-1 text-subhead font-medium text-foreground">{name}</span>
+            <span className="shrink-0 text-callout font-bold text-foreground tabular-nums">
+              {money(item.display?.finalPrice ?? item.finalPrice)}
+            </span>
+          </div>
+          {/* Only while the auction page can still be opened. */}
+          {listingHref ? (
+            <Link
+              href={listingHref}
+              className="self-start text-footnote font-semibold text-primary-text"
+              data-testid="order-view-listing"
+            >
+              {t('detail.viewListing')}
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       {item.returnRequest ? (

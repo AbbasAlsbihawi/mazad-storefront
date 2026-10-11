@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { MAX_MONEY_AMOUNT } from '@shared/lib';
+import { parseDinars } from '../lib/dinars';
 
 /* ── Server shapes ──────────────────────────────────────────────────────────────────────── */
 
@@ -48,6 +50,8 @@ export const sellerProductSchema = z.object({
     z.object({
       id: z.string(),
       url: z.string(),
+      // Not sent by /me/products today; resolveThumbUrl derives it from `url` until it is.
+      thumbUrl: z.string().nullish(),
       sortOrder: z.number(),
       isCover: z.boolean(),
     }),
@@ -126,12 +130,25 @@ export const productFormSchema = z
     descriptionAr: z.string().trim(),
     // Chosen on purpose: no default, so "Used" is never claimed for a new item by accident.
     condition: z.enum(PRODUCT_CONDITIONS, 'errors.field.conditionRequired'),
-    // Optional in the DTO; an empty field must send nothing rather than 0, which would advertise
-    // a market price of zero on the detail page.
+    // The new retail price, typed as grouped whole dinars. Optional in the DTO; an empty field
+    // must send nothing rather than 0, which would advertise a new price of zero on the auction.
     marketPrice: z
-      .union([z.literal(''), z.coerce.number().min(0)])
+      .string()
       .optional()
-      .transform((value) => (value === '' || value === undefined ? undefined : value)),
+      .transform((text, ctx) => {
+        if (!text?.trim()) return undefined;
+        const parsed = parseDinars(text);
+        if ('value' in parsed && parsed.value <= MAX_MONEY_AMOUNT) return parsed.value;
+        // Decimals get their own message ("whole dinars"), not a generic "invalid".
+        const message =
+          'value' in parsed
+            ? 'errors.field.marketPriceTooHigh'
+            : parsed.error === 'errors.field.wholeDinars'
+              ? parsed.error
+              : 'errors.field.marketPriceInvalid';
+        ctx.addIssue({ code: 'custom', message });
+        return z.NEVER;
+      }),
   })
   .superRefine((values, ctx) => {
     if (!values.nameAr && !values.nameEn) {

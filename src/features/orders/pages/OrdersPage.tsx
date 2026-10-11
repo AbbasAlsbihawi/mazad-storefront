@@ -4,11 +4,14 @@ import Link from 'next/link';
 import { ROUTES } from '@shared/constants';
 import { EmptyState, ErrorState, PageLoader } from '@shared/components/feedback';
 import { ScreenHeader } from '@shared/components/layout';
-import { Badge, Card, Icon, Skeleton } from '@shared/components/ui';
+import { Badge, Card, Skeleton } from '@shared/components/ui';
 import { useLocale, useMoney } from '@shared/hooks';
-import { formatDate, joinList, pickLocalizedName } from '@shared/lib';
+import { formatDate } from '@shared/lib';
+import { OrderItemImage } from '../components/OrderItemImage';
 import { useOrders, useSales } from '../hooks/useOrders';
+import { useOrderPaymentLabel } from '../hooks/useOrderPaymentLabel';
 import { useOrdersTranslation } from '../hooks/useOrdersTranslation';
+import { orderItemImage, orderItemName, orderStoreName } from '../lib/order-display';
 import type { Order, OrderStatus } from '../types/orders.types';
 
 const STATUS_TONE: Record<OrderStatus, 'live' | 'upcoming' | 'warning' | 'neutral'> = {
@@ -68,47 +71,73 @@ export function SalesPage() {
   return <OrdersPage mode="seller" />;
 }
 
+/**
+ * One order in the list: the (first) product's photo and name as bought, the order number and
+ * date, the buyer (seller view) or store, item price and delivery, how it is paid, and the total.
+ */
 function OrderRow({ order, mode }: { order: Order; mode: OrdersMode }) {
   const { t } = useOrdersTranslation();
   const { locale } = useLocale();
-  const { money, number } = useMoney();
+  const { money } = useMoney();
+  const payment = useOrderPaymentLabel(order);
   const isSeller = mode === 'seller';
+  const [first] = order.items;
+  const name = first ? orderItemName(first, locale) : '—';
+  const more = order.items.length - 1;
+  const itemPrice = more > 0 ? order.subtotal : (first?.display?.finalPrice ?? first?.finalPrice);
 
   return (
     <Link href={isSeller ? ROUTES.saleDetail(order.id) : ROUTES.orderDetail(order.id)}>
       <Card
         isInset
-        className="flex flex-col gap-2 transition-transform duration-fast ease-ios active:scale-[0.985]"
+        className="flex gap-3 transition-transform duration-fast ease-ios active:scale-[0.985]"
       >
-        <div className="flex items-center justify-between gap-3">
-          <span className="truncate text-subhead font-semibold text-foreground">
+        <OrderItemImage
+          src={first ? orderItemImage(first, 'thumb') : null}
+          alt={name}
+          sizePx={64}
+        />
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex items-start justify-between gap-2">
+            <span
+              className="min-w-0 truncate text-subhead font-semibold text-foreground"
+              data-testid="order-row-name"
+            >
+              {name}
+              {more > 0 ? ` ${t('list.more', { count: more })}` : null}
+            </span>
+            <Badge tone={STATUS_TONE[order.status]} hasDot={order.status === 'OUT_FOR_DELIVERY'}>
+              {t(`status.${order.status}`)}
+            </Badge>
+          </div>
+
+          <span className="truncate text-caption text-muted-foreground">
+            {order.orderNumber} · {formatDate(order.createdAt, locale)}
+          </span>
+          <span className="truncate text-footnote text-foreground-soft">
             {isSeller
               ? `${t('sales.buyer')}: ${order.customer?.fullName ?? '—'}`
-              : pickLocalizedName(order.store, locale)}
+              : orderStoreName(order, locale)}
           </span>
-          <Badge tone={STATUS_TONE[order.status]} hasDot={order.status === 'OUT_FOR_DELIVERY'}>
-            {t(`status.${order.status}`)}
-          </Badge>
-        </div>
+          <span className="text-caption text-muted-foreground tabular-nums">
+            {t(more > 0 ? 'list.itemsAndDelivery' : 'list.itemAndDelivery', {
+              item: money(itemPrice),
+              delivery: money(order.deliveryFee),
+            })}
+          </span>
 
-        <p className="truncate text-footnote text-muted-foreground">
-          {joinList(
-            order.items.slice(0, 2).map((item) => pickLocalizedName(item.product, locale)),
-            locale,
-          )}
-          {order.items.length > 2 ? ' …' : ''}
-        </p>
-
-        <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 text-caption text-muted-foreground">
-            <Icon name="package" size={14} />
-            {number(order.items.length)}
-            <span className="mx-1">·</span>
-            {formatDate(order.createdAt, locale)}
-          </span>
-          <span className="text-callout font-bold text-foreground tabular-nums">
-            {money(order.total)}
-          </span>
+          <div className="flex items-center justify-between gap-3">
+            <span
+              className="truncate text-caption text-muted-foreground"
+              data-testid="order-row-payment"
+            >
+              {payment?.method ?? null}
+            </span>
+            <span className="text-callout font-bold text-foreground tabular-nums">
+              {money(order.total)}
+            </span>
+          </div>
         </div>
       </Card>
     </Link>

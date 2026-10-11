@@ -1,10 +1,7 @@
 {
   "panel": {
-    "notLive": "Bidding is closed for this auction.",
-    "ownAuction": "This is your auction. Buyers bid on it here.",
     "wonViewOrder": "You won · View order",
     "wonViewWins": "You won · See your wins",
-    "notStarted": "Bidding hasn't started yet.",
     "loadError": "Couldn't load bidding details.",
     "signInToBid": "Sign in to place a bid"
   },
@@ -21,18 +18,16 @@
     "confirmNewAmount": "Bid {{amount}}",
     "bidBuysNow": "This amount reaches the buy-now price: placing it buys the item now.",
     "confirmBuyNow": "Confirm purchase for {{amount}}",
-    "buyNowConfirmHint": "Buying now ends the auction. You pay {{amount}} plus delivery.",
-    "leading": "You're the highest bidder.",
-    "outbid": "You were outbid. Bid again to take the lead."
+    "buyNowConfirmHint": "Buying now ends the auction. You pay {{amount}} plus delivery."
   },
   "autoBid": {
     "setUp": "Set up auto-bid",
     "maxAmount": "Maximum bid",
     "submit": "Start auto-bid",
     "cancel": "Turn off",
-    "active": "Auto-bid active up to {{amount}}",
     "change": "Change",
-    "exhausted": "The price passed your auto-bid limit of {{amount}}."
+    "exhausted": "The price passed your auto-bid limit of {{amount}}.",
+    "label": "Your auto-bid"
   },
   "myBids": {
     "title": "My bids",
@@ -86,5 +81,16 @@
     "AUTO_BID_NOT_FOUND": "You don't have an active auto-bid to cancel.",
     "INVALID_AMOUNT": "Bids are in whole dinars.",
     "AUCTION_NOT_AVAILABLE": "This auction is no longer available."
+  },
+  "state": {
+    "own": "This is your auction",
+    "won": "You won this auction",
+    "soldToOther": "Sold to another bidder",
+    "ended": "This auction has ended",
+    "notStarted": "The auction hasn't started yet",
+    "autoBid": "Auto-bid on up to {{amount}}",
+    "leading": "You're the highest bidder",
+    "outbid": "You've been outbid",
+    "canBid": "You can bid"
   }
 }

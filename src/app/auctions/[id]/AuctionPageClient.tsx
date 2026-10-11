@@ -59,11 +59,14 @@ export function AuctionBidding({
     };
   }, [win, orderId, refetchWins]);
 
+  const isOwnAuction = !!me.data && me.data.id === sellerId;
   return (
     <BidPanel
       auctionId={auctionId}
-      isOwnAuction={!!me.data && me.data.id === sellerId}
+      isOwnAuction={isOwnAuction}
       winner={win ? { orderId } : null}
+      // A closed auction's wins still loading: the winner must not first read "sold to another".
+      isCheckingWin={isClosed && isAuthenticated && !isOwnAuction && wins.isPending}
     />
   );
 }

@@ -8,7 +8,7 @@ import { EmptyState, ErrorState, PageLoader } from '@shared/components/feedback'
 import { ScreenHeader } from '@shared/components/layout';
 import { Badge, Button, Card, CardContent, Icon, Skeleton } from '@shared/components/ui';
 import { useLocale } from '@shared/hooks';
-import { pickLocalizedName, resolveAssetUrl } from '@shared/lib';
+import { pickLocalizedName, resolveThumbUrl } from '@shared/lib';
 import { useProducts, useDeleteProduct } from '../hooks/useProducts';
 import { useSellerAuctions } from '../hooks/useSellerAuctions';
 import { productAuctionState } from '../lib/auction-permissions';
@@ -57,7 +57,7 @@ export function SellerProductsPage({ categories = [] }: SellerProductsPageProps)
 
     const state = productAuctionState(product.id, auctions.data ?? []);
     const cover = product.images.find((image) => image.isCover) ?? product.images[0];
-    const coverUrl = resolveAssetUrl(cover?.url);
+    const coverUrl = resolveThumbUrl(cover?.thumbUrl ?? cover?.url);
 
     return (
       <Card key={product.id} isInset className="flex flex-col gap-3">

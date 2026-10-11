@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { paymentMethodSchema, paymentStatusSchema } from './payments.schema';
 
 export const orderStatusSchema = z.enum([
   'CREATED',
@@ -17,11 +18,33 @@ export const returnStatusSchema = z.enum([
   'CANCELLED',
 ]);
 
+/**
+ * What was bought, as the order was created (mazad-api's snapshot; older orders fall back to the
+ * product as it is now). Later renames, new photos or a blocked listing don't change it. Every
+ * field is optional: an older API sends none of this and the item still renders.
+ */
+const orderItemDisplaySchema = z.object({
+  productId: z.string().nullish(),
+  auctionId: z.string().nullish(),
+  nameEn: z.string().nullish(),
+  nameAr: z.string().nullish(),
+  imageUrl: z.string().nullish(),
+  thumbUrl: z.string().nullish(),
+  condition: z.string().nullish(),
+  marketPrice: z.string().nullish(),
+  buyNowPrice: z.string().nullish(),
+  finalPrice: z.string().nullish(),
+  fromSnapshot: z.boolean().nullish(),
+  /** The auction page can still be opened; no "View listing" link otherwise. */
+  listingAvailable: z.boolean().nullish(),
+});
+
 const orderItemSchema = z.object({
   id: z.string(),
   productId: z.string(),
   finalPrice: z.string(),
-  product: z.object({ id: z.string(), nameEn: z.string(), nameAr: z.string() }),
+  product: z.object({ id: z.string(), nameEn: z.string(), nameAr: z.string() }).nullish(),
+  display: orderItemDisplaySchema.nullish(),
   win: z.object({ id: z.string(), amount: z.string() }).nullable(),
   // The 7-day guarantee: present once the buyer has opened a return on this item.
   returnRequest: z
@@ -63,6 +86,19 @@ export const orderSchema = z.object({
   // Set once the order is paid (cash on delivery or SwiftPayIQ); older APIs omit it.
   paidAt: z.string().nullish(),
   items: z.array(orderItemSchema),
+  // The store's name when the order was created: shown instead of `store`, which is current.
+  storeName: z.object({ nameEn: z.string().nullish(), nameAr: z.string().nullish() }).nullish(),
+  // Newest first, status and amounts only (older APIs omit it).
+  payments: z
+    .array(
+      z.object({
+        id: z.string(),
+        method: paymentMethodSchema,
+        status: paymentStatusSchema,
+        paidAt: z.string().nullish(),
+      }),
+    )
+    .nullish(),
   store: z.object({
     id: z.string(),
     nameEn: z.string(),

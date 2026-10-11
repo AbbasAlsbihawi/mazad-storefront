@@ -97,23 +97,7 @@ export function BidForm({ auction }: BidFormProps) {
         <p className="text-caption text-muted-foreground">
           {t('form.minimumHint', { amount: money(String(minimumBid)) })}
         </p>
-        {standing?.leading ? (
-          <p
-            role="status"
-            className="text-footnote font-semibold text-success"
-            data-testid="bid-leading"
-          >
-            {t('form.leading')}
-          </p>
-        ) : standing?.myHighestBid ? (
-          <p
-            role="status"
-            className="text-footnote font-semibold text-warning"
-            data-testid="bid-outbid"
-          >
-            {t('form.outbid')}
-          </p>
-        ) : null}
+        {/* Leading / outbid is the panel's state line (UserStateLine), not repeated here. */}
         {priceMoved ? (
           <p role="status" className="text-footnote font-semibold text-warning">
             {t('form.priceMoved', { amount: money(String(minimumBid)) })}

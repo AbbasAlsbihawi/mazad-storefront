@@ -22,7 +22,8 @@
       "SELLER": "ألغاه البائع",
       "ADMIN": "ألغته منصة مزاد",
       "SYSTEM": "أُلغي تلقائيًا"
-    }
+    },
+    "viewListing": "عرض المزاد"
   },
   "status": {
     "CREATED": "قيد الانتظار",
@@ -171,6 +172,21 @@
       "PAYMENT_PROVIDER_UNAVAILABLE": "الدفع الإلكتروني غير متاح مؤقتًا. حاول لاحقًا أو ادفع عند الاستلام.",
       "PAYMENT_PROVIDER_REJECTED": "تعذّر على مزوّد الدفع فتح صفحة الدفع. حاول لاحقًا أو ادفع عند الاستلام.",
       "generic": "تعذّر فتح صفحة الدفع. حاول مجددًا."
-    }
+    },
+    "methodName": {
+      "CASH_ON_DELIVERY": "الدفع عند الاستلام",
+      "SWIFTPAY": "الدفع بالبطاقة"
+    },
+    "notPaidYet": "لم يُدفع بعد"
+  },
+  "list": {
+    "more_zero": "+{{count, num}} أخرى",
+    "more_one": "+ منتج آخر",
+    "more_two": "+ منتجان آخران",
+    "more_few": "+{{count, num}} منتجات أخرى",
+    "more_many": "+{{count, num}} منتجًا آخر",
+    "more_other": "+{{count, num}} منتج آخر",
+    "itemAndDelivery": "المنتج {{item}} · التوصيل {{delivery}}",
+    "itemsAndDelivery": "المنتجات {{item}} · التوصيل {{delivery}}"
   }
 }

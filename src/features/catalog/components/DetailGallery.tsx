@@ -5,16 +5,18 @@ import { useState } from 'react';
 import { IconButton } from '@shared/components/ui';
 import { cn } from '@shared/lib';
 import { useCatalogTranslation } from '../hooks/useCatalogTranslation';
+import type { GalleryImage } from '../types/catalog.types';
 
 export interface DetailGalleryProps {
-  /** Resolved image URLs, cover first. */
-  images: string[];
+  /** Resolved images, cover first: the full URL for the main image, the thumbnail for the strip. */
+  images: GalleryImage[];
   name: string;
 }
 
 /**
  * Every product photo: the main image with previous/next (also the arrow keys), "2 / 5", and a
- * row of thumbnails to jump to one. A click on the main image opens it full size in a new tab.
+ * row of thumbnails (the small versions) to jump to one. A click on the main image opens it full
+ * size in a new tab.
  */
 export function DetailGallery({ images, name }: DetailGalleryProps) {
   const { t } = useCatalogTranslation();
@@ -36,14 +38,14 @@ export function DetailGallery({ images, name }: DetailGalleryProps) {
       }}
     >
       <a
-        href={current}
+        href={current.url}
         target="_blank"
         rel="noreferrer"
         aria-label={t('detail.photoOpen', { index: index + 1, total })}
         className="absolute inset-0 block"
       >
         <Image
-          src={current}
+          src={current.url}
           alt={t('detail.photoLabel', { name, index: index + 1, total })}
           fill
           sizes="100vw"
@@ -79,9 +81,9 @@ export function DetailGallery({ images, name }: DetailGalleryProps) {
             {t('detail.photoCount', { index: index + 1, total })}
           </span>
           <div className="absolute inset-x-3 bottom-9 flex max-w-[60%] gap-1.5 overflow-x-auto">
-            {images.map((url, i) => (
+            {images.map((image, i) => (
               <button
-                key={`${i}-${url}`}
+                key={`${i}-${image.url}`}
                 type="button"
                 onClick={() => setIndex(i)}
                 aria-label={t('detail.photoShow', { index: i + 1, total })}
@@ -91,7 +93,7 @@ export function DetailGallery({ images, name }: DetailGalleryProps) {
                   i === index ? 'border-white' : 'border-transparent opacity-80',
                 )}
               >
-                <Image src={url} alt="" fill sizes="44px" className="object-cover" />
+                <Image src={image.thumbUrl} alt="" fill sizes="44px" className="object-cover" />
               </button>
             ))}
           </div>

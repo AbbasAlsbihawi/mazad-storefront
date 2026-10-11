@@ -19,9 +19,9 @@ export interface AutoBidControlProps {
 }
 
 /**
- * Collapsed "Set up auto-bid", the maximum field, or "Auto-bid active up to X" with Change and
- * Turn off. The active state is the server's (GET /auctions/:id/me), so it survives a reload, and
- * says when the price has passed the maximum.
+ * Collapsed "Set up auto-bid", the maximum field, or the active auto-bid's Change and Turn off
+ * (its limit is in the panel's state line). The active state is the server's
+ * (GET /auctions/:id/me), so it survives a reload, and says when the price has passed the maximum.
  */
 export function AutoBidControl({ auctionId }: AutoBidControlProps) {
   const { t } = useBiddingTranslation();
@@ -52,9 +52,10 @@ export function AutoBidControl({ auctionId }: AutoBidControlProps) {
           className={active.exhausted ? 'text-destructive' : 'text-foreground-soft'}
           data-testid="auto-bid-active"
         >
-          {t(active.exhausted ? 'autoBid.exhausted' : 'autoBid.active', {
-            amount: money(active.maxAmount),
-          })}
+          {/* The active limit itself is the panel's state line; only the exhausted one is news. */}
+          {active.exhausted
+            ? t('autoBid.exhausted', { amount: money(active.maxAmount) })
+            : t('autoBid.label')}
         </span>
         <span className="flex gap-1">
           <Button variant="plain" size="sm" onClick={() => setIsExpanded(true)}>

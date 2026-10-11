@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { useRef, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Icon, Spinner } from '@shared/components/ui';
-import { getErrorCode, resolveAssetUrl } from '@shared/lib';
+import { getErrorCode, resolveThumbUrl } from '@shared/lib';
 import { useAddProductImage, useRemoveProductImage } from '../hooks/useProducts';
 import { useSellingTranslation } from '../hooks/useSellingTranslation';
 import type { SellerProduct } from '../types/selling.types';
@@ -43,7 +43,7 @@ export function ProductImageManager({ product }: { product: SellerProduct }) {
 
       <div className="flex flex-wrap gap-2">
         {product.images.map((image) => {
-          const url = resolveAssetUrl(image.url);
+          const url = resolveThumbUrl(image.thumbUrl ?? image.url);
           const isRemoving = removeImage.isPending && removeImage.variables?.imageId === image.id;
 
           return (

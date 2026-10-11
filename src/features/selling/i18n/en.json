@@ -92,8 +92,8 @@
     "store": "Store",
     "category": "Category",
     "condition": "Condition",
-    "marketPrice": "Market price",
-    "marketPriceHint": "Shown on the listing as the original price. Optional.",
+    "marketPrice": "New retail price",
+    "marketPriceHint": "Optional — helps buyers compare the auction price with the price of a new item.",
     "product": "Product",
     "startingPrice": "Opening bid",
     "minIncrement": "Minimum raise",
@@ -109,7 +109,8 @@
     "incrementLadder": "Bids go up in steps set by Mazad: 1,000 IQD under 100,000; 5,000 up to 1 million; 25,000 up to 10 million; 100,000 above.",
     "startNow": "Start now",
     "startLater": "Schedule",
-    "oneLanguageHint": "Arabic or English is enough; the other language shows the same text until you add it."
+    "oneLanguageHint": "Arabic or English is enough; the other language shows the same text until you add it.",
+    "currency": "IQD"
   },
   "form": {
     "save": "Save",
@@ -164,7 +165,9 @@
       "conditionRequired": "Choose the condition.",
       "photoRequired": "Add at least one photo to this product before publishing.",
       "buyNowNotAboveStart": "The buy now price must be higher than the opening bid",
-      "buyNowInvalid": "Enter a valid buy now price"
+      "buyNowInvalid": "Enter a valid buy now price",
+      "marketPriceInvalid": "Enter the price as a whole number of dinars.",
+      "marketPriceTooHigh": "That price is above the maximum allowed."
     },
     "STORE_NOT_FOUND": "That store no longer exists.",
     "DEFAULT_STORE_PROTECTED": "Your default store cannot be deleted.",
