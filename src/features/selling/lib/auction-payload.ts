@@ -1,6 +1,9 @@
 import { auctionFormSchema } from '../schemas/selling.schema';
 import type { AuctionFormValues } from '../types/selling.types';
 import { fromDateTimeInputValue, toDateTimeInputValue } from './datetime-input';
+import { parseDinars } from './dinars';
+
+export { parseDinars };
 
 /** What the listing form holds: typed text, the start choice and datetime-local strings. */
 export interface AuctionFormState {
@@ -26,22 +29,6 @@ const MINUTE_MS = 60_000;
 const START_NOW_GRACE_MS = 5 * MINUTE_MS;
 const MIN_DURATION_MS = 60 * MINUTE_MS;
 const MAX_DURATION_MS = 14 * 24 * 60 * MINUTE_MS;
-
-const ARABIC_INDIC = '٠١٢٣٤٥٦٧٨٩';
-
-/** A typed amount (grouping commas, Arabic digits allowed) as whole dinars, or an error key. */
-export function parseDinars(text: string): { value: number } | { error: string } {
-  const normalized = text
-    .trim()
-    .replace(/[٠-٩]/g, (digit) => String(ARABIC_INDIC.indexOf(digit)))
-    .replace(/[,٬\s]/g, '');
-  if (!normalized) return { error: 'empty' };
-  if (/^\d+[.٫]\d*[1-9]\d*$/.test(normalized)) return { error: 'errors.field.wholeDinars' };
-  const whole = normalized.replace(/[.٫]0*$/, '');
-  if (!/^\d+$/.test(whole)) return { error: 'invalid' };
-  const value = Number(whole);
-  return Number.isSafeInteger(value) ? { value } : { error: 'invalid' };
-}
 
 /**
  * Rules (mazad-api's): the opening bid in whole dinars and at least 1,000 IQD; buy-now optional,

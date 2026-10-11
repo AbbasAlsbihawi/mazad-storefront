@@ -11,7 +11,7 @@ export {
 } from './money';
 export { formatDate, formatDateTime, formatDuration } from './date';
 export { joinList, pickLocalizedName } from './locale';
-export { resolveAssetUrl } from './asset';
+export { resolveAssetUrl, resolveThumbUrl } from './asset';
 export { getImageTintStyle } from './image-tint';
 export { getCategoryIcon } from './category-icon';
 export { getErrorCode, getErrorDetail, getErrorStatus } from './error.utils';

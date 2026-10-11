@@ -7,6 +7,7 @@ import { Button, Input, Select, Textarea } from '@shared/components/ui';
 import { getErrorCode, pickLocalizedName } from '@shared/lib';
 import { useLocale } from '@shared/hooks';
 import { PRODUCT_CONDITIONS, productFormSchema } from '../schemas/selling.schema';
+import { groupDinars } from '../lib/dinars';
 import { useCreateProduct, useUpdateProduct } from '../hooks/useProducts';
 import { useSellingTranslation } from '../hooks/useSellingTranslation';
 import type {
@@ -47,13 +48,14 @@ export function ProductForm({ product, stores, categories, onDone, onCancel }: P
           descriptionEn: product.descriptionEn,
           descriptionAr: product.descriptionAr,
           condition: product.condition,
-          marketPrice: product.marketPrice ? Number(product.marketPrice) : undefined,
+          marketPrice: product.marketPrice ? groupDinars(String(Number(product.marketPrice))) : '',
         }
       : {
           storeId: stores.find((store) => store.isDefault)?.id ?? stores[0]?.id ?? '',
         },
   });
 
+  const marketPrice = register('marketPrice');
   const mutation = product ? updateProduct : createProduct;
   const errorCode = getErrorCode(mutation.error);
 
@@ -123,14 +125,22 @@ export function ProductForm({ product, stores, categories, onDone, onCancel }: P
         error={errors.condition ? t(errors.condition.message ?? '') : undefined}
         {...register('condition')}
       />
+      {/* Whole dinars, grouped as typed ("1,250,000"); empty sends nothing. */}
       <Input
         label={t('fields.marketPrice')}
-        type="number"
-        inputMode="decimal"
-        step="0.01"
-        min="0"
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
         hint={t('fields.marketPriceHint')}
-        {...register('marketPrice')}
+        error={errors.marketPrice ? t(errors.marketPrice.message ?? '') : undefined}
+        trailing={
+          <span className="pe-2.5 text-subhead text-muted-foreground">{t('fields.currency')}</span>
+        }
+        {...marketPrice}
+        onChange={(event) => {
+          event.target.value = groupDinars(event.target.value);
+          void marketPrice.onChange(event);
+        }}
       />
 
       {errorCode ? (

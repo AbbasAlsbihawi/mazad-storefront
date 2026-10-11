@@ -22,7 +22,8 @@
       "SELLER": "Cancelled by the seller",
       "ADMIN": "Cancelled by Mazad",
       "SYSTEM": "Cancelled automatically"
-    }
+    },
+    "viewListing": "View listing"
   },
   "status": {
     "CREATED": "Pending",
@@ -171,6 +172,17 @@
       "PAYMENT_PROVIDER_UNAVAILABLE": "Electronic payment is temporarily unavailable. Try again later or pay cash on delivery.",
       "PAYMENT_PROVIDER_REJECTED": "The payment provider couldn't open a payment page. Try again later or pay cash on delivery.",
       "generic": "Couldn't open the payment page. Try again."
-    }
+    },
+    "methodName": {
+      "CASH_ON_DELIVERY": "Cash on delivery",
+      "SWIFTPAY": "Card"
+    },
+    "notPaidYet": "Not paid yet"
+  },
+  "list": {
+    "more_one": "+{{count, num}} more",
+    "more_other": "+{{count, num}} more",
+    "itemAndDelivery": "Item {{item}} · Delivery {{delivery}}",
+    "itemsAndDelivery": "Items {{item}} · Delivery {{delivery}}"
   }
 }

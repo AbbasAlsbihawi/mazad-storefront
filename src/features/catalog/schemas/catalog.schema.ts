@@ -47,33 +47,48 @@ export const productConditionSchema = z.enum(['NEW', 'LIKE_NEW', 'OPEN_BOX', 'US
 const productImageSchema = z.object({
   id: z.string(),
   url: z.string(),
+  // The 300 px thumbnail for strips and lists (equals `url` for external images; older APIs omit it).
+  thumbUrl: z.string().nullish(),
   sortOrder: z.number(),
   isCover: z.boolean(),
 });
 
+// The product's specifications (detail only, may be empty): there are no brand/model fields.
 const productVariantSchema = z.object({
-  id: z.string(),
-  nameEn: z.string(),
-  nameAr: z.string(),
-  valueEn: z.string(),
-  valueAr: z.string(),
+  id: z.string().optional(),
+  nameEn: z.string().nullish(),
+  nameAr: z.string().nullish(),
+  valueEn: z.string().nullish(),
+  valueAr: z.string().nullish(),
 });
 
-const auctionCategorySchema = z.object({
+const categoryRefSchema = z.object({
   id: z.string(),
   slug: z.string(),
   nameEn: z.string(),
   nameAr: z.string(),
 });
 
+// With a parent, the parent is the main category and this one the subcategory.
+const auctionCategorySchema = categoryRefSchema.extend({
+  parent: categoryRefSchema.nullish(),
+});
+
+export interface GalleryImage {
+  /** Full size, for the main image. */
+  url: string;
+  /** The small version for thumbnails; the full URL when there is none. */
+  thumbUrl: string;
+}
+
 /** Every photo in display order: the cover first, then by sortOrder. */
-function orderedImageUrls(images: z.infer<typeof productImageSchema>[]): string[] {
+function orderedGallery(images: z.infer<typeof productImageSchema>[]): GalleryImage[] {
   const sorted = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
   const cover = sorted.find((image) => image.isCover);
   const ordered = cover ? [cover, ...sorted.filter((image) => image !== cover)] : sorted;
   return ordered.flatMap((image) => {
     const url = resolveAssetUrl(image.url);
-    return url ? [url] : [];
+    return url ? [{ url, thumbUrl: resolveAssetUrl(image.thumbUrl) ?? url }] : [];
   });
 }
 
@@ -105,7 +120,7 @@ const auctionProductSchema = z
   .transform((product) => ({
     ...product,
     coverImage: resolveAssetUrl(pickCoverImageUrl(product.images)),
-    imageUrls: orderedImageUrls(product.images),
+    gallery: orderedGallery(product.images),
   }));
 
 const auctionSellerSchema = z.object({
@@ -129,6 +144,8 @@ export const auctionSchema = z.object({
   minIncrement: z.string(),
   currentPrice: z.string().nullable(),
   bidCount: z.number(),
+  // Distinct bidders (detail only; bidCount includes automatic bids).
+  bidderCount: z.number().optional(),
   startsAt: z.string(),
   endsAt: z.string(),
   originalEndsAt: z.string(),
@@ -140,6 +157,8 @@ export const auctionSchema = z.object({
   minNextBid: z.string().optional(),
   bidIncrement: z.string().optional(),
   saleCancelled: z.boolean().optional(),
+  // This auction's delivery fee (the same as store.deliveryFee, which older builds only send).
+  deliveryFee: z.string().optional(),
   paymentMethods: z.array(z.string()).optional(),
   returnWindowDays: z.number().optional(),
   sellerRating: z.object({ average: z.number().nullable(), count: z.number() }).optional(),
@@ -164,6 +183,9 @@ export const bidHistoryItemSchema = z.object({
   id: z.string(),
   amount: z.string(),
   createdAt: z.string(),
+  // Optional: older API builds. `isMine` only ever marks the signed-in viewer's own bids.
+  isAutoBid: z.boolean().optional(),
+  isMine: z.boolean().optional(),
   bidder: z.object({ maskedName: z.string() }),
 });
 

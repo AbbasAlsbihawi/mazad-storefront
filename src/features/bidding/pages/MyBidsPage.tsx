@@ -9,7 +9,7 @@ import { Badge, Card, Icon, Skeleton } from '@shared/components/ui';
 import { SegmentedControl } from '@shared/components/ios';
 import { ROUTES } from '@shared/constants';
 import { useLocale, useMoney, useServerClock } from '@shared/hooks';
-import { formatDuration, getImageTintStyle, pickLocalizedName, resolveAssetUrl } from '@shared/lib';
+import { formatDuration, getImageTintStyle, pickLocalizedName, resolveThumbUrl } from '@shared/lib';
 import { useMyBids } from '../hooks/useMyBids';
 import { useBiddingTranslation } from '../hooks/useBiddingTranslation';
 import type { BidStanding, MyBidItem } from '../types/bidding.types';
@@ -88,7 +88,8 @@ function MyBidRow({ item }: { item: MyBidItem }) {
   const { now } = useServerClock();
 
   const name = pickLocalizedName(item.auction.product, locale);
-  const coverImage = resolveAssetUrl(item.auction.product.coverImage);
+  // A 56 px thumb: the 300 px thumbnail, not the full photo.
+  const coverImage = resolveThumbUrl(item.auction.product.coverImage);
   const endsInMs = new Date(item.auction.endsAt).getTime() - now();
 
   return (

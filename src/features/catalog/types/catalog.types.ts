@@ -8,7 +8,7 @@ import type {
   storePageSchema,
 } from '../schemas/catalog.schema';
 
-export type { CategoryNode } from '../schemas/catalog.schema';
+export type { CategoryNode, GalleryImage } from '../schemas/catalog.schema';
 export type AuctionStatus = z.infer<typeof auctionStatusSchema>;
 export type ProductCondition = z.infer<typeof productConditionSchema>;
 export type Auction = z.infer<typeof auctionSchema>;
