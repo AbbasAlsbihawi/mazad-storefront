@@ -53,11 +53,15 @@ export const orderSchema = z.object({
   shipPhone: z.string().nullable(),
   note: z.string().nullable(),
   cancelReason: z.string().nullable(),
+  // Who cancelled (mazad-api Order.cancelledBy); absent from older API builds.
+  cancelledBy: z.enum(['BUYER', 'SELLER', 'ADMIN', 'SYSTEM']).nullish(),
   createdAt: z.string(),
   confirmedAt: z.string().nullable(),
   shippedAt: z.string().nullable(),
   deliveredAt: z.string().nullable(),
   cancelledAt: z.string().nullable(),
+  // Set once the order is paid (cash on delivery or SwiftPayIQ); older APIs omit it.
+  paidAt: z.string().nullish(),
   items: z.array(orderItemSchema),
   store: z.object({
     id: z.string(),
@@ -66,6 +70,10 @@ export const orderSchema = z.object({
     city: z.string(),
   }),
   seller: z.object({ id: z.string(), fullName: z.string(), isVerified: z.boolean() }),
+  // The buyer: included by mazad-api's orderInclude, shown to the seller (Sales).
+  customer: z
+    .object({ id: z.string(), fullName: z.string(), phone: z.string().nullable() })
+    .nullish(),
 });
 
 export const ordersListSchema = z.array(orderSchema);

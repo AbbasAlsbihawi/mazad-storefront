@@ -5,7 +5,10 @@ export const ROUTES = {
   store: (id: string) => `/stores/${id}`,
   login: '/login',
   register: '/register',
+  resetPassword: '/reset-password',
   account: '/account',
+  help: '/help',
+  helpTopic: (topic: string) => `/help/${topic}`,
   addressesList: '/account/addresses',
   myBids: '/account/bids',
   watchlistList: '/account/watchlist',
@@ -15,12 +18,15 @@ export const ROUTES = {
   wins: '/account/wins',
   orders: '/account/orders',
   orderDetail: (id: string) => `/account/orders/${id}`,
+  payments: '/account/payments',
   // The seller's own side, hung off the account screen rather than a sixth tab (five is the
   // HIG ceiling — see AppTabBar).
   selling: '/account/selling',
   sellingStores: '/account/selling/stores',
   sellingProducts: '/account/selling/products',
   sellingAuctions: '/account/selling/auctions',
+  sellingSales: '/account/selling/sales',
+  saleDetail: (id: string) => `/account/selling/sales/${id}`,
   sellingAuctionNew: (productId: string) =>
     `/account/selling/auctions?productId=${encodeURIComponent(productId)}`,
 } as const;

@@ -16,7 +16,13 @@
     "store": "Store",
     "note": "Note",
     "placedAt": "Placed",
-    "cancelReason": "Cancellation reason"
+    "cancelReason": "Cancellation reason",
+    "cancelledBy": {
+      "BUYER": "Cancelled by the buyer",
+      "SELLER": "Cancelled by the seller",
+      "ADMIN": "Cancelled by Mazad",
+      "SYSTEM": "Cancelled automatically"
+    }
   },
   "status": {
     "CREATED": "Pending",
@@ -51,6 +57,120 @@
     "ORDER_FORBIDDEN": "You can't view this order.",
     "ORDER_STATUS_INVALID": "This order can't be cancelled at its current status.",
     "RETURN_WINDOW_CLOSED": "The 7-day return window has closed.",
-    "RETURN_ALREADY_EXISTS": "There's already a return request for this item."
+    "RETURN_ALREADY_EXISTS": "There's already a return request for this item.",
+    "INVALID_ORDER_TRANSITION": "This order's status has already changed. Refresh to see it.",
+    "INVALID_RETURN_TRANSITION": "This return has already moved on. Refresh to see its current status.",
+    "RETURN_FORBIDDEN": "This item can't be returned.",
+    "RETURN_NOT_FOUND": "This return no longer exists.",
+    "REASON_REQUIRED": "Please add a reason.",
+    "RETURN_REJECTED": "This return was rejected.",
+    "INVALID_REFUND_AMOUNT": "Enter a valid refund amount.",
+    "ORDER_NOT_CANCELLABLE": "This order can't be cancelled at its current status.",
+    "CASH_CONFIRMATION_REQUIRED": "Confirm the cash you received from the buyer first.",
+    "CASH_AMOUNT_MISMATCH": "The cash received must equal the order total."
+  },
+  "sales": {
+    "title": "Orders received",
+    "emptyTitle": "No orders yet",
+    "empty": "When someone wins or buys one of your auctions, the order appears here.",
+    "buyer": "Buyer",
+    "callBuyer": "Call the buyer",
+    "next": {
+      "CONFIRMED": "Confirm order",
+      "OUT_FOR_DELIVERY": "Mark as out for delivery",
+      "DELIVERED": "Mark as delivered"
+    },
+    "nextHint": {
+      "CREATED": "Confirm the order, then prepare it for delivery.",
+      "CONFIRMED": "Mark it out for delivery when it leaves your store.",
+      "OUT_FOR_DELIVERY": "Mark it delivered once the buyer has it and paid on delivery."
+    },
+    "toast": {
+      "CONFIRMED": "Order confirmed.",
+      "OUT_FOR_DELIVERY": "Marked as out for delivery.",
+      "DELIVERED": "Marked as delivered."
+    },
+    "returns": {
+      "reason": "Buyer's reason",
+      "approve": "Approve return",
+      "reject": "Reject",
+      "rejectReason": "Why are you rejecting it?",
+      "rejectSubmit": "Reject return",
+      "received": "Product received",
+      "refund": "Refund the buyer",
+      "refundConfirm": "Refund {{amount}} to the buyer?",
+      "refundConfirmBody": "This can't be undone.",
+      "back": "Back"
+    },
+    "returnToast": {
+      "approve": "Return approved.",
+      "reject": "Return rejected.",
+      "received": "Marked as received.",
+      "refund": "Refund recorded."
+    },
+    "deliver": {
+      "cashConfirm": "Did you receive {{amount}} from the buyer? Confirm only once you have the full amount; the order is then marked delivered and paid.",
+      "paidConfirm": "This order was already paid by card. Mark it as delivered?"
+    }
+  },
+  "payment": {
+    "title": "Payment",
+    "methodLabel": "Payment method",
+    "cod": "Cash on delivery",
+    "codHint": "Pay the seller in cash when the order arrives.",
+    "swiftpay": "Electronic payment via SwiftPayIQ",
+    "swiftpayHint": "Pay now with an Iraqi card (QiCard, local Mastercard or Visa) on SwiftPayIQ's secure page.",
+    "amountDue": "Amount due",
+    "payNow": "Pay {{amount}}",
+    "continue": "Continue to the payment page",
+    "refresh": "Check payment status",
+    "retry": "Try again",
+    "testMode": "Test mode: no real money is charged.",
+    "openedHint": "The payment page opened in a new tab. Come back here when you're done: this page updates by itself once SwiftPayIQ confirms.",
+    "state": {
+      "awaiting": "Waiting for SwiftPayIQ to confirm your payment",
+      "awaitingHint": "Returning from the payment page doesn't confirm it; SwiftPayIQ notifies Mazad directly. This usually takes a few seconds.",
+      "paid": "Paid electronically",
+      "paidHint": "Nothing to pay on delivery.",
+      "paidCash": "Paid on delivery",
+      "failed": "The payment didn't go through",
+      "failedHint": "No money was taken. You can try again or pay cash on delivery.",
+      "refunded": "Payment refunded",
+      "partiallyRefunded": "Payment partly refunded",
+      "unpaid": "Cash on delivery"
+    },
+    "seller": {
+      "paid": "The buyer paid electronically. Do not collect cash on delivery.",
+      "cod": "Cash on delivery: collect the total when you deliver.",
+      "refunded": "The buyer's electronic payment was refunded."
+    },
+    "status": {
+      "PENDING": "Waiting",
+      "PAID": "Paid",
+      "FAILED": "Failed",
+      "PARTIALLY_REFUNDED": "Partly refunded",
+      "REFUNDED": "Refunded",
+      "CANCELLED": "Closed"
+    },
+    "method": {
+      "CASH_ON_DELIVERY": "Cash on delivery",
+      "SWIFTPAY": "SwiftPayIQ"
+    },
+    "history": {
+      "title": "Payment history",
+      "emptyTitle": "No payments yet",
+      "empty": "Electronic payments and cash payments of your orders show up here.",
+      "order": "Order"
+    },
+    "errors": {
+      "ELECTRONIC_PAYMENT_DISABLED": "Electronic payment isn't available right now. You can pay cash on delivery.",
+      "ORDER_ALREADY_PAID": "This order is already paid.",
+      "ORDER_NOT_PAYABLE": "This order can no longer be paid electronically.",
+      "ORDER_AMOUNT_NOT_PAYABLE": "This order's amount can't be paid electronically. You can pay cash on delivery.",
+      "CHECKOUT_IN_PROGRESS": "The payment page is being prepared. Try again in a moment.",
+      "PAYMENT_PROVIDER_UNAVAILABLE": "Electronic payment is temporarily unavailable. Try again later or pay cash on delivery.",
+      "PAYMENT_PROVIDER_REJECTED": "The payment provider couldn't open a payment page. Try again later or pay cash on delivery.",
+      "generic": "Couldn't open the payment page. Try again."
+    }
   }
 }

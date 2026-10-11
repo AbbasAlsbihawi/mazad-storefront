@@ -1,7 +1,14 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import { ROUTES } from '@shared/constants';
+import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import { recordServerTimeSample } from '@shared/lib/server-clock';
 import { useLocaleStore } from '@shared/store';
-import { getSessionTokens, setSessionTokens, type SessionTokens } from './auth-session';
+import {
+  getSessionTokens,
+  readPersistedTokens,
+  setSessionTokens,
+  type SessionTokens,
+} from './auth-session';
+import { withCrossTabLock } from './cross-tab-lock';
+import { redirectToLogin } from './redirect-to-login';
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 
@@ -18,8 +25,33 @@ httpClient.interceptors.request.use((config) => {
   }
   // mazad-api picks nameEn/nameAr from this header, default "ar" (see ADR-010).
   config.headers.set('Accept-Language', useLocaleStore.getState().locale);
+  (config as TimedConfig).sentAt = Date.now();
   return config;
 });
+
+interface TimedConfig extends InternalAxiosRequestConfig {
+  sentAt?: number;
+}
+
+/** Every response (errors included) carries X-Server-Time: one clock sample per request. */
+function sampleServerClock(response: AxiosResponse | undefined) {
+  const serverMs = Number(response?.headers?.['x-server-time']);
+  const sentAt = (response?.config as TimedConfig | undefined)?.sentAt;
+  if (sentAt !== undefined && Number.isFinite(serverMs)) {
+    recordServerTimeSample(serverMs, sentAt, Date.now());
+  }
+}
+
+httpClient.interceptors.response.use(
+  (response) => {
+    sampleServerClock(response);
+    return response;
+  },
+  (error: AxiosError) => {
+    sampleServerClock(error.response);
+    return Promise.reject(error);
+  },
+);
 
 /** Bare axios, not httpClient — a refresh call must never itself re-enter this interceptor. */
 async function refreshAccessToken(refreshToken: string): Promise<SessionTokens> {
@@ -30,13 +62,61 @@ async function refreshAccessToken(refreshToken: string): Promise<SessionTokens> 
   return { accessToken: response.data.accessToken, refreshToken: response.data.refreshToken };
 }
 
-interface RetriableConfig extends InternalAxiosRequestConfig {
-  _retried?: boolean;
+/*
+ * Single-flight refresh. mazad-api rotates the refresh token on every use and revokes the whole
+ * session when an already-rotated token comes back (REFRESH_TOKEN_REUSE, ADR-008). Requests that
+ * hit 401 together must share ONE /auth/refresh call; if each sent the same refresh token, the
+ * second call would end the session.
+ *
+ * Across tabs the same rule holds: the refresh runs under a Web Lock, and whoever gets the lock
+ * first checks storage. If another tab already rotated the session, its tokens are adopted with
+ * no network call; if another tab signed out, this refresh fails and this tab signs out too.
+ */
+let inFlightRefresh: Promise<SessionTokens> | null = null;
+
+/** Runs while holding the cross-tab lock; the new tokens are persisted before it is released. */
+async function rotateOrAdopt(refreshToken: string): Promise<SessionTokens> {
+  const persisted = readPersistedTokens();
+  if (!persisted) throw new Error('Signed out in another tab');
+  const tokens =
+    persisted.refreshToken !== refreshToken ? persisted : await refreshAccessToken(refreshToken);
+  // Inside the lock: the next tab to get it must already see the rotated refresh token.
+  setSessionTokens(tokens);
+  return tokens;
 }
 
+function refreshSessionOnce(refreshToken: string): Promise<SessionTokens> {
+  inFlightRefresh ??= withCrossTabLock(() => rotateOrAdopt(refreshToken)).finally(() => {
+    inFlightRefresh = null;
+  });
+  return inFlightRefresh;
+}
+
+/** Ends the session once: every caller that failed together lands here, only the first acts. */
 function forceSignOut() {
+  if (!getSessionTokens()) return;
   setSessionTokens(null);
-  if (typeof window !== 'undefined') window.location.href = ROUTES.login;
+  redirectToLogin();
+}
+
+function bearerOf(config: InternalAxiosRequestConfig): string | undefined {
+  const header = config.headers.get('Authorization');
+  return typeof header === 'string' ? header.replace(/^Bearer /, '') : undefined;
+}
+
+/**
+ * The refresh could not be completed for reasons that say nothing about the session (offline, rate
+ * limited, server error). Only the API refusing the refresh token (400/401/403), or another tab
+ * having signed out, ends the session.
+ */
+function isTransientRefreshFailure(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) return false;
+  const status = error.response?.status;
+  return status === undefined || ![400, 401, 403].includes(status);
+}
+
+interface RetriableConfig extends InternalAxiosRequestConfig {
+  _retried?: boolean;
 }
 
 httpClient.interceptors.response.use(
@@ -51,22 +131,29 @@ httpClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // mazad-api revokes the whole session on refresh-token reuse (REFRESH_TOKEN_REUSE) — a
-    // second 401 on an already-retried request must not attempt another refresh (ADR-008).
+    // Each request is retried at most once. A 401 on the retry means even the fresh token was
+    // refused, so the session is over; refreshing again would only loop.
     if (original._retried) {
       forceSignOut();
       return Promise.reject(error);
     }
+    original._retried = true;
 
+    let fresh: SessionTokens;
     try {
-      const refreshed = await refreshAccessToken(tokens.refreshToken);
-      setSessionTokens(refreshed);
-      original._retried = true;
-      original.headers.set('Authorization', `Bearer ${refreshed.accessToken}`);
-      return httpClient(original);
+      // A refresh may have completed while this request was in flight. Then it only needs the
+      // newer token, not a second rotation of the session.
+      fresh =
+        bearerOf(original) !== tokens.accessToken
+          ? tokens
+          : await refreshSessionOnce(tokens.refreshToken);
     } catch (refreshError) {
-      forceSignOut();
+      // Keep the session through outages; the next request tries the refresh again.
+      if (!isTransientRefreshFailure(refreshError)) forceSignOut();
       return Promise.reject(refreshError);
     }
+
+    original.headers.set('Authorization', `Bearer ${fresh.accessToken}`);
+    return httpClient(original);
   },
 );

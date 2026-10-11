@@ -11,12 +11,20 @@ import { useBiddingTranslation } from '../hooks/useBiddingTranslation';
 import { BidForm } from './BidForm';
 import { BuyNowButton } from './BuyNowButton';
 import { AutoBidControl } from './AutoBidControl';
+import { closedMessageKey } from '../lib/closed-message';
 
 export interface BidPanelProps {
   auctionId: string;
+  /** The viewer is this auction's seller: nothing to bid (mazad-api OWN_AUCTION_BID). */
+  isOwnAuction?: boolean;
+  /**
+   * The viewer won this auction (from GET /me/wins, composed by the route): its order, or null
+   * while auto-fulfilment is still creating it. Absent for everyone else.
+   */
+  winner?: { orderId: string | null } | null;
 }
 
-export function BidPanel({ auctionId }: BidPanelProps) {
+export function BidPanel({ auctionId, isOwnAuction = false, winner = null }: BidPanelProps) {
   const { t, isReady } = useBiddingTranslation();
   const isAuthenticated = useIsAuthenticated();
   const pricing = useAuctionPricing(auctionId);
@@ -29,11 +37,26 @@ export function BidPanel({ auctionId }: BidPanelProps) {
     return <ErrorState message={t('panel.loadError')} onRetry={() => void pricing.refetch()} />;
   }
 
+  // The winner of a closed auction: the way to what the win became, not just "bidding is closed".
+  if (pricing.data.status !== 'LIVE' && winner) {
+    return (
+      <BottomActionBar>
+        <Link
+          href={winner.orderId ? ROUTES.orderDetail(winner.orderId) : ROUTES.wins}
+          className={buttonVariants({ size: 'lg', isFullWidth: true })}
+          data-testid="won-view-order"
+        >
+          {t(winner.orderId ? 'panel.wonViewOrder' : 'panel.wonViewWins')}
+        </Link>
+      </BottomActionBar>
+    );
+  }
+
   if (pricing.data.status !== 'LIVE') {
     return (
       <BottomActionBar>
         <span className="w-full py-3 text-center text-subhead text-muted-foreground">
-          {t('panel.notLive')}
+          {t(closedMessageKey(pricing.data.status))}
         </span>
       </BottomActionBar>
     );
@@ -45,6 +68,17 @@ export function BidPanel({ auctionId }: BidPanelProps) {
         <Link href={ROUTES.login} className={buttonVariants({ size: 'lg', isFullWidth: true })}>
           {t('panel.signInToBid')}
         </Link>
+      </BottomActionBar>
+    );
+  }
+
+  // The seller looking at their own live auction: say so instead of a bid they can't place.
+  if (isOwnAuction) {
+    return (
+      <BottomActionBar>
+        <span className="w-full py-3 text-center text-subhead text-muted-foreground">
+          {t('panel.ownAuction')}
+        </span>
       </BottomActionBar>
     );
   }

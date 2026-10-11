@@ -24,6 +24,7 @@ export const QUERY_KEYS = {
     // TanStack Query footgun (see the composition-seam note in the interactive-features plan).
     auctionPricing: (id: string) => ['bidding', 'auctionPricing', id] as const,
     myBids: <T>(filters: T) => ['bidding', 'myBids', filters] as const,
+    myStanding: (id: string) => ['bidding', 'myStanding', id] as const,
   },
   watchlist: {
     list: ['watchlist', 'list'] as const,
@@ -34,6 +35,12 @@ export const QUERY_KEYS = {
   orders: {
     list: ['orders', 'list'] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,
+    sales: ['orders', 'sales'] as const,
+  },
+  payments: {
+    methods: ['payments', 'methods'] as const,
+    order: (orderId: string) => ['payments', 'order', orderId] as const,
+    mine: ['payments', 'mine'] as const,
   },
   notifications: {
     list: ['notifications', 'list'] as const,

@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, Icon } from '@shared/components/ui';
 import { BottomActionBar, Stepper } from '@shared/components/ios';
-import { getErrorCode, parseMoney } from '@shared/lib';
+import { getErrorCode, newIdempotencyKey, parseMoney, roundMoney } from '@shared/lib';
 import { useMoney } from '@shared/hooks';
 import { ROUTES } from '@shared/constants';
 import { computeMinimumBid } from '../lib/computeMinimumBid';
 import { usePlaceBid } from '../hooks/usePlaceBid';
+import { useMyStanding } from '../hooks/useMyStanding';
 import { useBiddingTranslation } from '../hooks/useBiddingTranslation';
 import type { AuctionPricing } from '../types/bidding.types';
 
@@ -27,15 +28,53 @@ export function BidForm({ auction }: BidFormProps) {
   const { t: tCommon } = useTranslation('common');
   const { money } = useMoney();
   const placeBid = usePlaceBid(auction.id);
+  const standing = useMyStanding(auction.id);
 
   const minimumBid = computeMinimumBid(auction) ?? 0;
-  const increment = parseMoney(auction.minIncrement) ?? 1;
+  // The raise at this price level (the server's ladder), else the auction's fixed increment.
+  const increment = parseMoney(auction.bidIncrement ?? auction.minIncrement) ?? 1;
   const [chosenAmount, setChosenAmount] = useState(minimumBid);
 
   // Another bidder raising the price moves the floor under us. Clamping during render rather
   // than syncing in an effect means the displayed amount is never briefly below what the server
   // would accept, and a deliberately higher bid is still preserved.
   const amount = Math.max(chosenAmount, minimumBid);
+  // The floor rose above what the user picked: the next tap only adopts the new amount, so a bid
+  // is never sent for more than the user had in front of them when they decided.
+  // A rise the user caused (their own bid, or their auto-bid answering someone) is not a conflict.
+  const priceMoved = chosenAmount < minimumBid && !standing?.leading;
+  const buyNowPrice = parseMoney(auction.buyNowPrice);
+  const reachesBuyNow = buyNowPrice != null && amount >= buyNowPrice;
+
+  // One Idempotency-Key per bid intent (auction + amount): retrying the same bid after a timeout
+  // reuses it, so a bid the server already committed is never placed twice.
+  const intent = useRef<{ amount: number; key: string } | null>(null);
+  function submit() {
+    if (priceMoved) {
+      setChosenAmount(minimumBid);
+      return;
+    }
+    if (intent.current?.amount !== amount) {
+      intent.current = { amount, key: newIdempotencyKey() };
+    }
+    placeBid.mutate(
+      { amount, idempotencyKey: intent.current.key },
+      {
+        onSuccess: (response) => {
+          intent.current = null;
+          // The next decision starts from the minimum after this bid, not the amount just placed.
+          if (!response?.auction) return;
+          const next = computeMinimumBid({
+            currentPrice: response.auction.currentPrice,
+            startingPrice: auction.startingPrice,
+            minIncrement: auction.minIncrement,
+            minNextBid: response.auction.minNextBid,
+          });
+          if (next != null) setChosenAmount(next);
+        },
+      },
+    );
+  }
 
   const errorCode = getErrorCode(placeBid.error);
 
@@ -48,7 +87,8 @@ export function BidForm({ auction }: BidFormProps) {
             value={amount}
             min={minimumBid}
             step={increment}
-            onChange={setChosenAmount}
+            // Stepper adds in floating point; snap every step to exact 2-decimal money.
+            onChange={(next) => setChosenAmount(roundMoney(next))}
             displayValue={money(String(amount))}
             decrementLabel={t('form.decrease')}
             incrementLabel={t('form.increase')}
@@ -57,6 +97,33 @@ export function BidForm({ auction }: BidFormProps) {
         <p className="text-caption text-muted-foreground">
           {t('form.minimumHint', { amount: money(String(minimumBid)) })}
         </p>
+        {standing?.leading ? (
+          <p
+            role="status"
+            className="text-footnote font-semibold text-success"
+            data-testid="bid-leading"
+          >
+            {t('form.leading')}
+          </p>
+        ) : standing?.myHighestBid ? (
+          <p
+            role="status"
+            className="text-footnote font-semibold text-warning"
+            data-testid="bid-outbid"
+          >
+            {t('form.outbid')}
+          </p>
+        ) : null}
+        {priceMoved ? (
+          <p role="status" className="text-footnote font-semibold text-warning">
+            {t('form.priceMoved', { amount: money(String(minimumBid)) })}
+          </p>
+        ) : null}
+        {reachesBuyNow ? (
+          <p role="status" className="text-footnote font-semibold text-foreground">
+            {t('form.bidBuysNow')}
+          </p>
+        ) : null}
 
         {errorCode ? (
           <p role="alert" className="flex items-start gap-1.5 text-footnote text-destructive">
@@ -89,9 +156,11 @@ export function BidForm({ auction }: BidFormProps) {
           hasShadow
           className="flex-[1.3]"
           isLoading={placeBid.isPending}
-          onClick={() => placeBid.mutate(amount)}
+          onClick={submit}
         >
-          {t('form.placeBid')}
+          {priceMoved
+            ? t('form.confirmNewAmount', { amount: money(String(minimumBid)) })
+            : t('form.placeBid')}
         </Button>
       </BottomActionBar>
     </>

@@ -1,4 +1,19 @@
 import type { NextConfig } from 'next';
+import { securityHeaders } from './src/shared/config/security-headers';
+
+// NEXT_PUBLIC_* values are inlined at build time: a production build without them would silently
+// ship the localhost development fallbacks (here, in shared/api/http-client.ts and
+// shared/lib/asset.ts) to every visitor. Fail the build instead, like mazad-dashboard does.
+if (process.env.NODE_ENV === 'production') {
+  const missing = ['NEXT_PUBLIC_API_URL', 'NEXT_PUBLIC_ASSET_BASE_URL'].filter(
+    (name) => !process.env[name]?.trim(),
+  );
+  if (missing.length > 0) {
+    throw new Error(
+      `${missing.join(' and ')} must be set for a production build (see .env.example)`,
+    );
+  }
+}
 
 const assetBaseUrl = process.env.NEXT_PUBLIC_ASSET_BASE_URL ?? 'http://localhost:3001/assets';
 
@@ -12,6 +27,14 @@ const assetUrl = (() => {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders(process.env.NEXT_PUBLIC_API_URL, assetBaseUrl),
+      },
+    ];
+  },
   // A stray ~/yarn.lock outside this workspace makes Turbopack guess the wrong project root —
   // pin it explicitly since frontend/ (this package.json) is always the real root.
   turbopack: {

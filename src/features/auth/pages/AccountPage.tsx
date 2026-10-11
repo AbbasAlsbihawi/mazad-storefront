@@ -7,9 +7,11 @@ import { ScreenHeader } from '@shared/components/layout';
 import { Badge, Button, Card, Icon } from '@shared/components/ui';
 import { ListRow } from '@shared/components/ios';
 import { useLocale, useTheme } from '@shared/hooks';
+import { isolatePhone } from '@shared/lib';
 import { useAuthTranslation } from '../hooks/useAuthTranslation';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useLogout } from '../hooks/useLogout';
+import { DeleteAccountSection } from '../components/DeleteAccountSection';
 
 export function AccountPage() {
   const { t, isReady } = useAuthTranslation();
@@ -33,7 +35,9 @@ export function AccountPage() {
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <p className="truncate text-title-3 font-bold text-foreground">{user.fullName}</p>
-            <p className="text-footnote text-muted-foreground tabular-nums">{user.phone}</p>
+            <p className="text-footnote text-muted-foreground tabular-nums">
+              {user.phone ? isolatePhone(user.phone) : null}
+            </p>
           </div>
           {user.isVerified ? (
             <Badge tone="live" className="shrink-0">
@@ -52,6 +56,7 @@ export function AccountPage() {
           <ListRow icon="gavel" title={t('account.myBids')} href={ROUTES.myBids} />
           <ListRow icon="badge-check" title={t('account.wins')} href={ROUTES.wins} />
           <ListRow icon="package" title={t('account.orders')} href={ROUTES.orders} />
+          <ListRow icon="credit-card" title={t('account.payments')} href={ROUTES.payments} />
           <ListRow icon="heart" title={t('account.watchlist')} href={ROUTES.watchlistList} />
           <ListRow icon="store" title={t('account.following')} href={ROUTES.following} />
           <ListRow icon="map-pin" title={t('account.addresses')} href={ROUTES.addressesList} />
@@ -61,6 +66,10 @@ export function AccountPage() {
             href={ROUTES.notifications}
             isLast
           />
+        </Card>
+
+        <Card hasShadow className="overflow-hidden">
+          <ListRow icon="eye" title={t('account.help')} href={ROUTES.help} isLast />
         </Card>
 
         {/* Preferences toggle in place rather than pushing a screen — one tap, no navigation. */}
@@ -93,6 +102,8 @@ export function AccountPage() {
         >
           {t('account.signOut')}
         </Button>
+
+        <DeleteAccountSection />
       </div>
     </>
   );

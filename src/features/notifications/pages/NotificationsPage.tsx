@@ -32,6 +32,11 @@ const TYPE_ICON: Record<NotificationType, IconName> = {
   WATCHED_AUCTION_STARTING: 'heart',
   ADMIN_AUCTION_PENDING: 'bell',
   ADMIN_RETURN_REQUESTED: 'bell',
+  PAYMENT_STATUS_CHANGED: 'credit-card',
+  AUCTION_CANCELLED: 'x',
+  AUCTION_LOST: 'gavel',
+  AUCTION_LIVE: 'gavel',
+  AUCTION_UNSOLD: 'gavel',
 };
 
 export function NotificationsPage() {
@@ -119,10 +124,7 @@ function NotificationRow({
 
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span
-          className={cn(
-            'text-subhead text-foreground',
-            isUnread ? 'font-semibold' : 'font-medium',
-          )}
+          className={cn('text-subhead text-foreground', isUnread ? 'font-semibold' : 'font-medium')}
         >
           {title}
         </span>
