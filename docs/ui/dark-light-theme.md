@@ -3,9 +3,10 @@
 ## How It Works
 
 1. `:root` carries the **dark** token values by default; `[data-theme='light']` overrides them.
-2. A `next/script` with `strategy="beforeInteractive"` in the root layout reads the saved
-   preference from `localStorage` and stamps `data-theme` (plus `lang`/`dir`) on `<html>` before
-   React hydrates — so there's no flash of the wrong palette on first paint.
+2. An inline `<script>` in the root layout's `<head>` (carrying the request's CSP nonce) reads the
+   saved preference from `localStorage` and stamps `data-theme` (plus `lang`/`dir`) on `<html>`
+   while the page is still being parsed — so there's no flash of the wrong palette or direction on
+   first paint.
 3. `useTheme` (`shared/hooks`) toggles `data-theme` after mount and persists the choice via
    `shared/store/theme.store.ts` (Zustand + `localStorage`).
 

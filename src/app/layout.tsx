@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
+import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import { SITE_NAME, isNoIndex, siteUrl } from '@shared/seo';
 import { AppProviders, AppShell } from './providers';
@@ -54,9 +54,12 @@ export const viewport: Viewport = {
   ],
 };
 
-// Reads the persisted locale/theme and stamps <html> before hydration, so neither the wrong
-// direction nor the wrong palette ever flashes (ADR-011). Vanilla JS only — this runs before
-// any bundled module, including Zustand, so it can't import the stores it's reading.
+// Reads the persisted locale/theme and stamps <html> before first paint, so neither the wrong
+// direction nor the wrong palette ever flashes (ADR-011). It is a plain inline script in <head>,
+// which the browser runs synchronously while parsing — not next/script's beforeInteractive, which
+// in the App Router is queued and only runs once the framework chunks have loaded. Vanilla JS
+// only — this runs before any bundled module, including Zustand, so it can't import the stores
+// it's reading.
 const THEME_LOCALE_INIT_SCRIPT = `
 (function () {
   try {
@@ -83,17 +86,24 @@ const THEME_LOCALE_INIT_SCRIPT = `
 })();
 `;
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // This request's CSP script nonce, from src/proxy.ts. Reading request headers renders every page
+  // per request: a nonce can't be baked into prerendered HTML (docs/security.md).
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script
+          id="theme-locale-init"
+          nonce={nonce}
+          // Browsers hide a nonce from the DOM after parsing, so it never matches on hydration.
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: THEME_LOCALE_INIT_SCRIPT }}
+        />
+      </head>
       {/* suppressHydrationWarning: some browser extensions (e.g. Grammarly) inject data-gr-*
           attributes into <body> before React hydrates; harmless, but noisy without this. */}
       <body suppressHydrationWarning>
-        <Script
-          id="theme-locale-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: THEME_LOCALE_INIT_SCRIPT }}
-        />
         <AppProviders>
           <AppShell>{children}</AppShell>
         </AppProviders>

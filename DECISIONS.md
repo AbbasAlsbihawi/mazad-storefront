@@ -133,7 +133,7 @@
 
 **Decision:** `:root` carries the dark token values and `[data-theme='light']` overrides them. A tiny inline script in the root layout reads `localStorage` and stamps `data-theme`, `lang`, and `dir` on `<html>` before hydration; `useTheme` and `useLocale` keep those attributes correct afterwards.
 
-**Consequences:** No theme or direction flash, and components reference only semantic tokens (`bg-surface`, `text-ink`, `border-hairline`) so neither palette is hardcoded anywhere. The script uses `next/script` with `beforeInteractive` rather than `dangerouslySetInnerHTML`, matching `docs/security.md`. `suppressHydrationWarning` on `<html>` is required because the server markup is stale by design.
+**Consequences:** No theme or direction flash, and components reference only semantic tokens (`bg-surface`, `text-ink`, `border-hairline`) so neither palette is hardcoded anywhere. The script is a plain `<script>` in `<head>` carrying the request's CSP nonce, so the browser runs it synchronously while parsing, before first paint. (It used to be `next/script` with `beforeInteractive`, which in the App Router is queued and only runs once the framework chunks load, so the wrong direction or palette could flash.) `suppressHydrationWarning` on `<html>` is required because the server markup is stale by design.
 
 ---
 
