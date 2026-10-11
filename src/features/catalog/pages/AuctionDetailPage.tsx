@@ -94,9 +94,11 @@ export function AuctionDetailPage({
   return (
     // Clears the pinned bottom action bar the bidding panel renders.
     <div className="pb-28">
-      {/* Image well — full-bleed pastel tint with the glass controls floating over it. */}
+      {/* Image well — full-bleed pastel tint with the glass controls floating over it. Tall enough
+          for the photo to be the first thing a buyer studies, with the thumbnails clear of the
+          arrows. */}
       <div
-        className="relative h-52 w-full"
+        className="relative h-80 w-full md:h-[28rem]"
         style={coverImage ? undefined : getImageTintStyle(data.product.id)}
       >
         {photos.length > 0 ? (
