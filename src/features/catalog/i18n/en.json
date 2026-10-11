@@ -87,7 +87,11 @@
   "store": {
     "deliveryFee": "Delivery fee",
     "activeAuctions": "Auctions from this store",
-    "notFound": "Store not found.",
+    "notFound": "Store not found",
+    "notFoundMessage": "The store may have been removed or suspended.",
+    "unavailable": "This store isn't available",
+    "unavailableMessage": "You can't view this store right now.",
+    "loadError": "Couldn't load this store.",
     "title": "Store"
   },
   "conditionHint": {

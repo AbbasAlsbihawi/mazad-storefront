@@ -193,16 +193,17 @@ export const bidHistorySchema = z.array(bidHistoryItemSchema);
 
 // --- Stores ------------------------------------------------------------------
 
+// GET /stores/:id is public: no address, phone or pin (the API stopped sending them), and any it
+// did send would be dropped here. Its `auctions` is an always-empty placeholder — listings come
+// from GET /auctions?storeId= — so it isn't read.
 export const storePageSchema = z.object({
   id: z.string(),
   name: z.string(),
   nameEn: z.string(),
   nameAr: z.string(),
   city: z.string(),
-  area: z.string().nullable(),
-  street: z.string().nullable(),
-  details: z.string().nullable(),
-  contactPhone: z.string().nullable(),
   deliveryFee: z.string(),
   seller: z.object({ id: z.string(), fullName: z.string(), isVerified: z.boolean() }),
+  // Optional: older API builds.
+  sellerRating: z.object({ average: z.number().nullable(), count: z.number() }).optional(),
 });

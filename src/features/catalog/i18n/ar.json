@@ -110,7 +110,11 @@
   "store": {
     "deliveryFee": "رسوم التوصيل",
     "activeAuctions": "مزادات هذا المتجر",
-    "notFound": "المتجر غير موجود.",
+    "notFound": "المتجر غير موجود",
+    "notFoundMessage": "قد يكون المتجر قد تم حذفه أو إيقافه.",
+    "unavailable": "هذا المتجر غير متاح",
+    "unavailableMessage": "لا يمكنك عرض هذا المتجر حاليًا.",
+    "loadError": "تعذّر تحميل هذا المتجر.",
     "title": "المتجر"
   },
   "conditionHint": {

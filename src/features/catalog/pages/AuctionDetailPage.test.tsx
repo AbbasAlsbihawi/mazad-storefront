@@ -8,6 +8,7 @@ import { renderWithQuery } from '@/test/render';
 import { catalogApi } from '../api/catalog.api';
 import catalogAr from '../i18n/ar.json';
 import catalogEn from '../i18n/en.json';
+import { SellerCard } from '../components/SellerCard';
 import { auctionSchema } from '../schemas/catalog.schema';
 import type { BidHistoryItem } from '../types/catalog.types';
 import { AuctionDetailPage } from './AuctionDetailPage';
@@ -342,6 +343,52 @@ describe('AuctionDetailPage: the seller', () => {
     expect(seller.queryByTestId('seller-verified')).toBeNull();
     expect(seller.getByTestId('seller-rating')).toHaveTextContent('No reviews yet');
     expect(seller.queryByText(/★/)).toBeNull();
+  });
+
+  it('View store goes to the store by its own id, never the seller id', async () => {
+    await renderAuction(
+      auction({
+        seller: { id: 'seller-9', fullName: 'Ali Hassan', isVerified: true },
+        store: {
+          id: 'store-42',
+          nameEn: 'Ali Store',
+          nameAr: 'متجر علي',
+          city: 'Baghdad',
+          deliveryFee: '5000.00',
+        },
+      }),
+    );
+    const seller = within(screen.getByTestId('detail-seller'));
+    expect(seller.getByRole('link', { name: 'View store' }).getAttribute('href')).toBe(
+      '/stores/store-42',
+    );
+    expect(seller.getByRole('link', { name: 'Ali Hassan' }).getAttribute('href')).toBe(
+      '/sellers/seller-9',
+    );
+  });
+
+  it('one seller with two stores: each auction links to its own store', () => {
+    const store = (id: string, nameEn: string) => ({
+      id,
+      nameEn,
+      nameAr: nameEn,
+      city: 'Baghdad',
+      deliveryFee: '5000.00',
+    });
+    renderWithQuery(
+      <>
+        <SellerCard auction={auction({ id: 'a1', store: store('st-a', 'Store A') })} />
+        <SellerCard auction={auction({ id: 'a2', store: store('st-b', 'Store B') })} />
+      </>,
+    );
+    const cards = screen.getAllByTestId('detail-seller').map((card) => within(card));
+    expect(cards.map((card) => card.getByText(/^Store [AB]$/).textContent)).toEqual([
+      'Store A',
+      'Store B',
+    ]);
+    expect(
+      cards.map((card) => card.getByRole('link', { name: 'View store' }).getAttribute('href')),
+    ).toEqual(['/stores/st-a', '/stores/st-b']);
   });
 });
 
