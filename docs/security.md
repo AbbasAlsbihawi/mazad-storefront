@@ -9,9 +9,9 @@
 
 ## XSS Prevention
 
-- React escapes all JSX output by default. Never use `dangerouslySetInnerHTML`.
+- React escapes all JSX output by default. Avoid `dangerouslySetInnerHTML`; the only uses are the static theme/locale script and escaped JSON-LD.
 - Validate and sanitize any user-generated content before rendering.
-- Set a Content Security Policy (CSP) header on the server.
+- The Content Security Policy and the other security headers are set for every response in `next.config.ts` from `src/shared/config/security-headers.ts`.
 
 ## CSRF
 
@@ -35,12 +35,14 @@ npm audit fix      # auto-fix where possible
 
 Run `npm audit` in CI. Block merges with high/critical vulnerabilities.
 
-## Content Security Policy (Nginx example)
+## Content Security Policy
 
-```nginx
-add_header Content-Security-Policy
-  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:";
-```
+`src/shared/config/security-headers.ts` builds the policy: `connect-src` this origin plus mazad-api
+over https and wss; images from this origin, the API's asset host and Unsplash; Google Fonts for the
+Cairo font; `frame-ancestors 'none'`; HSTS for two years without preload. `script-src` still allows
+`'unsafe-inline'`, because the App Router streams its payload through inline scripts; removing it
+needs a per-request nonce (as the admin dashboard does), which would render every page dynamically.
+There is no `'unsafe-eval'` (zod runs jitless).
 
 ## Sensitive Data in Logs
 
