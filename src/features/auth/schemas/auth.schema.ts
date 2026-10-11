@@ -82,6 +82,8 @@ export const authUserSchema = z.object({
   phone: z.string().nullable(),
   fullName: z.string(),
   isVerified: z.boolean(),
+  // The language of notifications and pushes ("ar" | "en"); absent from older API builds.
+  locale: z.string().nullish(),
 });
 
 export const authTokensSchema = z.object({

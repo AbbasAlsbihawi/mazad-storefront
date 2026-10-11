@@ -1,12 +1,15 @@
 import { httpClient } from '@shared/api';
-import { orderSchema, ordersListSchema } from '../schemas/orders.schema';
-import type { Order, OrderStatus, OrdersList } from '../types/orders.types';
+import { ORDERS_PAGE_SIZE } from '../lib/paging';
+import { orderSchema, ordersListSchema, salesSummarySchema } from '../schemas/orders.schema';
+import type { Order, OrderStatus, OrdersList, SalesSummary } from '../types/orders.types';
 
 export type SellerReturnAction = 'approve' | 'reject' | 'received' | 'refund';
 
 export const ordersApi = {
-  list: async (): Promise<OrdersList> => {
-    const response = await httpClient.get<unknown>('/me/orders', { params: { limit: 50 } });
+  list: async (page = 1): Promise<OrdersList> => {
+    const response = await httpClient.get<unknown>('/me/orders', {
+      params: { page, limit: ORDERS_PAGE_SIZE },
+    });
     return ordersListSchema.parse(response.data);
   },
 
@@ -26,9 +29,17 @@ export const ordersApi = {
   },
 
   /** The seller's received orders across their stores, newest first (same bare-array shape). */
-  listSales: async (): Promise<OrdersList> => {
-    const response = await httpClient.get<unknown>('/me/sales', { params: { limit: 50 } });
+  listSales: async (page = 1): Promise<OrdersList> => {
+    const response = await httpClient.get<unknown>('/me/sales', {
+      params: { page, limit: ORDERS_PAGE_SIZE },
+    });
     return ordersListSchema.parse(response.data);
+  },
+
+  /** The seller's received orders counted by status; `open` still needs the seller. */
+  salesSummary: async (): Promise<SalesSummary> => {
+    const response = await httpClient.get<unknown>('/me/sales/summary');
+    return salesSummarySchema.parse(response.data);
   },
 
   /**

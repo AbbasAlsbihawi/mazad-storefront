@@ -6,9 +6,9 @@ import { useCurrentUser } from '@features/auth';
 import { AuctionDetailPage } from '@features/catalog';
 import { BidPanel } from '@features/bidding';
 import { WatchlistToggle } from '@features/watchlist';
-import { FollowSellerButton } from '@features/sellers';
 import { useWins } from '@features/wins';
 import { useIsAuthenticated } from '@shared/hooks';
+import { SellerFollowToggle } from '@app/sellers/SellerFollowToggle';
 
 /** Statuses after which nobody bids any more and the viewer may be the winner. */
 const CLOSED = new Set(['ENDED', 'SOLD', 'UNSOLD']);
@@ -80,7 +80,7 @@ export function AuctionPageClient() {
         <AuctionBidding auctionId={params.id} sellerId={sellerId} status={status} />
       )}
       watchlistToggle={<WatchlistToggle auctionId={params.id} />}
-      renderSellerFollowToggle={(sellerId) => <FollowSellerButton sellerId={sellerId} />}
+      renderSellerFollowToggle={(sellerId) => <SellerFollowToggle sellerId={sellerId} />}
     />
   );
 }

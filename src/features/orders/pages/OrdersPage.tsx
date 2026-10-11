@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ROUTES } from '@shared/constants';
 import { EmptyState, ErrorState, PageLoader } from '@shared/components/feedback';
 import { ScreenHeader } from '@shared/components/layout';
-import { Badge, Card, Skeleton } from '@shared/components/ui';
+import { Badge, Button, Card, Skeleton } from '@shared/components/ui';
 import { useLocale, useMoney } from '@shared/hooks';
 import { formatDate } from '@shared/lib';
 import { OrderItemImage } from '../components/OrderItemImage';
@@ -35,6 +35,7 @@ export function OrdersPage({ mode = 'buyer' }: { mode?: OrdersMode }) {
   const buyerOrders = useOrders(!isSeller);
   const sales = useSales(isSeller);
   const orders = isSeller ? sales : buyerOrders;
+  const list = orders.data?.pages.flat() ?? [];
 
   if (!isReady) return <PageLoader />;
 
@@ -52,14 +53,30 @@ export function OrdersPage({ mode = 'buyer' }: { mode?: OrdersMode }) {
           ))
         ) : orders.isError ? (
           <ErrorState onRetry={() => void orders.refetch()} />
-        ) : orders.data.length === 0 ? (
+        ) : list.length === 0 ? (
           isSeller ? (
             <EmptyState icon="package" title={t('sales.emptyTitle')} message={t('sales.empty')} />
           ) : (
             <EmptyState icon="package" title={t('page.emptyTitle')} message={t('page.empty')} />
           )
         ) : (
-          orders.data.map((order) => <OrderRow key={order.id} order={order} mode={mode} />)
+          <>
+            {list.map((order) => (
+              <OrderRow key={order.id} order={order} mode={mode} />
+            ))}
+            {/* The next page, on request: older orders are never cut off at the first 50. */}
+            {orders.hasNextPage ? (
+              <Button
+                variant="outline"
+                isFullWidth
+                isLoading={orders.isFetchingNextPage}
+                onClick={() => void orders.fetchNextPage()}
+                data-testid="orders-load-more"
+              >
+                {t('list.loadMore')}
+              </Button>
+            ) : null}
+          </>
         )}
       </div>
     </>

@@ -20,10 +20,17 @@ export interface SellerAuctionCardProps {
   onEdit: (auction: SellerAuction) => void;
   /** "List again", pre-filled from this listing. */
   onRelist?: (auction: SellerAuction) => void;
+  /** Products that can be put up again; "List again" shows only for these (relistableProductIds). */
+  relistable?: ReadonlySet<string>;
 }
 
 /** One row of "My listings": status, the money, and only the actions this state actually allows. */
-export function SellerAuctionCard({ auction, onEdit, onRelist }: SellerAuctionCardProps) {
+export function SellerAuctionCard({
+  auction,
+  onEdit,
+  onRelist,
+  relistable,
+}: SellerAuctionCardProps) {
   const { t } = useSellingTranslation();
   const { t: tCommon } = useTranslation('common');
   const { locale } = useLocale();
@@ -34,9 +41,17 @@ export function SellerAuctionCard({ auction, onEdit, onRelist }: SellerAuctionCa
   const isMutating =
     (submitAuction.isPending && submitAuction.variables === auction.id) ||
     (cancelAuction.isPending && cancelAuction.variables?.id === auction.id);
-  const errorCode = getErrorCode(submitAuction.error) ?? getErrorCode(cancelAuction.error);
+  const cancelErrorCode = getErrorCode(cancelAuction.error);
+  // A refused withdrawal: the review ended first (or an older API), not a refused cancellation.
+  const errorCode =
+    getErrorCode(submitAuction.error) ??
+    (cancelErrorCode === 'AUCTION_NOT_CANCELLABLE' && cancelAuction.variables?.isWithdraw
+      ? 'AUCTION_NOT_WITHDRAWABLE'
+      : cancelErrorCode);
 
   const name = auction.product ? pickLocalizedName(auction.product, locale) : auction.id;
+  // Awaiting Mazad's review: cancelling it is "withdrawing" it from the queue.
+  const isWithdraw = auction.status === 'PENDING_APPROVAL';
 
   return (
     <Card isInset className="flex flex-col gap-2">
@@ -94,7 +109,7 @@ export function SellerAuctionCard({ auction, onEdit, onRelist }: SellerAuctionCa
           </Button>
         ) : null}
 
-        {onRelist && canRelistAuction(auction) ? (
+        {onRelist && canRelistAuction(auction, relistable) ? (
           <Button
             size="sm"
             variant="outline"
@@ -110,13 +125,18 @@ export function SellerAuctionCard({ auction, onEdit, onRelist }: SellerAuctionCa
             size="sm"
             variant="destructive"
             isLoading={isMutating}
+            data-testid={isWithdraw ? 'auction-withdraw' : 'auction-cancel'}
             onClick={() => {
-              if (window.confirm(t('auctions.cancelConfirm'))) {
-                cancelAuction.mutate({ id: auction.id });
+              if (
+                window.confirm(
+                  t(isWithdraw ? 'auctions.withdrawConfirm' : 'auctions.cancelConfirm'),
+                )
+              ) {
+                cancelAuction.mutate({ id: auction.id, isWithdraw });
               }
             }}
           >
-            {t('auctions.cancel')}
+            {t(isWithdraw ? 'auctions.withdraw' : 'auctions.cancel')}
           </Button>
         ) : null}
 

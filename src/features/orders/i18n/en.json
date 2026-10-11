@@ -23,7 +23,16 @@
       "ADMIN": "Cancelled by Mazad",
       "SYSTEM": "Cancelled automatically"
     },
-    "viewListing": "View listing"
+    "viewListing": "View listing",
+    "marketPriceAtPurchase": "New retail price at purchase",
+    "conditionLabel": "Condition",
+    "condition": {
+      "NEW": "New",
+      "LIKE_NEW": "Like new",
+      "OPEN_BOX": "Open box",
+      "USED": "Used"
+    },
+    "noDeliveryPhone": "No delivery phone was saved for this order"
   },
   "status": {
     "CREATED": "Pending",
@@ -143,7 +152,8 @@
     "seller": {
       "paid": "The buyer paid electronically. Do not collect cash on delivery.",
       "cod": "Cash on delivery: collect the total when you deliver.",
-      "refunded": "The buyer's electronic payment was refunded."
+      "refunded": "The buyer's electronic payment was refunded.",
+      "collected": "Cash collected on delivery. This order is complete."
     },
     "status": {
       "PENDING": "Waiting",
@@ -183,6 +193,7 @@
     "more_one": "+{{count, num}} more",
     "more_other": "+{{count, num}} more",
     "itemAndDelivery": "Item {{item}} · Delivery {{delivery}}",
-    "itemsAndDelivery": "Items {{item}} · Delivery {{delivery}}"
+    "itemsAndDelivery": "Items {{item}} · Delivery {{delivery}}",
+    "loadMore": "Load more"
   }
 }

@@ -35,6 +35,21 @@ export function paymentStateOf(data: OrderPayments | undefined): PaymentState {
   return 'unpaid';
 }
 
+/**
+ * The seller's one payment line. "Collect the total" only while the order is still on its way and
+ * the cash is not in yet; delivered with the cash collected reads as done; a cancelled order has
+ * nothing to collect (null: no line at all).
+ */
+export function sellerPaymentLineKey(state: PaymentState, status: OrderStatus): string | null {
+  if (state === 'paid') return 'payment.seller.paid';
+  if (state === 'refunded' || state === 'partiallyRefunded') return 'payment.seller.refunded';
+  if (status === 'CANCELLED') return null;
+  if (state === 'paidCash') {
+    return status === 'DELIVERED' ? 'payment.seller.collected' : 'payment.state.paidCash';
+  }
+  return PAYABLE.includes(status) ? 'payment.seller.cod' : 'payment.state.unpaid';
+}
+
 const STATE_TONE: Record<PaymentState, 'live' | 'upcoming' | 'warning' | 'neutral'> = {
   paid: 'live',
   paidCash: 'live',
@@ -67,14 +82,9 @@ export function OrderPaymentSection({ order, mode }: { order: Order; mode: 'buye
   const isTestMode = swiftpay?.mode === 'test';
 
   if (mode === 'seller') {
-    const line =
-      state === 'paid'
-        ? t('payment.seller.paid')
-        : state === 'refunded' || state === 'partiallyRefunded'
-          ? t('payment.seller.refunded')
-          : state === 'paidCash'
-            ? t('payment.state.paidCash')
-            : t('payment.seller.cod');
+    const lineKey = sellerPaymentLineKey(state, order.status);
+    if (!lineKey) return null;
+    const line = t(lineKey);
     return (
       <section>
         <SectionHeader title={t('payment.title')} />

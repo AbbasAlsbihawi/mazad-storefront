@@ -35,7 +35,10 @@ export const QUERY_KEYS = {
   orders: {
     list: ['orders', 'list'] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,
+    // Prefix of every sales query below, so invalidating it refreshes the count too.
     sales: ['orders', 'sales'] as const,
+    salesSummary: ['orders', 'sales', 'summary'] as const,
+    salesFirstPage: ['orders', 'sales', 'firstPage'] as const,
   },
   payments: {
     methods: ['payments', 'methods'] as const,
