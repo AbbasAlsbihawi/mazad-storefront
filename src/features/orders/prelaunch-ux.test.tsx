@@ -236,7 +236,9 @@ describe('cash on delivery: what the seller is told', () => {
 
 describe('retail price at purchase (snapshot only)', () => {
   it('shows the snapshot price and condition on the buyer order and the seller sale', async () => {
-    api.get.mockResolvedValue(withDisplay({ marketPrice: '400000.00', condition: 'LIKE_NEW' }));
+    api.get.mockResolvedValue(
+      withDisplay({ marketPrice: '400000.00', condition: 'LIKE_NEW', fromSnapshot: true }),
+    );
     const view = renderPage(<OrderDetailPage id="o1" />);
     const facts = await screen.findByTestId('order-item-facts');
     expect(facts.textContent).toMatch(/New retail price at purchase/);
@@ -251,15 +253,29 @@ describe('retail price at purchase (snapshot only)', () => {
   });
 
   it('nothing when the snapshot has no price (never the current product)', async () => {
-    api.get.mockResolvedValue(withDisplay({ marketPrice: null, condition: null }));
+    api.get.mockResolvedValue(
+      withDisplay({ marketPrice: null, condition: null, fromSnapshot: true }),
+    );
     renderPage(<OrderDetailPage id="o1" />);
     await screen.findByText('Camera');
     expect(screen.queryByTestId('order-item-facts')).toBeNull();
   });
 
+  it('shows nothing for an order placed before snapshots (values are the current product, not at purchase)', async () => {
+    api.get.mockResolvedValue(
+      withDisplay({ marketPrice: '400000.00', condition: 'LIKE_NEW', fromSnapshot: false }),
+    );
+    renderPage(<OrderDetailPage id="o1" />);
+    await screen.findByText('Camera');
+    expect(screen.queryByTestId('order-item-facts')).toBeNull();
+    expect(document.body.textContent).not.toMatch(/New retail price at purchase/);
+  });
+
   it('reads in Arabic', async () => {
     await setLanguage('ar');
-    api.get.mockResolvedValue(withDisplay({ marketPrice: '400000.00', condition: 'USED' }));
+    api.get.mockResolvedValue(
+      withDisplay({ marketPrice: '400000.00', condition: 'USED', fromSnapshot: true }),
+    );
     renderPage(<OrderDetailPage id="o1" />);
     const facts = await screen.findByTestId('order-item-facts');
     expect(facts.textContent).toMatch(/سعر المنتج الجديد وقت الشراء/);

@@ -9,11 +9,13 @@ const CONDITIONS = ['NEW', 'LIKE_NEW', 'OPEN_BOX', 'USED'];
 /**
  * What the item was described as when it was bought, from the order's snapshot only (never the
  * product as it is now): its condition, and the new retail price the seller gave. Each line only
- * when the snapshot has it, and no discount or savings maths on the price.
+ * when the snapshot has it, and no discount or savings maths on the price. Orders placed before
+ * snapshots existed carry the current product's values (fromSnapshot false), so they show nothing.
  */
 export function OrderItemFacts({ item }: { item: Order['items'][number] }) {
   const { t } = useOrdersTranslation();
   const { money } = useMoney();
+  if (item.display?.fromSnapshot !== true) return null;
   const condition = item.display?.condition;
   const marketPrice = item.display?.marketPrice;
   const hasCondition = condition != null && CONDITIONS.includes(condition);
