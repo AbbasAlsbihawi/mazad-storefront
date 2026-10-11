@@ -1,5 +1,11 @@
 import type { Metadata } from 'next';
-import { NOT_FOUND, auctionJsonLd, auctionMetadata, fetchPublicAuction } from '@shared/seo';
+import {
+  NOT_FOUND,
+  auctionJsonLd,
+  auctionMetadata,
+  fetchPublicAuction,
+  serializeJsonLd,
+} from '@shared/seo';
 import { AuctionPageClient } from './AuctionPageClient';
 
 type Props = { params: Promise<{ id: string }> };
@@ -21,10 +27,8 @@ export default async function Page({ params }: Props) {
       {auction && auction !== NOT_FOUND ? (
         <script
           type="application/ld+json"
-          // JSON.stringify output with "<" escaped cannot close the script element.
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(auctionJsonLd(id, auction)).replace(/</g, '\u003c'),
-          }}
+          // Holds seller-written text: serializeJsonLd escapes anything that could close the element.
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(auctionJsonLd(id, auction)) }}
         />
       ) : null}
       <AuctionPageClient />

@@ -182,3 +182,18 @@ export function auctionJsonLd(id: string, auction: PublicAuction): Record<string
     },
   };
 }
+
+/** Characters that could end an inline script element or a JS line. */
+const JSON_LD_UNSAFE = /[<>&\u2028\u2029]/g;
+
+/**
+ * JSON for an inline `<script type="application/ld+json">`. JSON.stringify leaves "<" as is, so a
+ * seller-written "</script>" in a product name would close the element and start real HTML. Each
+ * unsafe character becomes a JSON \uXXXX escape, which parsers read back as the same text.
+ */
+export function serializeJsonLd(value: unknown): string {
+  return JSON.stringify(value).replace(
+    JSON_LD_UNSAFE,
+    (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`,
+  );
+}
