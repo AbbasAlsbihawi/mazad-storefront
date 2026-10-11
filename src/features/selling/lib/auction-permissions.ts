@@ -1,4 +1,4 @@
-import type { SellerAuction, SellerAuctionStatus } from '../types/selling.types';
+import type { SellerAuction, SellerAuctionStatus, SellerProduct } from '../types/selling.types';
 
 /**
  * What a seller may do to their own auction, mirrored from mazad-api's AuctionsService and
@@ -18,11 +18,14 @@ export function canSubmitAuction(status: SellerAuctionStatus): boolean {
 
 /**
  * `canSellerCancel`: free before anyone has committed money, and while live only if nobody has
- * bid yet. Pulling a lot out from under existing bidders is an admin-only force-cancel.
+ * bid yet. Pulling a lot out from under existing bidders is an admin-only force-cancel. A listing
+ * awaiting approval can be withdrawn (an older API answers 409 AUCTION_NOT_CANCELLABLE, which the
+ * card shows before refreshing).
  */
 export function canCancelAuction(auction: Pick<SellerAuction, 'status' | 'bidCount'>): boolean {
   if (
     auction.status === 'DRAFT' ||
+    auction.status === 'PENDING_APPROVAL' ||
     auction.status === 'SCHEDULED' ||
     auction.status === 'REJECTED'
   ) {
@@ -38,14 +41,38 @@ export function isSaleFinal(auction: Pick<SellerAuction, 'status' | 'saleCancell
   return auction.status === 'SOLD' && !auction.saleCancelled;
 }
 
-/** "List again": unsold, cancelled, or a sale that was cancelled (the API refuses a standing sale). */
+/**
+ * "List again": unsold, cancelled, or a sale that was cancelled (the API refuses a standing sale).
+ * Given `relistable` (see relistableProductIds), only while the product itself can still be put up:
+ * a blocked, deleted or already re-listed product would open a form that can only fail.
+ */
 export function canRelistAuction(
-  auction: Pick<SellerAuction, 'status' | 'saleCancelled'>,
+  auction: Pick<SellerAuction, 'status' | 'saleCancelled' | 'product'>,
+  relistable?: ReadonlySet<string>,
 ): boolean {
-  return (
+  const isEnded =
     auction.status === 'UNSOLD' ||
     auction.status === 'CANCELLED' ||
-    (auction.status === 'SOLD' && auction.saleCancelled === true)
+    (auction.status === 'SOLD' && auction.saleCancelled === true);
+  if (!isEnded) return false;
+  if (!relistable) return true;
+  return auction.product != null && relistable.has(auction.product.id);
+}
+
+/**
+ * The seller's products that can get a new auction now: not blocked by Mazad, and not sold or in
+ * another running auction (productAuctionState). A product missing from the list (deleted) is
+ * not in it either.
+ */
+export function relistableProductIds(
+  products: readonly Pick<SellerProduct, 'id' | 'isBlocked'>[],
+  auctions: readonly Pick<SellerAuction, 'status' | 'product' | 'saleCancelled'>[],
+): Set<string> {
+  return new Set(
+    products
+      .filter((product) => !product.isBlocked)
+      .filter((product) => productAuctionState(product.id, auctions).canAuction)
+      .map((product) => product.id),
   );
 }
 

@@ -24,7 +24,8 @@
     "resend": "Resend code",
     "resendIn": "Resend code in {{seconds}}s",
     "newCodeSent": "A new code is on its way.",
-    "changePhone": "Change number"
+    "changePhone": "Change number",
+    "agree": "By creating an account you agree to the <terms>Terms</terms> and <privacy>Privacy policy</privacy>."
   },
   "account": {
     "title": "Account",
@@ -40,6 +41,12 @@
     "orders": "My orders",
     "payments": "Payment history",
     "help": "Help & policies"
+  },
+  "legal": {
+    "label": "Help and policies",
+    "help": "Help",
+    "privacy": "Privacy",
+    "terms": "Terms"
   },
   "deleteAccount": {
     "title": "Delete account",

@@ -24,7 +24,8 @@
     "resend": "إعادة إرسال الرمز",
     "resendIn": "إعادة الإرسال بعد {{seconds}} ث",
     "newCodeSent": "تم إرسال رمز جديد.",
-    "changePhone": "تغيير الرقم"
+    "changePhone": "تغيير الرقم",
+    "agree": "بإنشاء حساب، فإنك توافق على <terms>الشروط</terms> و<privacy>سياسة الخصوصية</privacy>."
   },
   "account": {
     "title": "الحساب",
@@ -40,6 +41,12 @@
     "orders": "طلباتي",
     "payments": "سجل المدفوعات",
     "help": "المساعدة والسياسات"
+  },
+  "legal": {
+    "label": "المساعدة والسياسات",
+    "help": "المساعدة",
+    "privacy": "الخصوصية",
+    "terms": "الشروط"
   },
   "deleteAccount": {
     "title": "حذف الحساب",

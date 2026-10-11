@@ -134,7 +134,7 @@ describe('ordersApi seller calls', () => {
     const post = vi.spyOn(httpClient, 'post').mockResolvedValue({ data: {} });
     const get = vi.spyOn(httpClient, 'get').mockResolvedValue({ data: [] });
     await realApi.listSales();
-    expect(get).toHaveBeenCalledWith('/me/sales', { params: { limit: 50 } });
+    expect(get).toHaveBeenCalledWith('/me/sales', { params: { page: 1, limit: 50 } });
     await realApi.updateStatus('o1', 'CONFIRMED');
     expect(post).toHaveBeenCalledWith('/orders/o1/status', { status: 'CONFIRMED' });
     await realApi.returnAction('r1', 'approve');

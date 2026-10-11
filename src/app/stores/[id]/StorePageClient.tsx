@@ -2,14 +2,14 @@
 
 import { useParams } from 'next/navigation';
 import { StorePage } from '@features/catalog';
-import { FollowSellerButton } from '@features/sellers';
+import { SellerFollowToggle } from '@app/sellers/SellerFollowToggle';
 
 export function StorePageClient() {
   const params = useParams<{ id: string }>();
   return (
     <StorePage
       id={params.id}
-      renderSellerFollowToggle={(sellerId) => <FollowSellerButton sellerId={sellerId} />}
+      renderSellerFollowToggle={(sellerId) => <SellerFollowToggle sellerId={sellerId} />}
     />
   );
 }

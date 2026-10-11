@@ -13,9 +13,11 @@ import { SellerStoreList } from '../components/SellerStoreList';
 export interface SellerProfilePageProps {
   id: string;
   reviewsSlot?: ReactNode;
+  /** The Follow control; the route hides it on the viewer's own profile. */
+  renderFollowToggle?: (sellerId: string) => ReactNode;
 }
 
-export function SellerProfilePage({ id, reviewsSlot }: SellerProfilePageProps) {
+export function SellerProfilePage({ id, reviewsSlot, renderFollowToggle }: SellerProfilePageProps) {
   const { t, isReady } = useSellersTranslation();
   const { locale } = useLocale();
   const seller = useSellerProfile(id);
@@ -34,7 +36,11 @@ export function SellerProfilePage({ id, reviewsSlot }: SellerProfilePageProps) {
         <CardContent className="flex flex-col gap-3 text-sm text-foreground-soft">
           <div className="flex flex-wrap items-center gap-3">
             <p>{t('profile.memberSince', { date: formatDate(data.memberSince, locale) })}</p>
-            <FollowSellerButton sellerId={data.id} />
+            {renderFollowToggle ? (
+              renderFollowToggle(data.id)
+            ) : (
+              <FollowSellerButton sellerId={data.id} />
+            )}
           </div>
           <p>{t('profile.followers', { count: data.followerCount })}</p>
           <p>

@@ -12,6 +12,7 @@ import { useSignupOtp } from '../hooks/useSignupOtp';
 import { useAuthTranslation } from '../hooks/useAuthTranslation';
 import { resolveAuthErrorCode } from '../lib/auth-errors';
 import { SignupCodeStep } from './SignupCodeStep';
+import { TermsNotice } from './TermsNotice';
 
 /** Checked before a code is requested; the code itself is only asked for afterwards. */
 const DETAIL_FIELDS = ['fullName', 'phone', 'password'] as const;
@@ -120,6 +121,7 @@ export function RegisterForm() {
           {tCommon(`errors.${errorCode}`, { defaultValue: tCommon('errors.generic') })}
         </p>
       ) : null}
+      <TermsNotice />
       <Button
         type="submit"
         isLoading={isVerifying ? registerMutation.isPending : otp.mutation.isPending}

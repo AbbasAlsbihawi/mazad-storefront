@@ -44,6 +44,9 @@ function useRefreshOrder(orderId: string) {
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.detail(orderId) });
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.sales });
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.orders.list });
+    // Delivering a cash order records the cash; a refund changes the payment: re-read both.
+    void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.order(orderId) });
+    void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.payments.mine });
   };
 }
 

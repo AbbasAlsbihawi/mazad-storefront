@@ -5,6 +5,7 @@ import { ROUTES } from '@shared/constants';
 import { EmptyState, ErrorState, PageLoader } from '@shared/components/feedback';
 import { ScreenHeader } from '@shared/components/layout';
 import { Button, Card, CardContent, Icon, Skeleton } from '@shared/components/ui';
+import { relistableProductIds } from '../lib/auction-permissions';
 import { useProducts } from '../hooks/useProducts';
 import { useSellerAuctions } from '../hooks/useSellerAuctions';
 import { useSellingTranslation } from '../hooks/useSellingTranslation';
@@ -25,6 +26,12 @@ export function SellerAuctionsPage({ initialProductId }: SellerAuctionsPageProps
   const [editing, setEditing] = useState<string | null>(initialProductId ? 'new' : null);
 
   if (!isReady) return <PageLoader />;
+
+  // Until the products are known, "List again" stays hidden rather than risk a dead-end form.
+  const relistable =
+    products.data && auctions.data
+      ? relistableProductIds(products.data, auctions.data)
+      : new Set<string>();
 
   // "relist:<id>": a new listing pre-filled from an ended one.
   const relistId = editing?.startsWith('relist:') ? editing.slice('relist:'.length) : null;
@@ -80,6 +87,7 @@ export function SellerAuctionsPage({ initialProductId }: SellerAuctionsPageProps
                   auction={auction}
                   onEdit={(next) => setEditing(next.id)}
                   onRelist={(from) => setEditing(`relist:${from.id}`)}
+                  relistable={relistable}
                 />
               ))
             )}

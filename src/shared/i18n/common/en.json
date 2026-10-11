@@ -44,6 +44,18 @@
     "retry": "Try again",
     "empty": "Nothing here yet."
   },
+  "notFound": {
+    "title": "Page not found",
+    "message": "This page doesn't exist or was moved. Head home or browse the auctions."
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "message": "This page couldn't be shown. Try again, or head home or to the auctions."
+  },
+  "recovery": {
+    "home": "Home",
+    "browse": "Browse auctions"
+  },
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "INVALID_CREDENTIALS": "Incorrect phone number or password.",

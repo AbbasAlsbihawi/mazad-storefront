@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@shared/constants';
 import { useToast } from '@shared/hooks';
+import { getErrorStatus } from '@shared/lib';
 import { sellingApi } from '../api/selling.api';
 import { useSellingTranslation } from './useSellingTranslation';
 import type { AuctionFormValues } from '../types/selling.types';
@@ -72,13 +73,21 @@ export function useCancelAuction() {
   const { t } = useSellingTranslation();
 
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
+    // `isWithdraw`: the listing was awaiting approval, so the toast says "withdrawn".
+    mutationFn: ({ id, reason }: { id: string; reason?: string; isWithdraw?: boolean }) =>
       sellingApi.cancelAuction(id, reason),
-    onSuccess: () => {
+    onSuccess: (_auction, { isWithdraw }) => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
       // Cancelling frees the product to be auctioned again, which the product list reflects.
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.products });
-      toast.success(t('toast.auctionCancelled'));
+      toast.success(t(isWithdraw ? 'toast.auctionWithdrawn' : 'toast.auctionCancelled'));
+    },
+    // 409 AUCTION_NOT_CANCELLABLE: the listing moved on (an admin approved it first, or an older
+    // API refuses a withdrawal). The card shows the error; the list refreshes to the real status.
+    onError: (error) => {
+      if (getErrorStatus(error) === 409) {
+        void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
+      }
     },
   });
 }
