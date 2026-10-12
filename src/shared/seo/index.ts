@@ -7,6 +7,7 @@ export {
   auctionMetadata,
   isNoIndex,
   sellerMetadata,
+  serializeJsonLd,
   siteUrl,
   storeMetadata,
 } from './metadata';
