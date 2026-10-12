@@ -113,3 +113,9 @@ export const orderSchema = z.object({
 });
 
 export const ordersListSchema = z.array(orderSchema);
+
+/** GET /me/sales/summary: open = CREATED + CONFIRMED + OUT_FOR_DELIVERY. */
+export const salesSummarySchema = z.object({
+  open: z.number().int().nonnegative(),
+  byStatus: z.record(z.string(), z.number()).optional(),
+});

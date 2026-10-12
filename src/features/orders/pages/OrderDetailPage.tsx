@@ -25,6 +25,7 @@ import {
   useReturnAction,
 } from '../hooks/useOrderMutations';
 import { useOrdersTranslation } from '../hooks/useOrdersTranslation';
+import { OrderItemFacts } from '../components/OrderItemFacts';
 import { OrderItemImage } from '../components/OrderItemImage';
 import { OrderPaymentSection } from '../components/OrderPaymentSection';
 import { useOrderPayments } from '../hooks/usePayments';
@@ -142,6 +143,12 @@ export function OrderDetailPage({ id, mode = 'buyer' }: { id: string; mode?: Ord
               ) : null}
               {data.shipPhone ? (
                 <DeliveryPhone phone={data.shipPhone} isCallable={isSeller} />
+              ) : isSeller ? (
+                // Older orders saved none: say so, never a call link without a number, and
+                // never the buyer's account phone instead.
+                <p className="text-muted-foreground" data-testid="order-no-delivery-phone">
+                  {t('detail.noDeliveryPhone')}
+                </p>
               ) : null}
               {data.note ? (
                 <p className="text-muted-foreground">
@@ -254,6 +261,7 @@ function OrderItemRow({
               {money(item.display?.finalPrice ?? item.finalPrice)}
             </span>
           </div>
+          <OrderItemFacts item={item} />
           {/* Only while the auction page can still be opened. */}
           {listingHref ? (
             <Link

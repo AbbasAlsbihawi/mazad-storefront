@@ -23,7 +23,16 @@
       "ADMIN": "ألغته منصة مزاد",
       "SYSTEM": "أُلغي تلقائيًا"
     },
-    "viewListing": "عرض المزاد"
+    "viewListing": "عرض المزاد",
+    "marketPriceAtPurchase": "سعر المنتج الجديد وقت الشراء",
+    "conditionLabel": "الحالة",
+    "condition": {
+      "NEW": "جديد",
+      "LIKE_NEW": "شبه جديد",
+      "OPEN_BOX": "مفتوح العلبة",
+      "USED": "مستعمل"
+    },
+    "noDeliveryPhone": "لم يُحفظ رقم هاتف للتوصيل في هذا الطلب"
   },
   "status": {
     "CREATED": "قيد الانتظار",
@@ -143,7 +152,8 @@
     "seller": {
       "paid": "دفع المشتري إلكترونيًا. لا تستلم مبلغًا نقديًا عند التسليم.",
       "cod": "الدفع عند الاستلام: استلم المبلغ الإجمالي عند التسليم.",
-      "refunded": "تم رد الدفعة الإلكترونية للمشتري."
+      "refunded": "تم رد الدفعة الإلكترونية للمشتري.",
+      "collected": "تم استلام المبلغ نقدًا عند التسليم. اكتمل هذا الطلب."
     },
     "status": {
       "PENDING": "بالانتظار",
@@ -187,6 +197,7 @@
     "more_many": "+{{count, num}} منتجًا آخر",
     "more_other": "+{{count, num}} منتج آخر",
     "itemAndDelivery": "المنتج {{item}} · التوصيل {{delivery}}",
-    "itemsAndDelivery": "المنتجات {{item}} · التوصيل {{delivery}}"
+    "itemsAndDelivery": "المنتجات {{item}} · التوصيل {{delivery}}",
+    "loadMore": "عرض المزيد"
   }
 }

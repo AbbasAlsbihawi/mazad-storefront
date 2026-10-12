@@ -10,5 +10,6 @@ export { useLogin } from './hooks/useLogin';
 export { useRegister } from './hooks/useRegister';
 export { useLogout } from './hooks/useLogout';
 export { useCurrentUser } from './hooks/useCurrentUser';
+export { LocaleSync } from './hooks/useLocaleSync';
 export { useIsAuthenticated } from '@shared/hooks';
 export type { AuthUser } from './types/auth.types';

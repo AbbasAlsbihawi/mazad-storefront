@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ROUTES } from '@shared/constants';
 import { PageLoader } from '@shared/components/feedback';
+import { LegalLinks } from '../components/LegalLinks';
 import { LoginForm } from '../components/LoginForm';
 import { useAuthTranslation } from '../hooks/useAuthTranslation';
 
@@ -21,6 +22,7 @@ export function LoginPage() {
           {t('login.createAccount')}
         </Link>
       </p>
+      <LegalLinks />
     </div>
   );
 }

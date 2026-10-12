@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ROUTES } from '@shared/constants';
 import { PageLoader } from '@shared/components/feedback';
+import { LegalLinks } from '../components/LegalLinks';
 import { RegisterForm } from '../components/RegisterForm';
 import { useAuthTranslation } from '../hooks/useAuthTranslation';
 
@@ -21,6 +22,7 @@ export function RegisterPage() {
           {t('register.signIn')}
         </Link>
       </p>
+      <LegalLinks />
     </div>
   );
 }
