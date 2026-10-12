@@ -13,13 +13,14 @@
  * font fetch). Self-hosting the .woff2 files removes that risk if it matters later.
  */
 :root {
-  /* brand */
-  --color-primary: #678af5;
-  --color-primary-pressed: #4a6fe0;
+  /* brand. Contrast (WCAG AA): white text on the primary fill and the accent's link text on the
+     page background both reach 4.5:1, so the light theme uses a deeper shade of the same blue. */
+  --color-primary: #4669dc;
+  --color-primary-pressed: #3a59c4;
   --color-primary-foreground: #ffffff;
   --color-primary-tint: #edf1fe;
   --color-primary-text: #3d5fcc;
-  --color-accent: #678af5;
+  --color-accent: #3d5fcc;
   --color-gold: oklch(0.76 0.13 80);
 
   /* backgrounds + surfaces */
@@ -32,14 +33,15 @@
   /* labels */
   --color-foreground: oklch(0.16 0.008 265);
   --color-foreground-soft: oklch(0.42 0.01 265);
-  --color-muted-foreground: oklch(0.6 0.012 265);
+  /* At least 4.5:1 on every light surface it sits on (page, card, raised, primary tint). */
+  --color-muted-foreground: oklch(0.52 0.012 265);
   --color-foreground-disabled: oklch(0.76 0.008 265);
 
   /* lines + fills */
   --color-border: oklch(0.16 0.008 265 / 10%);
   --color-separator: oklch(0.16 0.008 265 / 8%);
   --color-fill: oklch(0.16 0.008 265 / 5%);
-  --color-ring: #678af5;
+  --color-ring: #4669dc;
 
   /* semantic status */
   /* Image wells. There is no product photography yet, so a missing photo falls back to a flat
@@ -49,13 +51,14 @@
   --image-well-c: 0.05;
 
   /* semantic status */
-  --color-live: oklch(0.62 0.17 148);
+  /* Deep enough for 4.5:1 both as text on the page and under white badge text. */
+  --color-live: oklch(0.54 0.15 148);
   --color-live-foreground: oklch(1 0 0);
-  --color-info: oklch(0.6 0.16 250);
+  --color-info: oklch(0.54 0.16 250);
   --color-info-foreground: oklch(1 0 0);
-  --color-warning: oklch(0.72 0.17 60);
-  --color-warning-foreground: oklch(0.2 0.05 60);
-  --color-destructive: oklch(0.6 0.21 25);
+  --color-warning: oklch(0.55 0.15 55);
+  --color-warning-foreground: oklch(1 0 0);
+  --color-destructive: oklch(0.54 0.21 25);
   --color-destructive-foreground: oklch(1 0 0);
 
   --font-sans:
@@ -80,7 +83,8 @@
 
   --color-foreground: oklch(0.98 0.002 265);
   --color-foreground-soft: oklch(0.82 0.006 265);
-  --color-muted-foreground: oklch(0.63 0.01 265);
+  /* At least 4.5:1 on the dark surfaces, including the primary tint (unread rows). */
+  --color-muted-foreground: oklch(0.7 0.01 265);
   --color-foreground-disabled: oklch(0.45 0.008 265);
 
   --color-border: oklch(1 0 0 / 14%);
