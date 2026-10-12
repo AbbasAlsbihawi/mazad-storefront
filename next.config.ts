@@ -1,5 +1,5 @@
 import type { NextConfig } from 'next';
-import { securityHeaders } from './src/shared/config/security-headers';
+import { SERVICE_WORKER_CSP, staticSecurityHeaders } from './src/shared/config/security-headers';
 
 // NEXT_PUBLIC_* values are inlined at build time: a production build without them would silently
 // ship the localhost development fallbacks (here, in shared/api/http-client.ts and
@@ -27,11 +27,14 @@ const assetUrl = (() => {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
+  // The Content-Security-Policy is per request (a script nonce): see src/proxy.ts.
   async headers() {
     return [
+      { source: '/:path*', headers: staticSecurityHeaders() },
       {
-        source: '/:path*',
-        headers: securityHeaders(process.env.NEXT_PUBLIC_API_URL, assetBaseUrl),
+        source: '/sw.js',
+        headers: [{ key: 'Content-Security-Policy', value: SERVICE_WORKER_CSP }],
       },
     ];
   },
