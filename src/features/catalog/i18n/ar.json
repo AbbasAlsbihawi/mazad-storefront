@@ -169,7 +169,13 @@
     "priceBetween": "{{min}} – {{max}}",
     "priceFrom": "من {{min}}",
     "priceUpTo": "حتى {{max}}",
-    "finalHour": "ينتهي خلال ساعة"
+    "finalHour": "ينتهي خلال ساعة",
+    "titleCount_zero": "التصفية، {{count}} مفعّل",
+    "titleCount_one": "التصفية، {{count}} مفعّل",
+    "titleCount_two": "التصفية، {{count}} مفعّلان",
+    "titleCount_few": "التصفية، {{count}} مفعّلة",
+    "titleCount_many": "التصفية، {{count}} مفعّلاً",
+    "titleCount_other": "التصفية، {{count}} مفعّل"
   },
   "empty": {
     "title": "لا مزادات مطابقة",

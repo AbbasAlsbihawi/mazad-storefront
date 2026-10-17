@@ -91,7 +91,12 @@ export function AuctionsBrowsePage() {
                 placeholder={t('browse.searchPlaceholder')}
                 clearLabel={tCommon('search.clear')}
                 onFilter={() => setSheetOpen(true)}
-                filterLabel={t('filters.title')}
+                // The count on the button is part of its name (what you see is what is read).
+                filterLabel={
+                  countSheetFilters(filters) > 0
+                    ? t('filters.titleCount', { count: countSheetFilters(filters) })
+                    : t('filters.title')
+                }
                 filterCount={countSheetFilters(filters)}
               />
             </form>

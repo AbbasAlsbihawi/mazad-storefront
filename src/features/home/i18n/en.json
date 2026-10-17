@@ -53,9 +53,6 @@
   },
   "viewAll": "See all",
   "allCategories": "All",
-  "board": {
-    "open": "Open {{name}}"
-  },
   "stores": {
     "live_one": "{{count, num}} live",
     "live_other": "{{count, num}} live",

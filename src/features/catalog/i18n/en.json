@@ -142,7 +142,9 @@
     "priceBetween": "{{min}} – {{max}}",
     "priceFrom": "From {{min}}",
     "priceUpTo": "Up to {{max}}",
-    "finalHour": "Ending within the hour"
+    "finalHour": "Ending within the hour",
+    "titleCount_one": "Filters, {{count}} on",
+    "titleCount_other": "Filters, {{count}} on"
   },
   "empty": {
     "title": "No matching auctions",

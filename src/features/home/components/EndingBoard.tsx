@@ -46,7 +46,6 @@ export function EndingBoard({ board }: { board: Board }) {
 }
 
 function BoardRow({ auction }: { auction: HomeAuction }) {
-  const { t } = useHomeTranslation();
   const { t: tCommon } = useTranslation('common');
   const { locale } = useLocale();
   const name = pickLocalizedName(auction.product, locale);
@@ -54,7 +53,6 @@ function BoardRow({ auction }: { auction: HomeAuction }) {
   return (
     <Link
       href={ROUTES.auctionDetail(auction.id)}
-      aria-label={t('board.open', { name })}
       className="group grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3.5 rounded-lg py-1"
     >
       <span className="relative size-14 overflow-hidden rounded-[16px] border border-border bg-surface-raised">

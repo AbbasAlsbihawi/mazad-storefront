@@ -12,7 +12,7 @@ export function PanelBar({ children, className }: { children: ReactNode; classNa
       className={cn(
         'fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[600px] px-[18px] pt-3.5 pb-[calc(env(safe-area-inset-bottom)+18px)]',
         'bg-[linear-gradient(transparent,var(--color-background)_26%)]',
-        'lg:static lg:z-auto lg:max-w-none lg:bg-none lg:p-0',
+        'lg:static lg:z-auto lg:mx-0 lg:max-w-none lg:bg-none lg:p-0',
         className,
       )}
     >

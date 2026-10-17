@@ -24,7 +24,7 @@ export function PlaceBidSlide({
   onPlaced?: () => void;
 }) {
   const { t } = useBiddingTranslation();
-  const { money } = useMoney();
+  const { money, number } = useMoney();
   const [isAskingLarge, setIsAskingLarge] = useState(false);
   const amount = money(String(draft.amount));
   const place = async () => {
@@ -36,7 +36,8 @@ export function PlaceBidSlide({
   return (
     <>
       <SlideToConfirm
-        label={t('form.slideToBid', { amount })}
+        // The number alone fits the track (as in the design); the confirmation names the currency.
+        label={t('form.slideToBid', { amount: number(draft.amount) })}
         doneLabel={t('form.bidPlaced')}
         icon="gavel"
         isDisabled={draft.priceMoved}
