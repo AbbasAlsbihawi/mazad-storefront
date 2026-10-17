@@ -1,232 +1,390 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
+/* Theme and language variants follow the attributes the pre-paint script stamps on <html>. */
+@custom-variant dark (&:where(html:not([data-theme='light']), html:not([data-theme='light']) *));
+@custom-variant light (&:where([data-theme='light'], [data-theme='light'] *));
+@custom-variant en (&:where(html[lang='en'], html[lang='en'] *));
+@custom-variant ar (&:where(html:not([lang='en']), html:not([lang='en']) *));
+
 /*
- * Light is the :root default; [data-theme='dark'] overrides it. Ported from the Mazad Design
- * System — periwinkle-blue brand accent, Cairo typeface, full radius/shadow/motion scale,
- * replacing the earlier dark-first/gold/system-font palette. The pre-hydration script in the
- * root layout stamps data-theme before React mounts, so there's no flash either way (ADR-011
- * still holds, only the default flipped).
+ * Bidoom design tokens (results/bidoom-design/bidoom-design.css). Dark is the :root default and
+ * [data-theme='light'] overrides it; the pre-paint script in the root layout stamps data-theme
+ * before React mounts, so the wrong palette never flashes (ADR-011).
  *
- * Cairo loads from Google Fonts at build/runtime — a deliberate, known trade-off against the
- * project's earlier system-font-only choice (made so network-isolated builds couldn't fail on a
- * font fetch). Self-hosting the .woff2 files removes that risk if it matters later.
+ * Gold is a signal, not decoration: prices, the one primary action per screen, the active tab and
+ * your own position in a bid history. Status colours are separate from gold.
+ *
+ * Fonts are self-hosted through next/font (src/app/fonts.ts); the --font-* variables below are
+ * set on <html> by that module's class names. Arabic reads in IBM Plex Sans Arabic with El Messiri
+ * for display; English in Jost with Cinzel for display; numbers always in Jost.
  */
 :root {
-  /* brand. Contrast (WCAG AA): white text on the primary fill and the accent's link text on the
-     page background both reach 4.5:1, so the light theme uses a deeper shade of the same blue. */
-  --color-primary: #4669dc;
-  --color-primary-pressed: #3a59c4;
-  --color-primary-foreground: #ffffff;
-  --color-primary-tint: #edf1fe;
-  --color-primary-text: #3d5fcc;
-  --color-accent: #3d5fcc;
-  --color-gold: oklch(0.76 0.13 80);
+  color-scheme: dark;
 
-  /* backgrounds + surfaces */
-  --color-background: oklch(0.976 0.003 260);
-  --color-surface: oklch(1 0 0);
-  --color-surface-raised: oklch(0.955 0.004 260);
-  --color-surface-sunken: oklch(0.93 0.005 260);
-  --color-scrim: oklch(0 0 0 / 45%);
+  /* grounds and surfaces */
+  --color-background: #080706;
+  --color-background-deep: #040302;
+  --color-surface: #110e0a;
+  --color-surface-raised: #19150f;
+  --color-surface-high: #262019;
+  --color-scrim: rgb(5 4 3 / 60%);
 
-  /* labels */
-  --color-foreground: oklch(0.16 0.008 265);
-  --color-foreground-soft: oklch(0.42 0.01 265);
-  /* At least 4.5:1 on every light surface it sits on (page, card, raised, primary tint). */
-  --color-muted-foreground: oklch(0.52 0.012 265);
-  --color-foreground-disabled: oklch(0.76 0.008 265);
+  /* text */
+  --color-foreground: #f4eee4;
+  --color-foreground-soft: #bdb4a4;
+  --color-muted-foreground: #978e7f;
+  --color-foreground-disabled: #6b6357;
 
-  /* lines + fills */
-  --color-border: oklch(0.16 0.008 265 / 10%);
-  --color-separator: oklch(0.16 0.008 265 / 8%);
-  --color-fill: oklch(0.16 0.008 265 / 5%);
-  --color-ring: #4669dc;
+  /* lines */
+  --color-border: rgb(212 166 70 / 13%);
+  --color-border-strong: rgb(212 166 70 / 24%);
+  --color-separator: rgb(212 166 70 / 13%);
 
-  /* semantic status */
-  /* Image wells. There is no product photography yet, so a missing photo falls back to a flat
-     pastel tint keyed on the product id (see lib/image-tint.ts) plus a muted glyph. Lightness and
-     chroma are tokens so dark mode can dim the whole family without touching the hues. */
-  --image-well-l: 0.93;
-  --image-well-c: 0.05;
+  /* gold */
+  --color-gold: #d4a646;
+  --color-gold-hi: #f6d77a;
+  --color-gold-lo: #96650f;
+  --color-gold-ink: #120e07;
+  --color-gold-soft: rgb(212 166 70 / 12%);
+  --color-gold-line: rgb(212 166 70 / 45%);
 
-  /* semantic status */
-  /* Deep enough for 4.5:1 both as text on the page and under white badge text. */
-  --color-live: oklch(0.54 0.15 148);
-  --color-live-foreground: oklch(1 0 0);
-  --color-info: oklch(0.54 0.16 250);
-  --color-info-foreground: oklch(1 0 0);
-  --color-warning: oklch(0.55 0.15 55);
-  --color-warning-foreground: oklch(1 0 0);
-  --color-destructive: oklch(0.54 0.21 25);
-  --color-destructive-foreground: oklch(1 0 0);
+  /* states */
+  --color-live: #7bd39a;
+  --color-live-soft: rgb(123 211 154 / 13%);
+  --color-live-foreground: #0d2416;
+  --color-destructive: #f2846f;
+  --color-destructive-soft: rgb(242 132 111 / 13%);
+  --color-destructive-foreground: #2a0e08;
+  --color-warning: #f4a54b;
+  --color-warning-soft: rgb(244 165 75 / 14%);
+  --color-warning-foreground: #2a1705;
+  --color-info: #d9cbb0;
+  --color-info-soft: rgb(217 203 176 / 10%);
+  --color-info-foreground: #1a1611;
 
-  --font-sans:
-    'Cairo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Arabic', Arial,
-    sans-serif;
+  /* glass chrome over content and photos */
+  --color-glass: rgb(24 22 20 / 70%);
+  --color-glass-line: rgb(255 245 225 / 12%);
+  --color-tabbar: rgb(17 14 10 / 90%);
+  --color-header: rgb(18 17 16 / 82%);
+
+  /* text that sits on a photo stays light in both themes: photos are dark under their fade */
+  --color-on-photo: #f4eee4;
+  --color-on-photo-gold: #f6d77a;
+
+  --grad: linear-gradient(180deg, #f8dd86 0%, #e3b556 48%, #c08a2c 100%);
+  --glow: radial-gradient(
+    closest-side,
+    rgb(226 178 60 / 30%),
+    rgb(226 178 60 / 7%) 55%,
+    transparent
+  );
+  --sh: 0 24px 48px -26px rgb(0 0 0 / 75%);
+  --sh-gold: 0 12px 26px -14px rgb(212 166 70 / 42%);
+
+  /* gold icon tiles: gradient stroke, soft gold fill, a faint glow in dark */
+  --bi-s: url(#biG);
+  --bi-f: url(#biF);
+  --tile-bg:
+    radial-gradient(120% 90% at 50% 0%, rgb(212 166 70 / 13%), transparent 62%),
+    linear-gradient(180deg, #18140d, #0c0a07);
+  --tile-line: rgb(212 166 70 / 30%);
+  --tile-glow: drop-shadow(0 0 5px rgb(212 166 70 / 30%));
+
+  /* wordmark gradients (logo-defs.svg) and the knock-out colour of the mark */
+  --af: url(#bdAT);
+  --wf: url(#bdWT);
+  --ko: var(--color-background);
+
+  /* type: Arabic first by default; html[lang='en'] swaps the order below */
+  --f: var(--font-plex-arabic), var(--font-jost), system-ui, sans-serif;
+  --fd: var(--font-el-messiri), var(--font-cinzel), serif;
+  --fn: var(--font-jost), var(--font-plex-arabic), system-ui, sans-serif;
 }
 
-[data-theme='dark'] {
-  --color-primary: #8ba6f8;
-  --color-primary-pressed: #6e8dee;
-  --color-primary-foreground: #101b33;
-  --color-primary-tint: #28324f;
-  --color-primary-text: #a9befb;
-  --color-accent: #8ba6f8;
-  --color-gold: oklch(0.8 0.12 80);
+[data-theme='light'] {
+  color-scheme: light;
 
-  --color-background: oklch(0.11 0.004 265);
-  --color-surface: oklch(0.17 0.006 265);
-  --color-surface-raised: oklch(0.22 0.007 265);
-  --color-surface-sunken: oklch(0.08 0.004 265);
-  --color-scrim: oklch(0 0 0 / 60%);
+  --color-background: #f4eedf;
+  --color-background-deep: #e9e1ce;
+  --color-surface: #fffdf8;
+  --color-surface-raised: #f8f3e8;
+  --color-surface-high: #ece4d3;
+  --color-scrim: rgb(26 20 12 / 42%);
 
-  --color-foreground: oklch(0.98 0.002 265);
-  --color-foreground-soft: oklch(0.82 0.006 265);
-  /* At least 4.5:1 on the dark surfaces, including the primary tint (unread rows). */
-  --color-muted-foreground: oklch(0.7 0.01 265);
-  --color-foreground-disabled: oklch(0.45 0.008 265);
+  --color-foreground: #1a1611;
+  --color-foreground-soft: #585046;
+  --color-muted-foreground: #665c50;
+  --color-foreground-disabled: #a39886;
 
-  --color-border: oklch(1 0 0 / 14%);
-  --color-separator: oklch(1 0 0 / 10%);
-  --color-fill: oklch(1 0 0 / 8%);
-  --color-ring: #8ba6f8;
+  --color-border: rgb(45 32 12 / 8%);
+  --color-border-strong: rgb(45 32 12 / 15%);
+  --color-separator: rgb(45 32 12 / 8%);
 
-  --image-well-l: 0.28;
-  --image-well-c: 0.04;
+  --color-gold: #87601f;
+  --color-gold-hi: #a87a33;
+  --color-gold-lo: #6e4c17;
+  --color-gold-ink: #1b1409;
+  --color-gold-soft: rgb(148 105 42 / 10%);
+  --color-gold-line: rgb(148 105 42 / 35%);
 
-  --color-live: oklch(0.74 0.18 148);
-  --color-live-foreground: oklch(0.14 0.04 148);
-  --color-info: oklch(0.72 0.14 250);
-  --color-info-foreground: oklch(0.14 0.04 250);
-  --color-warning: oklch(0.8 0.15 65);
-  --color-warning-foreground: oklch(0.16 0.05 65);
-  --color-destructive: oklch(0.68 0.2 25);
-  --color-destructive-foreground: oklch(0.14 0.04 25);
+  --color-live: #15703c;
+  --color-live-soft: rgb(28 130 72 / 10%);
+  --color-live-foreground: #ffffff;
+  --color-destructive: #a8321d;
+  --color-destructive-soft: rgb(187 59 37 / 9%);
+  --color-destructive-foreground: #ffffff;
+  --color-warning: #8f4c08;
+  --color-warning-soft: rgb(168 90 12 / 10%);
+  --color-warning-foreground: #ffffff;
+  --color-info: #5c5245;
+  --color-info-soft: rgb(92 82 69 / 8%);
+  --color-info-foreground: #ffffff;
+
+  --color-glass: rgb(255 255 255 / 78%);
+  --color-glass-line: rgb(45 32 12 / 10%);
+  --color-tabbar: rgb(255 253 248 / 94%);
+  --color-header: rgb(242 239 234 / 85%);
+
+  --grad: linear-gradient(180deg, #f3d58c 0%, #ddae55 50%, #bc8a35 100%);
+  --glow: radial-gradient(closest-side, rgb(210 160 80 / 22%), transparent);
+  --sh: 0 22px 40px -26px rgb(60 40 10 / 35%);
+  --sh-gold: 0 14px 28px -14px rgb(160 115 45 / 55%);
+
+  --bi-s: url(#biGd);
+  --bi-f: url(#biFd);
+  --tile-bg:
+    radial-gradient(120% 90% at 50% 0%, rgb(201 154 58 / 16%), transparent 62%),
+    linear-gradient(180deg, #fffdf8, #f1e8d5);
+  --tile-line: rgb(148 105 42 / 30%);
+  --tile-glow: none;
+
+  --af: url(#bdATd);
+  --wf: url(#bdWTd);
+}
+
+/* A photo page (welcome) and the featured lot stay dark in the light theme too. */
+[data-surface='dark'] {
+  color-scheme: dark;
+  --color-background: #080706;
+  --color-surface: #110e0a;
+  --color-surface-raised: #19150f;
+  --color-surface-high: #262019;
+  --color-foreground: #f4eee4;
+  --color-foreground-soft: #bdb4a4;
+  --color-muted-foreground: #978e7f;
+  --color-border: rgb(212 166 70 / 13%);
+  --color-border-strong: rgb(212 166 70 / 24%);
+  --color-gold: #d4a646;
+  --color-gold-hi: #f6d77a;
+  --color-gold-ink: #120e07;
+  --color-gold-soft: rgb(212 166 70 / 12%);
+  --color-gold-line: rgb(212 166 70 / 45%);
+  --color-glass: rgb(24 22 20 / 70%);
+  --color-glass-line: rgb(255 245 225 / 12%);
+  --grad: linear-gradient(180deg, #f8dd86 0%, #e3b556 48%, #c08a2c 100%);
+  --bi-s: url(#biG);
+  --bi-f: url(#biF);
+  --tile-bg:
+    radial-gradient(120% 90% at 50% 0%, rgb(212 166 70 / 13%), transparent 62%),
+    linear-gradient(180deg, #18140d, #0c0a07);
+  --tile-line: rgb(212 166 70 / 30%);
+  --af: url(#bdAT);
+  --wf: url(#bdWT);
+  --ko: #080706;
+}
+
+html[lang='en'] {
+  --f: var(--font-jost), var(--font-plex-arabic), system-ui, sans-serif;
+  --fd: var(--font-cinzel), var(--font-el-messiri), serif;
 }
 
 @theme inline {
+  /* Tailwind's own breakpoints stay, except lg: the design switches to its desktop layout at 960. */
+  --breakpoint-lg: 60rem;
+
   --color-background: var(--color-background);
+  --color-background-deep: var(--color-background-deep);
   --color-surface: var(--color-surface);
   --color-surface-raised: var(--color-surface-raised);
-  --color-surface-sunken: var(--color-surface-sunken);
+  --color-surface-high: var(--color-surface-high);
+  --color-surface-sunken: var(--color-background-deep);
   --color-scrim: var(--color-scrim);
   --color-foreground: var(--color-foreground);
   --color-foreground-soft: var(--color-foreground-soft);
   --color-muted-foreground: var(--color-muted-foreground);
   --color-foreground-disabled: var(--color-foreground-disabled);
   --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
   --color-separator: var(--color-separator);
-  --color-fill: var(--color-fill);
-  --color-primary: var(--color-primary);
-  --color-primary-pressed: var(--color-primary-pressed);
-  --color-primary-foreground: var(--color-primary-foreground);
-  --color-primary-tint: var(--color-primary-tint);
-  --color-primary-text: var(--color-primary-text);
-  --color-accent: var(--color-accent);
+  --color-fill: var(--color-surface-raised);
   --color-gold: var(--color-gold);
+  --color-gold-hi: var(--color-gold-hi);
+  --color-gold-lo: var(--color-gold-lo);
+  --color-gold-ink: var(--color-gold-ink);
+  --color-gold-soft: var(--color-gold-soft);
+  --color-gold-line: var(--color-gold-line);
+  /* Legacy names kept so every screen picks up the Bidoom palette: the primary is gold. */
+  --color-primary: var(--color-gold);
+  --color-primary-pressed: var(--color-gold-lo);
+  --color-primary-foreground: var(--color-gold-ink);
+  --color-primary-tint: var(--color-gold-soft);
+  --color-primary-text: var(--color-gold);
+  --color-accent: var(--color-gold);
+  --color-ring: var(--color-gold);
   --color-live: var(--color-live);
+  --color-live-soft: var(--color-live-soft);
   --color-live-foreground: var(--color-live-foreground);
   --color-info: var(--color-info);
+  --color-info-soft: var(--color-info-soft);
   --color-info-foreground: var(--color-info-foreground);
   --color-warning: var(--color-warning);
+  --color-warning-soft: var(--color-warning-soft);
   --color-warning-foreground: var(--color-warning-foreground);
   --color-destructive: var(--color-destructive);
+  --color-destructive-soft: var(--color-destructive-soft);
   --color-destructive-foreground: var(--color-destructive-foreground);
-  --color-ring: var(--color-ring);
-  --font-sans: var(--font-sans);
+  --color-glass: var(--color-glass);
+  --color-glass-line: var(--color-glass-line);
+  --color-tabbar: var(--color-tabbar);
+  --color-header: var(--color-header);
+  --color-on-photo: var(--color-on-photo);
+  --color-on-photo-gold: var(--color-on-photo-gold);
 
-  /* iOS-continuous-corner radii — deliberately overrides Tailwind's built-in rounded-sm/md/lg/xl
-     sizes app-wide, so every existing usage picks up the new geometry with no per-file change. */
+  --font-sans: var(--f);
+  --font-display: var(--fd);
+  --font-num: var(--fn);
+
   --radius-xs: 8px;
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
   --radius-xl: 24px;
-  --radius-sheet: 28px;
+  --radius-2xl: 28px;
+  --radius-3xl: 32px;
+  --radius-sheet: 34px;
 
-  /* elevation — soft, warm-neutral, never harsh; cards use shadow instead of a border now */
-  --shadow-card: 0 1px 2px oklch(0.16 0.008 265 / 4%), 0 6px 20px oklch(0.16 0.008 265 / 6%);
-  --shadow-raised: 0 2px 6px oklch(0.16 0.008 265 / 6%), 0 12px 32px oklch(0.16 0.008 265 / 10%);
-  --shadow-bar: 0 -1px 0 oklch(0.16 0.008 265 / 6%), 0 -8px 24px oklch(0.16 0.008 265 / 6%);
-  --shadow-button: 0 4px 14px rgb(103 138 245 / 35%);
-  /* The floating tab bar. A detached capsule has no edge to anchor it, so it carries a deeper,
-     tighter-spread shadow than --shadow-bar to read as hovering rather than pasted on. */
-  --shadow-float: 0 12px 32px -8px oklch(0.16 0.008 265 / 28%);
+  --shadow-card: var(--sh);
+  --shadow-raised: var(--sh);
+  --shadow-gold: var(--sh-gold);
+  --shadow-float: var(--sh);
+  --shadow-button: var(--sh-gold);
+  --shadow-bar: 0 -1px 0 var(--color-border);
 
-  /* motion */
-  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
-  --duration-fast: 180ms;
-  --duration-medium: 260ms;
+  /* one motion grammar: 420ms ease-out; quick feedback at 200ms */
+  --ease-ios: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 200ms;
+  --duration-medium: 420ms;
 
-  /* Apple HIG text styles. Named rather than t-shirt-sized so a component states the role it is
-     playing ("this is a large title") instead of a size that drifts when the ladder is retuned.
-     Tailwind's own text-xs…text-3xl stay available; new work uses these. */
-  --text-large-title: 34px;
-  --text-large-title--line-height: 1.15;
-  --text-large-title--letter-spacing: -0.4px;
+  /* type scale (design: t-display, t-h1, t-h2, t-h3, t-body, t-sm, t-xs) */
+  --text-display: 38px;
+  --text-display--line-height: 1.18;
+  --text-display-lg: 56px;
+  --text-display-lg--line-height: 1.08;
+  --text-h1: 31px;
+  --text-h1--line-height: 1.25;
+  --text-h1-lg: 40px;
+  --text-h1-lg--line-height: 1.2;
+  --text-h2: 20px;
+  --text-h2--line-height: 1.3;
+  --text-h3: 16px;
+  --text-h3--line-height: 1.35;
+  --text-section: 21px;
+  --text-section--line-height: 1.25;
+  --text-section-lg: 26px;
+  --text-section-lg--line-height: 1.25;
+  --text-price-lg: 40px;
+  --text-price-lg--line-height: 1.05;
+
+  /* legacy role names, retuned to the Bidoom ladder */
+  --text-large-title: 31px;
+  --text-large-title--line-height: 1.25;
   --text-title-1: 28px;
-  --text-title-1--line-height: 1.15;
-  --text-title-1--letter-spacing: -0.4px;
-  --text-title-2: 22px;
+  --text-title-1--line-height: 1.25;
+  --text-title-2: 20px;
   --text-title-2--line-height: 1.3;
-  --text-title-2--letter-spacing: -0.4px;
-  --text-title-3: 20px;
-  --text-title-3--line-height: 1.3;
-  --text-title-3--letter-spacing: -0.4px;
-  --text-headline: 17px;
-  --text-headline--line-height: 1.3;
-  --text-body: 17px;
-  --text-body--line-height: 1.5;
-  --text-callout: 16px;
-  --text-callout--line-height: 1.5;
-  --text-subhead: 15px;
-  --text-subhead--line-height: 1.3;
+  --text-title-3: 18px;
+  --text-title-3--line-height: 1.35;
+  --text-headline: 16px;
+  --text-headline--line-height: 1.4;
+  --text-body: 15px;
+  --text-body--line-height: 1.6;
+  --text-callout: 15px;
+  --text-callout--line-height: 1.6;
+  --text-subhead: 14px;
+  --text-subhead--line-height: 1.45;
   --text-footnote: 13px;
-  --text-footnote--line-height: 1.3;
+  --text-footnote--line-height: 1.45;
   --text-caption: 12px;
-  --text-caption--line-height: 1.3;
+  --text-caption--line-height: 1.4;
   --text-caption-2: 11px;
   --text-caption-2--line-height: 1.3;
 
-  /* layout constants — the iOS chrome measures itself against these, and scroll areas pad by
-     them so content never hides behind the nav bar, tab bar or action bar. */
-  --spacing-gutter: 16px;
+  /* layout constants */
+  --spacing-gutter: 20px;
   --spacing-touch: 44px;
-  --spacing-nav-bar: 44px;
-  --spacing-tab-bar: 52px;
-  /* The floating tab bar clears more: a 60px capsule (48px buttons + 6px padding) riding 14px
-     above the safe area, plus a little air so the last row does not graze it. Excludes the safe
-     area itself — callers add env(safe-area-inset-bottom) on top. */
-  --spacing-tab-bar-floating: 84px;
+  --spacing-nav-bar: 60px;
+  --spacing-tab-bar: 74px;
+  /* the floating tab bar: a 74px capsule riding 22px above the safe area, plus air */
+  --spacing-tab-bar-floating: 120px;
+  --spacing-bid-bar: 130px;
+  --spacing-header: 78px;
   --spacing-safe-top: 44px;
   --spacing-safe-bottom: 24px;
+  --container-page: 1280px;
 
-  /* the only blur in the system — nav bar, tab bar, action bar, controls over imagery */
   --blur-chrome: 20px;
 
-  /* The two animations in the system. Both are status indicators, not decoration: the live dot
-     and the skeleton shimmer. Presentation transitions are handled per-component with --ease-ios. */
-  --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-sheet-up: sheet-up 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-pop: pop 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-toast-in: toast-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-chevron: chevron 1.6s ease-in-out infinite;
+  --animate-roll: roll 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
   @keyframes toast-in {
     from {
       opacity: 0;
-      transform: translateY(-12px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
+      transform: translateY(-30px);
     }
   }
-
   @keyframes pulse-dot {
+    50% {
+      opacity: 0.25;
+    }
+  }
+  @keyframes shimmer {
+    to {
+      background-position: -150% 0;
+    }
+  }
+  @keyframes sheet-up {
+    from {
+      transform: translateY(40%);
+      opacity: 0;
+    }
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes chevron {
     0%,
     100% {
-      opacity: 1;
+      opacity: 0.25;
     }
     50% {
-      opacity: 0.35;
+      opacity: 1;
+    }
+  }
+  @keyframes roll {
+    0% {
+      transform: translateY(60%);
+      opacity: 0;
+      filter: blur(3px);
     }
   }
 }
@@ -237,40 +395,49 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* The document is the scroll container, so this is the only place scroll-padding can live.
-     Sized for the floating tab bar — the taller of the two bottom bars — so anything scrolled
-     into view (a focused field, a hash target) clears the chrome under either variant. */
+  /* The document scrolls, so scroll-padding lives here: clear the floating tab bar. */
   html {
     scroll-padding-bottom: calc(var(--spacing-tab-bar-floating) + env(safe-area-inset-bottom));
+    background-color: var(--color-background);
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-size: var(--text-body);
-    line-height: var(--line-height-normal, 1.5);
+    font-size: 15px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-gold-soft);
+    color: var(--color-foreground);
   }
 
   h1,
   h2,
-  h3,
-  h4 {
-    letter-spacing: -0.4px;
-    line-height: 1.15;
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-ring);
+    outline: 2px solid var(--color-gold);
     outline-offset: 2px;
   }
 
-  /* Press feedback may change color or opacity but never layout, so a long-press on a card must
-     not select text or pop the iOS callout. */
   button,
   [role='button'] {
     -webkit-touch-callout: none;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -284,18 +451,200 @@
   }
 }
 
-/* The floating tab bar's glass — heavier than --blur-chrome and saturated, because the capsule
-   floats over photography rather than sitting against a page edge: it has to stay legible while
-   still showing what is passing underneath. Written out rather than composed from Tailwind's
-   backdrop utilities so the declaration order and the -webkit- prefix are exactly the ones the
-   design system specifies. */
-@utility backdrop-glass {
-  -webkit-backdrop-filter: saturate(180%) blur(24px);
-  backdrop-filter: saturate(180%) blur(24px);
+/* ---------- the Bidoom icon set (64 grid, round caps and joins) ----------
+   Path classes come from the icon sheet: f = soft-filled shape, d = solid dot, k = a detail line
+   drawn over a filled shape (it takes the knock-out colour when the icon is solid). Inline icons
+   take the text colour; the gold variant uses the biG/biF gradients from the brand sprite. */
+@layer components {
+  .bi {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: var(--bw, 5);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+  .bi .f {
+    fill: currentColor;
+    fill-opacity: 0.14;
+  }
+  .bi .d {
+    fill: currentColor;
+    stroke: none;
+  }
+  .bi.solid .f {
+    fill-opacity: 1;
+  }
+  .bi.solid .k {
+    stroke: var(--knock, var(--color-background));
+  }
+  .bi.gold {
+    --bw: 3.8;
+    stroke: var(--bi-s);
+    filter: var(--tile-glow);
+  }
+  .bi.gold .f {
+    fill: var(--bi-f);
+    fill-opacity: 1;
+  }
+  .bi.gold .d {
+    fill: var(--bi-s);
+  }
+  .bi.gold.solid .f {
+    fill: var(--bi-s);
+  }
 }
 
-/* Hides the scrollbar on horizontal rails (category rail, chip rows, auction rails) — they scroll
-   by touch/trackpad and a visible bar breaks the 76pt tile rhythm. */
+/* ---------- utilities ---------- */
+
+/* the gold gradient fill of the one primary action, avatars and the slide knob */
+@utility bg-grad {
+  background-image: var(--grad);
+}
+
+/* gold icon tiles and category circles */
+@utility bg-tile {
+  background: var(--tile-bg);
+  border-color: var(--tile-line);
+  box-shadow: inset 0 1px 0 rgb(246 215 122 / 7%);
+}
+
+/* the warm radial glow behind the desktop hero and the welcome mark */
+@utility bg-glow {
+  background: var(--glow);
+}
+
+/* full-photo lot card: dark fade so light text reads on any photo */
+@utility bg-lot-shade {
+  background: linear-gradient(
+    180deg,
+    rgb(8 7 6 / 28%) 0%,
+    rgb(8 7 6 / 0%) 24%,
+    rgb(8 7 6 / 0%) 36%,
+    rgb(8 7 6 / 60%) 60%,
+    rgb(8 7 6 / 95%) 100%
+  );
+}
+
+/* the featured lot's fade, deeper at the foot where its price and timer sit */
+@utility bg-feature-shade {
+  background: linear-gradient(180deg, rgb(10 9 8 / 5%) 20%, rgb(10 9 8 / 92%) 88%);
+}
+
+/* a photo hero fading into the page */
+@utility bg-hero-shade {
+  background: linear-gradient(
+    180deg,
+    rgb(10 9 8 / 35%),
+    transparent 30%,
+    transparent 62%,
+    var(--color-background)
+  );
+}
+
+/* skeleton shimmer, drawn from the real card shapes */
+@utility skeleton {
+  background: linear-gradient(
+      100deg,
+      var(--color-surface) 30%,
+      var(--color-surface-raised) 50%,
+      var(--color-surface) 70%
+    )
+    0 0 / 300% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* a slow sheen over the primary action, like light passing over metal */
+@utility gold-sheen {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgb(255 248 225 / 50%) 50%,
+      transparent 65%
+    );
+    transform: translateX(-130%);
+    animation: sheen 6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s infinite;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-130%);
+  }
+  24%,
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+/* sideways rails: the edge with more to show fades out (set --fs/--fe from the scroll position) */
+@utility rail-fade {
+  --fs: 0px;
+  --fe: 44px;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fs),
+    #000 calc(100% - var(--fe)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--fs),
+    #000 calc(100% - var(--fe)),
+    transparent 100%
+  );
+  &:where([dir='rtl'], [dir='rtl'] *) {
+    -webkit-mask-image: linear-gradient(
+      to left,
+      transparent 0,
+      #000 var(--fs),
+      #000 calc(100% - var(--fe)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to left,
+      transparent 0,
+      #000 var(--fs),
+      #000 calc(100% - var(--fe)),
+      transparent 100%
+    );
+  }
+}
+
+/* numbers: Jost, tabular so countdowns never jitter in width */
+@utility font-tabular {
+  font-family: var(--fn);
+  font-variant-numeric: tabular-nums;
+}
+
+/* digit-only runs (times, codes, phones) read left to right inside Arabic text */
+@utility ltr-isolate {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* glass over content: the floating tab bar, toasts, controls over photos */
+@utility backdrop-glass {
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  backdrop-filter: blur(22px) saturate(160%);
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

@@ -36,9 +36,11 @@ describe('storefront content security policy', () => {
     expect(directive(csp, 'img-src')).toContain('https://mazad-api-production-e5a8.up.railway.app');
   });
 
-  it('loads the Cairo web font (Google Fonts stylesheet + font files)', () => {
-    expect(directive(csp, 'style-src')).toContain('https://fonts.googleapis.com');
-    expect(directive(csp, 'font-src')).toContain('https://fonts.gstatic.com');
+  it('serves the self-hosted fonts and stylesheets from this origin only (no Google Fonts)', () => {
+    expect(directive(csp, 'style-src')).toBe("style-src 'self' 'unsafe-inline'");
+    expect(directive(csp, 'font-src')).toBe("font-src 'self' data:");
+    expect(csp).not.toContain('fonts.googleapis.com');
+    expect(csp).not.toContain('fonts.gstatic.com');
   });
 
   it('never allows plugins, framing, base or form hijacking, and upgrades http', () => {

@@ -8,8 +8,9 @@ export function useTheme() {
   const setTheme = useThemeStore((state) => state.setTheme);
 
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
+    // Dark is the :root default; only light needs the attribute (see globals.css).
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
     } else {
       document.documentElement.removeAttribute('data-theme');
     }

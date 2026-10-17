@@ -56,8 +56,9 @@ request header for the one inline script of our own, the theme/locale script.
 - JSON-LD (`<script type="application/ld+json">` on auction pages) is a data block that the browser
   never executes, so it is not subject to `script-src` and was never a reason for
   `'unsafe-inline'`. What keeps it safe is the escaping of its content, not the CSP.
-- `style-src` keeps `'unsafe-inline'` (React style attributes, next/image) plus Google Fonts; styles
-  cannot run code. `font-src` allows `fonts.gstatic.com` for the Cairo font.
+- `style-src` keeps `'unsafe-inline'` (React style attributes, next/image); styles cannot run code.
+  The fonts are self-hosted by next/font (`src/app/fonts.ts`), so `style-src` and `font-src` name
+  no external host.
 - `connect-src`: this origin plus mazad-api over https and wss (REST and Socket.IO). `img-src`: this
   origin, the API's asset host and Unsplash.
 - `worker-src 'self'` (the service worker, `public/sw.js`) and `manifest-src 'self'`.
