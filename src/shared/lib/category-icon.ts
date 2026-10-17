@@ -1,29 +1,27 @@
 import type { IconName } from '@shared/components/ui';
 
 /**
- * mazad-api's categories carry an `iconUrl`, but the design system allows only the vendored
- * Lucide set — no raster icons — so the slug picks a glyph instead. Unknown slugs fall back to
- * `package` rather than rendering nothing.
+ * Categories come from mazad-api's /categories; their `iconUrl` is not used because every icon on
+ * screen comes from the one Bidoom sheet. The slug picks a glyph (whole word or a known prefix),
+ * and an unknown slug falls back to the generic package rather than rendering nothing.
  */
-const SLUG_ICONS: Record<string, IconName> = {
-  electronics: 'credit-card',
-  phones: 'credit-card',
-  mobiles: 'credit-card',
-  computers: 'layout-grid',
-  cameras: 'camera',
-  fashion: 'shopping-bag',
-  clothing: 'shopping-bag',
-  watches: 'clock',
-  jewelry: 'star',
-  home: 'house',
-  furniture: 'house',
-  vehicles: 'map-pin',
-  cars: 'map-pin',
-  collectibles: 'badge-check',
-  antiques: 'badge-check',
-  sports: 'trending-up',
-};
+const SLUG_ICONS: [RegExp, IconName][] = [
+  [/^(cars?|vehicles?|motors?|auto(-parts)?|car-parts|motorcycles?)$/, 'car'],
+  [/^(plates?|number-plates?|license-plates?)$/, 'plate'],
+  [/^(real-?estate|property|properties|houses?|land)$/, 'house'],
+  [/^(jewel(le)?ry|gold|diamonds?)$/, 'diamond'],
+  [/^(watches?|clocks?)$/, 'watch'],
+  [/^(phones?|mobiles?|smartphones?|tablets?)$/, 'mobile'],
+  [/^(electronics?|audio|headphones?|computers?|laptops?|cameras?)$/, 'headphones'],
+  [/^(art|arts|antiques?|collectibles?|rugs?|carpets?)$/, 'frame'],
+  [/^(games?|gaming|consoles?|video-games?)$/, 'gamepad'],
+  [/^(fashion|clothing|clothes|apparel)$/, 'shirt'],
+  [/^(shoes?|sneakers?|footwear)$/, 'sneaker'],
+  [/^(home|furniture|home-appliances|appliances|decor)$/, 'couch'],
+  [/^(perfumes?|fragrances?|beauty|cosmetics)$/, 'perfume'],
+];
 
 export function getCategoryIcon(slug: string): IconName {
-  return SLUG_ICONS[slug] ?? 'package';
+  const normalized = slug.trim().toLowerCase();
+  return SLUG_ICONS.find(([pattern]) => pattern.test(normalized))?.[1] ?? 'package';
 }

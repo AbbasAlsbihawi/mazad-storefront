@@ -50,11 +50,13 @@ export function ListRow({
       ) : icon ? (
         <span
           className={cn(
-            'inline-flex size-9 shrink-0 items-center justify-center rounded-sm',
-            iconTone === 'tint' ? 'bg-primary-tint text-primary' : 'bg-fill text-foreground-soft',
+            'inline-flex size-11 shrink-0 items-center justify-center rounded-[14px] border',
+            iconTone === 'tint'
+              ? 'bg-tile'
+              : 'border-border bg-surface-raised text-foreground-soft',
           )}
         >
-          <Icon name={icon} size={18} />
+          <Icon name={icon} size={24} tone={iconTone === 'tint' ? 'gold' : 'current'} />
         </span>
       ) : null}
 
@@ -72,11 +74,7 @@ export function ListRow({
       ) : null}
 
       {hasChevron && isInteractive ? (
-        <Icon
-          name="chevron-right"
-          size={18}
-          className="text-foreground-disabled rtl:-scale-x-100"
-        />
+        <Icon name="caret-left" size={17} className="text-muted-foreground ltr:-scale-x-100" />
       ) : null}
     </>
   );
@@ -117,7 +115,10 @@ export interface CategoryTileProps {
   onClick?: () => void;
 }
 
-/** CategoryTile — the 60pt rounded-square shortcut used in the home-screen category rail. */
+/**
+ * CategoryTile (design .cat): on phones a 64px gold-glyph tile over its label; from 960px a pill
+ * with a small tile and the label beside it. The selected one is ringed in gold.
+ */
 export function CategoryTile({
   label,
   icon,
@@ -130,16 +131,15 @@ export function CategoryTile({
     <>
       <span
         className={cn(
-          'inline-flex size-15 items-center justify-center rounded-lg',
-          'transition-[transform,background-color] duration-fast ease-ios active:scale-96',
-          isActive
-            ? 'bg-primary text-primary-foreground shadow-button'
-            : 'bg-surface text-primary shadow-card',
+          'grid size-16 place-items-center rounded-[20px] border bg-tile',
+          'transition-[box-shadow,border-color] duration-medium ease-ios lg:size-[42px] lg:rounded-[13px]',
+          isActive &&
+            'border-[1.5px] border-gold shadow-[0_0_0_4px_var(--color-gold-soft),0_12px_26px_-14px_rgb(212_166_70/70%)] lg:border-gold-line lg:shadow-none',
         )}
       >
-        <Icon name={icon} size={26} />
+        <Icon name={icon} tone="gold" size={34} className="lg:size-[25px]" />
       </span>
-      <span className="text-center text-caption leading-tight font-medium text-foreground-soft">
+      <span className="text-center text-[12.5px] leading-tight lg:text-sm">
         {label}
         {count != null ? (
           <span className="block text-caption-2 text-muted-foreground">{count}</span>
@@ -148,18 +148,24 @@ export function CategoryTile({
     </>
   );
 
-  const classes = 'flex w-19 shrink-0 flex-col items-center gap-2';
+  const classes = cn(
+    'grid w-[72px] shrink-0 content-start justify-items-center gap-[7px]',
+    'lg:w-auto lg:grid-flow-col lg:items-center lg:gap-2.5 lg:rounded-full lg:border lg:py-1.5 lg:ps-1.5 lg:pe-[18px]',
+    isActive
+      ? 'text-gold lg:border-gold-line lg:bg-gold-soft light:text-gold-lo'
+      : 'text-foreground-soft lg:border-border lg:bg-surface',
+  );
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} aria-current={isActive ? 'page' : undefined} className={classes}>
         {content}
       </Link>
     );
   }
 
   return (
-    <button type="button" onClick={onClick} className={classes}>
+    <button type="button" onClick={onClick} aria-pressed={isActive} className={classes}>
       {content}
     </button>
   );

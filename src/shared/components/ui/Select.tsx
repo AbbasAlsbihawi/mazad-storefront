@@ -1,5 +1,7 @@
 import { forwardRef, useId, type SelectHTMLAttributes } from 'react';
 import { cn } from '@shared/lib';
+import { FIELD_LABEL, fieldControl } from './field-styles';
+import { FieldMessage, describedBy } from './FieldMessage';
 import { Icon } from './Icon';
 
 export interface SelectOption {
@@ -11,7 +13,7 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
   label: string;
   options: SelectOption[];
   error?: string;
-  /** Shown under the field when there's no error — the two never appear together. */
+  /** Shown under the field when there's no error: the two never appear together. */
   hint?: string;
   /** Leading blank option. Omit on a field that always has a value. */
   placeholder?: string;
@@ -19,9 +21,8 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
 }
 
 /**
- * Select — the Input field in a picker's clothing. A native `<select>` underneath, because on iOS
- * that opens the system wheel, which is the control the design system's pickers are drawn after
- * and the one a screen reader and a keyboard already know how to drive.
+ * Select: the Input field in a picker's clothing. A native `<select>` underneath, because that
+ * opens the system picker on phones and a screen reader and a keyboard already know it.
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { label, options, error, hint, placeholder, isLabelHidden = false, id, className, ...props },
@@ -29,18 +30,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 ) {
   const generatedId = useId();
   const selectId = id ?? generatedId;
-  const errorId = `${selectId}-error`;
-  const hintId = `${selectId}-hint`;
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label
-        htmlFor={selectId}
-        className={cn(
-          'text-footnote font-semibold text-foreground-soft',
-          isLabelHidden && 'sr-only',
-        )}
-      >
+    <div className="flex flex-col gap-2">
+      <label htmlFor={selectId} className={cn(FIELD_LABEL, isLabelHidden && 'sr-only')}>
         {label}
       </label>
       <div className="relative">
@@ -48,14 +41,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           ref={ref}
           id={selectId}
           aria-invalid={!!error}
-          aria-describedby={error ? errorId : hint ? hintId : undefined}
+          aria-describedby={describedBy(selectId, error, hint)}
           className={cn(
-            'h-[50px] w-full appearance-none rounded-md border border-border bg-surface',
+            fieldControl({ hasError: !!error }),
             // Room for the chevron on the trailing side, which flips with the writing direction.
-            'ps-3.5 pe-10 text-body text-foreground',
-            'transition-colors duration-fast ease-ios focus:border-primary',
-            'disabled:bg-fill disabled:text-foreground-disabled',
-            error && 'border-destructive',
+            'h-14 appearance-none pe-11',
             className,
           )}
           {...props}
@@ -69,20 +59,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         </select>
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 end-3.5 flex items-center text-muted-foreground"
+          className="pointer-events-none absolute inset-y-0 end-4 flex items-center text-muted-foreground"
         >
-          <Icon name="chevron-down" size={18} />
+          <Icon name="caret-down" size={16} />
         </span>
       </div>
-      {error ? (
-        <p id={errorId} role="alert" className="text-footnote text-destructive">
-          {error}
-        </p>
-      ) : hint ? (
-        <p id={hintId} className="text-footnote text-muted-foreground">
-          {hint}
-        </p>
-      ) : null}
+      <FieldMessage id={selectId} error={error} hint={hint} />
     </div>
   );
 });

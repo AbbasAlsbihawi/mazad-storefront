@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon } from './Icon';
 import { Input, type InputProps } from './Input';
 
-/** A password field with a show/hide toggle (as in the app); the value never leaves the field. */
+/** A password field with a show/hide toggle; the value never leaves the field. Reads LTR. */
 export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type' | 'trailing'>>(
   function PasswordInput(props, ref) {
     const { t } = useTranslation('common');
@@ -13,6 +13,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type
     return (
       <Input
         ref={ref}
+        isLatin
         {...props}
         type={isVisible ? 'text' : 'password'}
         trailing={
@@ -21,9 +22,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type
             onClick={() => setIsVisible((v) => !v)}
             aria-label={t(isVisible ? 'password.hide' : 'password.show')}
             aria-pressed={isVisible}
-            className="inline-flex size-10 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
+            className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
           >
-            <Icon name="eye" size={20} />
+            <Icon name={isVisible ? 'eye-off' : 'eye'} size={20} />
           </button>
         }
       />
