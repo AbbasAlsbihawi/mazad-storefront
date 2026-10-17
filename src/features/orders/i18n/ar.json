@@ -57,7 +57,7 @@
     "REFUNDED": "تم رد المبلغ",
     "CANCELLED": "أُلغي طلب الإرجاع"
   },
-  "returnWindow": "يمكن طلب الإرجاع خلال ٧ أيام من التسليم.",
+  "returnWindow": "يمكن طلب الإرجاع خلال 7 أيام من التسليم.",
   "toast": {
     "cancelled": "تم إلغاء الطلب",
     "returnOpened": "تم إرسال طلب الإرجاع"
@@ -66,7 +66,7 @@
     "ORDER_NOT_FOUND": "الطلب غير موجود.",
     "ORDER_FORBIDDEN": "لا يمكنك عرض هذا الطلب.",
     "ORDER_STATUS_INVALID": "لا يمكن إلغاء الطلب في حالته الحالية.",
-    "RETURN_WINDOW_CLOSED": "انتهت مهلة الإرجاع البالغة ٧ أيام.",
+    "RETURN_WINDOW_CLOSED": "انتهت مهلة الإرجاع البالغة 7 أيام.",
     "RETURN_ALREADY_EXISTS": "يوجد طلب إرجاع لهذا المنتج بالفعل.",
     "INVALID_ORDER_TRANSITION": "تغيّرت حالة هذا الطلب. حدّث الصفحة لرؤيتها.",
     "INVALID_RETURN_TRANSITION": "تغيّرت حالة طلب الإرجاع. حدّث الصفحة لرؤية حالته الحالية.",

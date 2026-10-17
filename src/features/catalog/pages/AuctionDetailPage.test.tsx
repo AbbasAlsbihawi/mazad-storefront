@@ -438,19 +438,19 @@ describe('AuctionDetailPage: in Arabic', () => {
     const prices = within(screen.getByTestId('detail-prices'));
     expect(prices.getByText('السعر الحالي')).toBeTruthy();
     expect(prices.getByText('سعر افتتاح المزاد')).toBeTruthy();
-    expect(priceRow('price-market')).toBe('سعر المنتج الجديد٤٠٠,٠٠٠ د.ع');
-    expect(priceRow('price-buy-now-total')).toBe('الإجمالي مع التوصيل عند الشراء الآن٣٠٥,٠٠٠ د.ع');
+    expect(priceRow('price-market')).toBe('سعر المنتج الجديد400,000 د.ع');
+    expect(priceRow('price-buy-now-total')).toBe('الإجمالي مع التوصيل عند الشراء الآن305,000 د.ع');
     expect(screen.getAllByTestId('price-saving')[0]).toHaveTextContent(
-      'أقل بـ ٢٧٥,٠٠٠ د.ع من سعر المنتج الجديد',
+      'أقل بـ 275,000 د.ع من سعر المنتج الجديد',
     );
-    expect(screen.getByTestId('detail-activity')).toHaveTextContent('٣ مزايدين · ٥ مزايدات');
+    expect(screen.getByTestId('detail-activity')).toHaveTextContent('3 مزايدين · 5 مزايدات');
     const info = within(screen.getByTestId('detail-product-info'));
     expect(info.getByText('الفئة الفرعية').nextSibling).toHaveTextContent('كاميرات أفلام');
     expect(info.getByText('العلامة').nextSibling).toHaveTextContent('كانون');
     // No Arabic for this specification: the English one, never a blank row.
     expect(info.getByText('Lens').nextSibling).toHaveTextContent('50 mm');
     expect(screen.getByTestId('detail-returns')).toHaveTextContent(
-      'يمكن طلب الإرجاع خلال ٧ أيام من الاستلام',
+      'يمكن طلب الإرجاع خلال 7 أيام من الاستلام',
     );
     expect(
       within(screen.getByTestId('detail-payment-methods'))

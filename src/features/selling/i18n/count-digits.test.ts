@@ -5,7 +5,7 @@ import sellingEn from './en.json';
 
 /**
  * Counts inside translated sentences ("3 صور", "12 متابع") used to keep Western digits while the
- * prices and bid counts around them were Arabic-Indic. `{{count, num}}` gives them the same digits
+ * prices and bid counts around them were Western. `{{count, num}}` gives them the same digits
  * as formatNumber.
  */
 describe('counts inside translations', () => {
@@ -13,10 +13,10 @@ describe('counts inside translations', () => {
   addNamespaceBundle('selling', 'en', sellingEn);
   afterAll(() => i18next.changeLanguage('ar'));
 
-  it('uses Arabic-Indic digits in Arabic', async () => {
+  it('uses Western digits in Arabic too (ar-IQ, latn)', async () => {
     await i18next.changeLanguage('ar');
-    expect(i18next.t('selling:products.imageCount', { count: 3 })).toBe('٣ صور');
-    expect(i18next.t('selling:auctions.bids', { count: 12 })).toBe('١٢ مزايدة');
+    expect(i18next.t('selling:products.imageCount', { count: 3 })).toBe('3 صور');
+    expect(i18next.t('selling:auctions.bids', { count: 12 })).toBe('12 مزايدة');
   });
 
   it('keeps Western digits in English', async () => {

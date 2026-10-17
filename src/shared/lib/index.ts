@@ -3,13 +3,16 @@ export {
   parseMoney,
   formatMoney,
   formatNumber,
-  toArabicDigits,
+  formatMoneyParts,
+  formatRating,
+  numberLocale,
+  currencyLabel,
   toMinorUnits,
   fromMinorUnits,
   roundMoney,
   MAX_MONEY_AMOUNT,
 } from './money';
-export { formatDate, formatDateTime, formatDuration } from './date';
+export { formatDate, formatDateTime, formatDuration, formatTime } from './date';
 export { joinList, pickLocalizedName } from './locale';
 export { resolveAssetUrl, resolveThumbUrl } from './asset';
 export { getImageTintStyle } from './image-tint';
