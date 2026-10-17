@@ -107,7 +107,12 @@ export function BidAmountField({ draft, topBid }: { draft: BidDraft; topBid: num
             )}
           >
             <b className="font-num text-[13.5px] font-medium">{number(value)}</b>
-            <small className="font-num text-[11px] opacity-75">
+            <small
+              className={cn(
+                'font-num text-[11px]',
+                value !== draft.amount && 'text-foreground-soft',
+              )}
+            >
               +{number(Math.max(0, value - topBid))}
             </small>
           </button>
