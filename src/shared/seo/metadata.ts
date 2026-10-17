@@ -14,7 +14,7 @@ import {
  * the storefront's default locale and its main audience — with the English name alongside.
  */
 
-export const SITE_NAME = 'مزاد Mazad';
+export const SITE_NAME = 'بيدوم Bidoom';
 const DESCRIPTION_MAX = 200;
 
 /**
@@ -114,7 +114,7 @@ export function auctionMetadata(id: string, auction: PublicResult<PublicAuction>
 export function storeMetadata(id: string, store: PublicResult<PublicStore>): Metadata {
   if (store === null || store === NOT_FOUND) return fallback(store, 'متجر');
   const title = bilingual(store.nameAr, store.nameEn);
-  const description = truncate(`متجر على مزاد في ${store.city} · البائع ${store.seller.fullName}`);
+  const description = truncate(`متجر على بيدوم في ${store.city} · البائع ${store.seller.fullName}`);
   return withCanonical(`/stores/${id}`, {
     title,
     description,
@@ -138,7 +138,7 @@ export function sellerMetadata(id: string, seller: PublicResult<PublicSeller>): 
       ? ` · التقييم ${seller.rating.average.toFixed(1)} من ${seller.rating.count}`
       : '';
   const description = truncate(
-    `${seller.isVerified ? 'بائع موثّق' : 'بائع'} على مزاد · ${seller.followerCount} متابع${rating}`,
+    `${seller.isVerified ? 'بائع موثّق' : 'بائع'} على بيدوم · ${seller.followerCount} متابع${rating}`,
   );
   return withCanonical(`/sellers/${id}`, {
     title,

@@ -1,67 +1,80 @@
 /*
- * Rasterises the Mazad mark into the PNG set the web app manifest and iOS need.
+ * Rasterises the Bidoom mark into the PNG set the web app manifest, iOS and link previews need.
  *
- * The mark itself is the same geometry as shared/components/ui/Logo.tsx (design system,
- * `assets/logo-mark.svg`) — kept in sync by hand, since a home-screen icon is a build artefact
- * rather than something the app renders. White on brand blue: the mark's usual blue-on-white
- * disappears against a light wallpaper, and white is one of the three colours the mark is
- * allowed to take.
+ * The source is the brand sprite (src/shared/components/brand/brand-sprite.ts, generated from the
+ * owner's logo-defs.svg): the `bd-engraved` gold plate is the app icon. A rasteriser has no CSS
+ * cascade, so the sprite's custom properties are resolved to the values the engraved plate sets
+ * for itself (ink #120E07 knocked out of gold #D9AA4A) before rendering.
  *
- * Run with `npm run icons:generate` after changing the mark or the brand colour.
+ * Run with `npm run icons:generate` after changing the mark.
  */
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
-const PUBLIC_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PUBLIC_DIR = join(ROOT, 'public');
 
-// --color-primary, light theme. globals.css states it in hex already, so no conversion needed.
-const BRAND = '#678af5';
+const INK = '#120E07';
+const PLATE_KNOCKOUT = '#D9AA4A';
+const GROUND = '#080706';
 
-/*
- * The mark sits off-centre in its own 64pt grid — the stroke-adjusted bounds are x 10..58,
- * y 14..46, so its centre is (34, 30) against the grid's (32, 32). Nudging it back matters at
- * icon sizes, where an off-centre glyph reads as a mistake rather than as style.
- */
-const MARK_OFFSET_X = -2;
-const MARK_OFFSET_Y = 2;
+async function spriteDefs() {
+  const source = await readFile(
+    join(ROOT, 'src', 'shared', 'components', 'brand', 'brand-sprite.ts'),
+    'utf8',
+  );
+  const json = source.slice(source.indexOf('"'), source.lastIndexOf('"') + 1);
+  return JSON.parse(json)
+    .replace(/var\(--ko,#[0-9A-Fa-f]{6}\)/g, PLATE_KNOCKOUT)
+    .replace(/var\(--af,(url\(#\w+\))\)/g, '$1')
+    .replace(/var\(--wf,(url\(#\w+\))\)/g, '$1')
+    .replace(/currentColor/g, INK)
+    .replace(/<g style="color:#120E07;--ko:#D9AA4A">/g, '<g>');
+}
+
+/** The rounded gold plate on a transparent square (favicon, "any" icons). */
+function plateSvg(defs, size) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${size}" height="${size}" viewBox="0 0 120 120">${defs}<use href="#bd-engraved" xlink:href="#bd-engraved" width="120" height="120"/></svg>`;
+}
 
 /**
- * @param {number} scale Fraction of the grid the mark occupies. 1 keeps the logo's own
- *   proportions; maskable icons need it smaller so a circular crop can't clip the mark.
+ * Full-bleed gold with the mark inside the safe zone: iOS masks the touch icon itself and Android
+ * crops maskable icons to the launcher's shape, so neither may carry transparent corners.
  */
-function markSvg(size, scale = 1) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="${BRAND}"/>
-  <g transform="translate(32 32) scale(${scale}) translate(${MARK_OFFSET_X - 32} ${MARK_OFFSET_Y - 32})">
-    <g fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="42" cy="30" r="12"/>
-      <path d="M30 42H14"/>
-    </g>
-  </g>
+function bleedSvg(defs, size, markScale) {
+  const w = 72 * markScale;
+  const h = 92 * markScale;
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${size}" height="${size}" viewBox="0 0 120 120">${defs}<rect width="120" height="120" fill="url(#bdG)"/><use href="#bd-mono-flat" xlink:href="#bd-mono-flat" x="${60 - w / 2}" y="${60 - h / 2}" width="${w}" height="${h}"/></svg>`;
+}
+
+/** The link-preview card: the mark and the بيدوم wordmark on the night ground with its glow. */
+function ogSvg(defs) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630">${defs}
+  <defs><radialGradient id="ogGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#E2B23C" stop-opacity=".30"/><stop offset=".55" stop-color="#E2B23C" stop-opacity=".07"/><stop offset="1" stop-color="#E2B23C" stop-opacity="0"/></radialGradient></defs>
+  <rect width="1200" height="630" fill="${GROUND}"/>
+  <ellipse cx="600" cy="315" rx="520" ry="300" fill="url(#ogGlow)"/>
+  <use href="#bd-engraved" xlink:href="#bd-engraved" x="660" y="205" width="220" height="220"/>
+  <use href="#bd-ar" xlink:href="#bd-ar" x="300" y="210" width="340" height="210"/>
 </svg>`;
 }
 
-const ICONS = [
-  { file: 'favicon.png', size: 32 },
-  { file: 'icon-192.png', size: 192 },
-  { file: 'icon-512.png', size: 512 },
-  // iOS ignores the manifest and masks this itself, so it must be opaque and full-bleed.
-  { file: 'apple-touch-icon.png', size: 180 },
-  // Android crops maskable icons to whatever shape the launcher uses; only the middle 80% is
-  // guaranteed to survive, and the mark is wide enough to need more headroom than that.
-  { file: 'icon-maskable-512.png', size: 512, scale: 0.8 },
+const defs = await spriteDefs();
+
+const OUTPUTS = [
+  { file: 'favicon.png', svg: plateSvg(defs, 32) },
+  { file: 'icon-192.png', svg: plateSvg(defs, 192) },
+  { file: 'icon-512.png', svg: plateSvg(defs, 512) },
+  { file: 'apple-touch-icon.png', svg: bleedSvg(defs, 180, 1) },
+  { file: 'icon-maskable-512.png', svg: bleedSvg(defs, 512, 0.8) },
+  { file: 'og.png', svg: ogSvg(defs) },
 ];
 
 await mkdir(PUBLIC_DIR, { recursive: true });
 
-await Promise.all(
-  ICONS.map(async ({ file, size, scale }) => {
-    const png = await sharp(Buffer.from(markSvg(size, scale)))
-      .png()
-      .toBuffer();
-    await writeFile(join(PUBLIC_DIR, file), png);
-    console.log(`${file} — ${size}x${size}`);
-  }),
-);
+for (const { file, svg } of OUTPUTS) {
+  const png = await sharp(Buffer.from(svg)).png().toBuffer();
+  await writeFile(join(PUBLIC_DIR, file), png);
+  console.log(file);
+}
