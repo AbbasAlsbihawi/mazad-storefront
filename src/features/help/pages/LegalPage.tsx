@@ -20,24 +20,26 @@ export function LegalPage({ topic, contact }: { topic: LegalTopic; contact?: Rea
   const page = HELP_CONTENT[topic][locale];
   const copy = HELP_COPY[locale];
   return (
-    <PageContainer className="max-w-[900px] pb-10">
-      <ArticleHeader
-        title={copy.legalTitles[topic]}
-        backHref={ROUTES.help}
-        crumbs={[{ label: copy.help, href: ROUTES.help }]}
-        currentCrumb={copy.legalCrumb}
-      >
-        <p className="text-[13px] text-muted-foreground">{page.summary}</p>
-      </ArticleHeader>
-      <article className="mt-4 grid gap-4">
-        <LegalTabs current={topic} labels={copy.legalTabs} navLabel={copy.legalTabsLabel} />
-        {page.isDraft ? <DraftNotice text={copy.draftNotice} /> : null}
-        {page.tldr ? (
-          <TldrCard title={copy.inShort} lines={page.tldr} icons={LEGAL_TLDR_ICONS[topic]} />
-        ) : null}
-        <LegalAccordion key={topic} sections={page.sections} locale={locale} contact={contact} />
-        {contact ? <div className="px-1 text-[13px] text-muted-foreground">{contact}</div> : null}
-      </article>
+    <PageContainer className="pb-10">
+      <div className="mx-auto w-full max-w-[820px]">
+        <ArticleHeader
+          title={copy.legalTitles[topic]}
+          backHref={ROUTES.help}
+          crumbs={[{ label: copy.help, href: ROUTES.help }]}
+          currentCrumb={copy.legalCrumb}
+        >
+          <p className="text-[13px] text-muted-foreground">{page.summary}</p>
+        </ArticleHeader>
+        <article className="mt-4 grid gap-4">
+          <LegalTabs current={topic} labels={copy.legalTabs} navLabel={copy.legalTabsLabel} />
+          {page.isDraft ? <DraftNotice text={copy.draftNotice} /> : null}
+          {page.tldr ? (
+            <TldrCard title={copy.inShort} lines={page.tldr} icons={LEGAL_TLDR_ICONS[topic]} />
+          ) : null}
+          <LegalAccordion key={topic} sections={page.sections} locale={locale} contact={contact} />
+          {contact ? <div className="px-1 text-[13px] text-muted-foreground">{contact}</div> : null}
+        </article>
+      </div>
     </PageContainer>
   );
 }

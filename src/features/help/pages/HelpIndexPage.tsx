@@ -23,45 +23,47 @@ export function HelpIndexPage({ contact }: { contact?: ReactNode }) {
   const isSearching = query.trim().length > 0;
 
   return (
-    <PageContainer className="max-w-[900px] pb-10">
-      <ArticleHeader
-        title={copy.indexHeading}
-        barTitle={copy.indexBar}
-        backHref={ROUTES.account}
-        crumbs={[{ label: copy.account, href: ROUTES.account }]}
-        currentCrumb={copy.help}
-        isDisplay
-      />
-      <div className="mt-4 grid gap-4">
-        <SearchField
-          value={query}
-          onChange={setQuery}
-          label={copy.searchLabel}
-          placeholder={copy.searchPlaceholder}
-          clearLabel={copy.searchClear}
+    <PageContainer className="pb-10">
+      <div className="mx-auto w-full max-w-[820px]">
+        <ArticleHeader
+          title={copy.indexHeading}
+          barTitle={copy.indexBar}
+          backHref={ROUTES.account}
+          crumbs={[{ label: copy.account, href: ROUTES.account }]}
+          currentCrumb={copy.help}
+          isDisplay
         />
-        {isSearching ? (
-          <HelpSearchResults query={query.trim()} results={results} copy={copy} />
-        ) : (
-          <nav aria-label={copy.topicsLabel}>
-            <ul className="grid gap-2 lg:gap-2.5">
-              {HELP_TOPICS.map((topic) => {
-                const page = HELP_CONTENT[topic][locale];
-                return (
-                  <li key={topic}>
-                    <MenuRow
-                      icon={HELP_TOPIC_ICONS[topic]}
-                      title={page.title}
-                      subtitle={page.blurb}
-                      href={ROUTES.helpTopic(topic)}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-        )}
-        {contact}
+        <div className="mt-4 grid gap-4">
+          <SearchField
+            value={query}
+            onChange={setQuery}
+            label={copy.searchLabel}
+            placeholder={copy.searchPlaceholder}
+            clearLabel={copy.searchClear}
+          />
+          {isSearching ? (
+            <HelpSearchResults query={query.trim()} results={results} copy={copy} />
+          ) : (
+            <nav aria-label={copy.topicsLabel}>
+              <ul className="grid gap-2 lg:gap-2.5">
+                {HELP_TOPICS.map((topic) => {
+                  const page = HELP_CONTENT[topic][locale];
+                  return (
+                    <li key={topic}>
+                      <MenuRow
+                        icon={HELP_TOPIC_ICONS[topic]}
+                        title={page.title}
+                        subtitle={page.blurb}
+                        href={ROUTES.helpTopic(topic)}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          )}
+          {contact}
+        </div>
       </div>
     </PageContainer>
   );
