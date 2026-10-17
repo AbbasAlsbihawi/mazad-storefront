@@ -100,21 +100,18 @@ export function SellerAuctionsPage() {
               aria-label={t('auctions.filter')}
               className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:px-0"
             >
-              <Chip
-                isActive={filter === 'ALL'}
-                onClick={() => setFilter('ALL')}
-                count={number(list.length)}
-              >
+              {/* Counts sit in the label at full strength: Chip's dimmed count misses AA on the
+                  light theme's active chip. */}
+              <Chip isActive={filter === 'ALL'} onClick={() => setFilter('ALL')}>
                 {t('auctions.all')}
+                <span className="font-tabular text-xs font-semibold">{number(list.length)}</span>
               </Chip>
               {CHIP_ORDER.filter((status) => (counts.get(status) ?? 0) > 0).map((status) => (
-                <Chip
-                  key={status}
-                  isActive={filter === status}
-                  onClick={() => setFilter(status)}
-                  count={number(counts.get(status) ?? 0)}
-                >
+                <Chip key={status} isActive={filter === status} onClick={() => setFilter(status)}>
                   {t(`status.${status}`)}
+                  <span className="font-tabular text-xs font-semibold">
+                    {number(counts.get(status) ?? 0)}
+                  </span>
                 </Chip>
               ))}
             </div>
