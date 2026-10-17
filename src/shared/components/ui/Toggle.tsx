@@ -25,17 +25,24 @@ export function Toggle({
       aria-label={label}
       disabled={isDisabled}
       onClick={() => onChange(!isOn)}
+      // A 44px hit area around the 30px track.
       className={cn(
-        'relative h-[30px] w-[50px] shrink-0 rounded-full border transition-colors duration-fast ease-ios',
+        'group relative grid h-11 w-[50px] shrink-0 place-items-center',
         'disabled:pointer-events-none disabled:opacity-45',
-        isOn ? 'border-transparent bg-grad' : 'border-border-strong bg-surface-high',
         className,
       )}
     >
       <span
         aria-hidden
         className={cn(
-          'absolute top-[3px] size-[22px] rounded-full transition-[inset-inline-start] duration-medium ease-ios',
+          'absolute inset-x-0 top-[7px] h-[30px] rounded-full border transition-colors duration-fast ease-ios',
+          isOn ? 'border-transparent bg-grad' : 'border-border-strong bg-surface-high',
+        )}
+      />
+      <span
+        aria-hidden
+        className={cn(
+          'absolute top-[11px] size-[22px] rounded-full transition-[inset-inline-start] duration-medium ease-ios',
           isOn
             ? 'start-[23px] bg-white shadow-[0_1px_3px_rgb(0_0_0/30%)]'
             : 'start-[3px] bg-muted-foreground light:bg-white light:shadow-[0_1px_3px_rgb(45_32_12/35%)]',

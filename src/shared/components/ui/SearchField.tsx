@@ -86,7 +86,7 @@ export function SearchField({
       {onFilter ? (
         <button
           type="button"
-          aria-label={filterLabel}
+          aria-label={filterCount ? undefined : filterLabel}
           onClick={onFilter}
           className={cn(
             'relative inline-flex size-[52px] shrink-0 items-center justify-center rounded-full',
@@ -95,6 +95,7 @@ export function SearchField({
           )}
         >
           <Icon name="sliders" size={20} />
+          {filterCount ? <span className="sr-only">{filterLabel}</span> : null}
           {filterCount ? (
             <span className="absolute -end-0.5 -top-0.5 grid h-[19px] min-w-[19px] place-items-center rounded-full border-2 border-background bg-foreground px-1 font-tabular text-[11px] leading-none font-semibold text-background">
               {filterCount}
