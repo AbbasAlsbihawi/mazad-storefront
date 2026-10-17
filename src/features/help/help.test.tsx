@@ -4,7 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useLocaleStore } from '@shared/store';
 import { HELP_CONTENT, HELP_TOPICS, markerOf, type HelpBlock, type ReviewRef } from './content';
-import { HelpBlocks, HelpTopicPage } from './HelpPages';
+import { HelpBlocks } from './components/HelpBlocks';
+import { HelpTopicPage } from './pages/HelpTopicPage';
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), back: vi.fn() }) }));
 
@@ -12,15 +13,20 @@ afterEach(() => useLocaleStore.getState().setLocale('ar'));
 
 /** A block's language-independent shape: kind, list length, link target, review reference. */
 function shape(block: HelpBlock) {
+  const until = block.untilContact ? ':untilContact' : '';
   switch (block.type) {
     case 'bullets':
-      return `bullets:${block.items.length}`;
+      return `bullets:${block.items.length}${until}`;
     case 'link':
-      return `link:${block.href}`;
+      return `link:${block.href}${until}`;
     case 'pending':
-      return `pending:${block.ref}`;
+      return `pending:${block.ref}${until}`;
+    case 'example':
+      return `example:${block.rows.map((row) => `${row.amount}${row.isResult ? '*' : ''}`).join()}`;
+    case 'steps':
+      return `steps:${block.items.map((item) => item.icon).join()}`;
     default:
-      return block.type;
+      return `${block.type}${until}`;
   }
 }
 
@@ -100,7 +106,7 @@ describe('help and policy content', () => {
     expect(text).not.toMatch(/confirm the order and choose/);
     expect(text).not.toMatch(/does not complete the purchase/);
     expect(text).toMatch(/creates the order automatically/);
-    expect(text).toMatch(/تُنشئ مزاد الطلب تلقائيًا/);
+    expect(text).toMatch(/تُنشئ بيدوم الطلب تلقائيًا/);
   });
 
   it('describes both payment methods, never cash only', () => {
@@ -164,6 +170,7 @@ describe('help and policy pages', () => {
       'H2',
       'P',
       'UL',
+      'FIGURE',
       'P',
       'P',
     ]);
