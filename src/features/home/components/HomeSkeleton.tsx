@@ -1,24 +1,30 @@
 import { AuctionGridSkeleton, AuctionRailSkeleton } from '@shared/components/cards';
 import { Skeleton } from '@shared/components/ui';
+import { cn } from '@shared/lib';
+
+/** A quiet bar inside a skeleton card, where the real text lands (design `.sk-lot`). */
+function Bar({ className }: { className: string }) {
+  return <i className={cn('block rounded-full bg-surface-high opacity-75', className)} />;
+}
 
 /** Stands in for the featured lot: its badge, name, price, timer and actions where they land. */
 export function FeaturedLotSkeleton() {
   return (
     <div
       aria-hidden
-      className="relative grid min-h-[330px] content-end gap-3 rounded-3xl border border-gold-line bg-surface p-5 lg:min-h-[470px]"
+      className="skeleton relative grid min-h-[330px] content-end gap-3 rounded-3xl border border-gold-line p-5 lg:min-h-[470px]"
     >
-      <Skeleton radius="full" className="absolute start-4 top-4 h-7 w-28" />
-      <Skeleton radius="full" className="h-5 w-4/5" />
-      <Skeleton radius="full" className="h-5 w-1/2" />
-      <Skeleton radius="full" className="mt-2 h-3 w-16" />
+      <Bar className="absolute start-4 top-4 h-7 w-28" />
+      <Bar className="h-5 w-4/5" />
+      <Bar className="h-5 w-1/2" />
+      <Bar className="mt-2 h-3 w-16" />
       <div className="flex items-center justify-between gap-3">
-        <Skeleton radius="full" className="h-8 w-1/2" />
-        <Skeleton radius="lg" className="h-10 w-28" />
+        <Bar className="h-8 w-1/2" />
+        <Bar className="h-10 w-28 rounded-[12px]" />
       </div>
       <div className="flex gap-2.5">
-        <Skeleton radius="full" className="h-[52px] flex-1" />
-        <Skeleton radius="full" className="size-[52px]" />
+        <Bar className="h-[52px] flex-1" />
+        <Bar className="size-[52px]" />
       </div>
     </div>
   );
