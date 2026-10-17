@@ -25,6 +25,7 @@ const store: Store = {
   contactPhone: null,
   deliveryFee: '5000.00',
   isDefault: true,
+  supportsCover: false,
 };
 
 async function setLanguage(locale: 'en' | 'ar') {

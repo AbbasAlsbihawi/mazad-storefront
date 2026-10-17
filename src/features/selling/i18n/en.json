@@ -21,14 +21,28 @@
   },
   "stores": {
     "title": "My stores",
-    "add": "Add store",
-    "edit": "Edit store",
+    "add": "New store",
+    "edit": "Edit",
     "empty": "You have no stores yet.",
     "emptyHint": "Add a store to start selling. Every product belongs to one of your stores.",
     "default": "Default",
-    "deliveryFee": "Delivery {{fee}}",
     "delete": "Delete store",
-    "deleteConfirm": "Delete this store? This cannot be undone."
+    "deleteConfirm": "It is removed with its listing details. This can't be undone.",
+    "newTitle": "New store",
+    "editTitle": "Edit store",
+    "view": "View store",
+    "delivery": "Delivery",
+    "free": "Free",
+    "liveAuctions_one": "{{count, num}} live auction",
+    "liveAuctions_other": "{{count, num}} live auctions",
+    "hub": "Seller hub",
+    "deleteTitle": "Delete this store?",
+    "defaultHint": "New products go to this store unless you choose another.",
+    "cover": "Cover photo",
+    "coverAdd": "Add a cover",
+    "coverChange": "Change cover",
+    "coverRemove": "Remove cover",
+    "coverHint": "Shown across the top of your store page."
   },
   "products": {
     "lockedInAuction": "Locked while it is in an auction. Manage it from My auctions.",
@@ -188,7 +202,9 @@
     "auctionWithdrawn": "Listing withdrawn",
     "auctionDraftSaved": "Draft saved. Publish it when you are ready.",
     "auctionPublished": "Published. Your auction is on Bidoom.",
-    "auctionSentForReview": "Sent for review. It goes live once Bidoom approves it."
+    "auctionSentForReview": "Sent for review. It goes live once Bidoom approves it.",
+    "coverUpdated": "Cover updated",
+    "coverRemoved": "Cover removed"
   },
   "errors": {
     "field": {
@@ -245,7 +261,9 @@
       "TOO_SHORT": "An auction must run for at least an hour.",
       "TOO_LONG": "An auction can run for at most 14 days.",
       "END_TOO_SOON": "This listing ends too soon to publish. Edit its dates first."
-    }
+    },
+    "IMAGE_NOT_OWNED": "That image wasn't uploaded from your account.",
+    "IMAGE_NOT_FOUND": "That image couldn't be found. Upload it again."
   },
   "conditionHint": {
     "NEW": "Unused, in its original packaging.",

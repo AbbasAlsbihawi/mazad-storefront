@@ -21,14 +21,32 @@
   },
   "stores": {
     "title": "متاجري",
-    "add": "إضافة متجر",
-    "edit": "تعديل المتجر",
+    "add": "متجر جديد",
+    "edit": "تعديل",
     "empty": "لا توجد متاجر بعد.",
     "emptyHint": "أضف متجرًا لتبدأ البيع. كل منتج ينتمي إلى أحد متاجرك.",
     "default": "الافتراضي",
-    "deliveryFee": "التوصيل {{fee}}",
     "delete": "حذف المتجر",
-    "deleteConfirm": "هل تريد حذف هذا المتجر؟ لا يمكن التراجع."
+    "deleteConfirm": "يُحذف المتجر وبياناته. لا يمكن التراجع عن ذلك.",
+    "newTitle": "متجر جديد",
+    "editTitle": "تعديل المتجر",
+    "view": "عرض المتجر",
+    "delivery": "التوصيل",
+    "free": "مجاني",
+    "liveAuctions_zero": "{{count, num}} مزاد مباشر",
+    "liveAuctions_one": "مزاد مباشر واحد",
+    "liveAuctions_two": "مزادان مباشران",
+    "liveAuctions_few": "{{count, num}} مزادات مباشرة",
+    "liveAuctions_many": "{{count, num}} مزاداً مباشراً",
+    "liveAuctions_other": "{{count, num}} مزاد مباشر",
+    "hub": "مركز البائع",
+    "deleteTitle": "حذف هذا المتجر؟",
+    "defaultHint": "تذهب المنتجات الجديدة إلى هذا المتجر ما لم تختر غيره.",
+    "cover": "صورة الغلاف",
+    "coverAdd": "أضف غلافاً",
+    "coverChange": "غيّر الغلاف",
+    "coverRemove": "أزل الغلاف",
+    "coverHint": "تظهر أعلى صفحة متجرك."
   },
   "products": {
     "lockedInAuction": "مقفل أثناء عرضه في مزاد. أدِره من «مزاداتي».",
@@ -199,7 +217,9 @@
     "auctionWithdrawn": "تم سحب الإعلان",
     "auctionDraftSaved": "حُفظت المسودة. انشرها عندما تكون جاهزًا.",
     "auctionPublished": "نُشر. مزادك الآن على بيدوم.",
-    "auctionSentForReview": "أُرسل للمراجعة. يبدأ بعد موافقة بيدوم."
+    "auctionSentForReview": "أُرسل للمراجعة. يبدأ بعد موافقة بيدوم.",
+    "coverUpdated": "تم تحديث الغلاف",
+    "coverRemoved": "تمت إزالة الغلاف"
   },
   "errors": {
     "field": {
@@ -256,7 +276,9 @@
       "TOO_SHORT": "يجب أن يستمر المزاد ساعة على الأقل.",
       "TOO_LONG": "لا يمكن أن يستمر المزاد أكثر من 14 يومًا.",
       "END_TOO_SOON": "ينتهي هذا الإعلان قريبًا جدًا ولا يمكن نشره. عدّل مواعيده أولًا."
-    }
+    },
+    "IMAGE_NOT_OWNED": "لم تُرفع هذه الصورة من حسابك.",
+    "IMAGE_NOT_FOUND": "تعذّر العثور على الصورة. ارفعها مرة أخرى."
   },
   "conditionHint": {
     "NEW": "غير مستعمل، في تغليفه الأصلي.",

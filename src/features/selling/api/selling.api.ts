@@ -37,6 +37,12 @@ export const sellingApi = {
     return storeSchema.parse(response.data);
   },
 
+  /** PATCH /me/stores/:id { coverKey }: an upload key of this seller's, or null to remove it. */
+  setStoreCover: async (id: string, coverKey: string | null): Promise<Store> => {
+    const response = await httpClient.patch<unknown>(`/me/stores/${id}`, { coverKey });
+    return storeSchema.parse(response.data);
+  },
+
   deleteStore: async (id: string): Promise<void> => {
     await httpClient.delete(`/me/stores/${id}`);
   },
