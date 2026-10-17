@@ -131,18 +131,6 @@
       "emptyTitle": "No ratings yet",
       "emptyMessage": "Ratings appear here once buyers have received their orders.",
       "topTags": "Most mentioned"
-    },
-    "tags": {
-      "AS_DESCRIBED": "As described",
-      "FAST_DELIVERY": "Fast delivery",
-      "GOOD_PACKAGING": "Well packed",
-      "FRIENDLY_SELLER": "Easy to reach",
-      "GOOD_VALUE": "Good value",
-      "NOT_AS_DESCRIBED": "Not as described",
-      "LATE_DELIVERY": "Late delivery",
-      "POOR_PACKAGING": "Poor packaging",
-      "UNRESPONSIVE_SELLER": "Hard to reach",
-      "DAMAGED": "Arrived damaged"
     }
   },
   "conditionHint": {

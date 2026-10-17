@@ -100,7 +100,9 @@ export function AuctionPageClient() {
         />
       )}
       watchlistToggle={<WatchlistToggle auctionId={params.id} />}
-      renderSellerFollowToggle={(sellerId) => <SellerFollowToggle sellerId={sellerId} />}
+      renderSellerFollowToggle={(sellerId) => (
+        <SellerFollowToggle sellerId={sellerId} emphasis="quiet" />
+      )}
     />
   );
 }
