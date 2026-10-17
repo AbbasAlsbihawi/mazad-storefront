@@ -33,7 +33,10 @@ export function WinsPage({ addresses = [], isAddressesPending = false, orders }:
   if (!isReady) return <PageLoader />;
 
   const pending = (wins.data ?? []).filter((win) => win.status === 'PENDING_CONFIRMATION');
-  const settled = (wins.data ?? []).filter((win) => win.status !== 'PENDING_CONFIRMATION');
+  // Newest first: the API lists by status and confirmation deadline.
+  const settled = (wins.data ?? [])
+    .filter((win) => win.status !== 'PENDING_CONFIRMATION')
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return (
     <>
