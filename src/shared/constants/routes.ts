@@ -1,5 +1,11 @@
 export const ROUTES = {
   home: '/',
+  /** First run: the brand page with slide to start (Bidoom design `welcome`). */
+  welcome: '/welcome',
+  /** One-way reports and suggestions (shown only when the API has support reports). */
+  contact: '/contact',
+  /** The contact form opened from an order, as a problem report with the order attached. */
+  orderProblem: (orderId: string) => `/contact?orderId=${encodeURIComponent(orderId)}`,
   auctions: '/auctions',
   auctionDetail: (id: string) => `/auctions/${id}`,
   store: (id: string) => `/stores/${id}`,
