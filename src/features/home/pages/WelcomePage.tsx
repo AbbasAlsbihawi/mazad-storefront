@@ -16,8 +16,9 @@ import { WelcomeArt } from '../components/welcome/WelcomeArt';
 
 const PERKS: { icon: IconName; key: string }[] = [
   { icon: 'live', key: 'live' },
-  { icon: 'shield', key: 'verified' },
+  // Not "verified sellers": verification is per seller, not a promise about all of them.
   { icon: 'cash', key: 'cod' },
+  { icon: 'hourglass', key: 'antiSniping' },
 ];
 
 const LINK_CLASS = 'text-gold underline underline-offset-4';

@@ -14,7 +14,7 @@
     "filters": "Filters"
   },
   "hero": {
-    "kicker": "Live auctions from verified sellers in Iraq",
+    "kicker": "Live auctions from sellers across Iraq",
     "title": "Bid on what you want, ",
     "titleGold": "at the price you decide.",
     "body": "Prices that move in front of you, clear bid steps, and payment on delivery.",
@@ -31,7 +31,6 @@
     "shareUnavailable": "Couldn't share this auction."
   },
   "perks": {
-    "verified": "Verified sellers",
     "cod": "Pay on delivery",
     "returns": "7-day returns",
     "antiSniping": "Anti-sniping"
@@ -71,8 +70,8 @@
     "title": "Live auctions. Watch the price move.",
     "perks": {
       "live": "Live auctions",
-      "verified": "Verified sellers",
-      "cod": "Pay on delivery"
+      "cod": "Pay on delivery",
+      "antiSniping": "Anti-sniping"
     },
     "slide": "Slide to start",
     "slideDone": "Welcome",
