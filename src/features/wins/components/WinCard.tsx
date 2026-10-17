@@ -51,7 +51,7 @@ export function WinCard({ win, order }: { win: Win; order?: WinOrderSummary }) {
             <Price value={win.amount} tone="gold" size="md" />
           </span>
           <span className="text-xs text-muted-foreground">
-            {formatDate(win.confirmedAt ?? win.createdAt, locale)}
+            {formatDate(win.auction.endsAt, locale)}
           </span>
         </span>
       </span>
