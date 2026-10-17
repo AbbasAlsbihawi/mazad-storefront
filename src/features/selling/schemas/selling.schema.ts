@@ -67,6 +67,9 @@ export const sellerProductListSchema = z.object({
     .passthrough(),
 });
 
+/** GET /products/:id for the owner: only the block reason is read from it. */
+export const productBlockSchema = z.object({ blockReason: z.string().nullish() });
+
 export const sellerAuctionSchema = z.object({
   id: z.string(),
   status: z.enum(SELLER_AUCTION_STATUSES),

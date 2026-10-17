@@ -46,11 +46,12 @@ function renderForm() {
 /** The required fields, so only the market price decides whether the form submits. */
 async function fillRequired() {
   await userEvent.selectOptions(screen.getByLabelText('Category'), 'c1');
-  await userEvent.type(screen.getByLabelText('Name (English)'), 'Camera');
-  await userEvent.type(screen.getByLabelText('Description (English)'), 'Works.');
+  await userEvent.type(screen.getByLabelText('Name in English'), 'Camera');
+  await userEvent.type(screen.getByLabelText('Description in English'), 'Works.');
+  await userEvent.click(screen.getByRole('radio', { name: 'Like new' }));
 }
 
-const marketPrice = () => screen.getByLabelText('New retail price');
+const marketPrice = () => screen.getByLabelText('Retail price new (optional)');
 
 beforeAll(async () => {
   addNamespaceBundle('selling', 'en', sellingEn);
@@ -73,9 +74,7 @@ describe('ProductForm: new retail price', () => {
     renderForm();
     expect(marketPrice()).toBeTruthy();
     expect(
-      screen.getByText(
-        'Optional — helps buyers compare the auction price with the price of a new item.',
-      ),
+      screen.getByText('We show buyers how much they save against the new price.'),
     ).toBeTruthy();
     expect(screen.getByText('IQD')).toBeTruthy();
     expect(screen.queryByText(/original price/i)).toBeNull();
@@ -86,7 +85,7 @@ describe('ProductForm: new retail price', () => {
     await fillRequired();
     await userEvent.type(marketPrice(), '1250000');
     expect(marketPrice()).toHaveValue('1,250,000');
-    await userEvent.click(screen.getByRole('button', { name: 'Create' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save product' }));
     await waitFor(() => expect(sellingApi.createProduct).toHaveBeenCalled());
     expect(vi.mocked(sellingApi.createProduct).mock.calls[0]![0]).toMatchObject({
       marketPrice: 1_250_000,
@@ -97,7 +96,7 @@ describe('ProductForm: new retail price', () => {
     renderForm();
     await fillRequired();
     await userEvent.type(marketPrice(), '1250.5');
-    await userEvent.click(screen.getByRole('button', { name: 'Create' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save product' }));
     expect(await screen.findByText('Use whole dinars (no fractions).')).toBeTruthy();
     expect(sellingApi.createProduct).not.toHaveBeenCalled();
   });
@@ -106,7 +105,7 @@ describe('ProductForm: new retail price', () => {
     renderForm();
     await fillRequired();
     await userEvent.type(marketPrice(), 'abc');
-    await userEvent.click(screen.getByRole('button', { name: 'Create' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save product' }));
     expect(await screen.findByText('Enter the price as a whole number of dinars.')).toBeTruthy();
     expect(sellingApi.createProduct).not.toHaveBeenCalled();
   });
@@ -114,7 +113,7 @@ describe('ProductForm: new retail price', () => {
   it('is optional: empty sends no market price at all', async () => {
     renderForm();
     await fillRequired();
-    await userEvent.click(screen.getByRole('button', { name: 'Create' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save product' }));
     await waitFor(() => expect(sellingApi.createProduct).toHaveBeenCalled());
     expect(vi.mocked(sellingApi.createProduct).mock.calls[0]![0].marketPrice).toBeUndefined();
   });
@@ -122,10 +121,33 @@ describe('ProductForm: new retail price', () => {
   it('in Arabic: label, helper and suffix', async () => {
     await setLanguage('ar');
     renderForm();
-    expect(screen.getByLabelText('سعر المنتج الجديد في السوق')).toBeTruthy();
-    expect(
-      screen.getByText('اختياري — يساعد المشتري على مقارنة سعر المزاد بسعر المنتج الجديد.'),
-    ).toBeTruthy();
+    expect(screen.getByLabelText('سعره جديداً (اختياري)')).toBeTruthy();
+    expect(screen.getByText('نعرض للمشترين كم يوفّرون مقارنة بالسعر الجديد.')).toBeTruthy();
     expect(screen.getByText('د.ع')).toBeTruthy();
+  });
+});
+
+describe('ProductForm: condition as a segmented choice', () => {
+  it('has no default: the seller has to pick one', async () => {
+    renderForm();
+    await userEvent.selectOptions(screen.getByLabelText('Category'), 'c1');
+    await userEvent.type(screen.getByLabelText('Name in English'), 'Camera');
+    await userEvent.type(screen.getByLabelText('Description in English'), 'Works.');
+    await userEvent.click(screen.getByRole('button', { name: 'Save product' }));
+    expect(await screen.findByText('Choose the condition.')).toBeTruthy();
+    expect(sellingApi.createProduct).not.toHaveBeenCalled();
+  });
+
+  it('sends the chosen condition and explains it', async () => {
+    renderForm();
+    await fillRequired();
+    expect(screen.getByRole('radio', { name: 'Like new' })).toBeChecked();
+    expect(screen.getByText('Used briefly; no visible wear.')).toBeTruthy();
+    await userEvent.click(screen.getByRole('button', { name: 'Save product' }));
+    await waitFor(() => expect(sellingApi.createProduct).toHaveBeenCalled());
+    expect(vi.mocked(sellingApi.createProduct).mock.calls[0]![0]).toMatchObject({
+      condition: 'LIKE_NEW',
+      nameAr: 'Camera',
+    });
   });
 });

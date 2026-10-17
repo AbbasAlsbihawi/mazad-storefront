@@ -1,5 +1,6 @@
 import { httpClient } from '@shared/api';
 import {
+  productBlockSchema,
   sellerAuctionListSchema,
   sellerAuctionSchema,
   sellerProductListSchema,
@@ -60,6 +61,12 @@ export const sellingApi = {
   ): Promise<SellerProduct> => {
     const response = await httpClient.patch<unknown>(`/products/${id}`, values);
     return sellerProductSchema.parse(response.data);
+  },
+
+  /** The owner's view of one product: it adds why Bidoom blocked it (absent from /me/products). */
+  getProductBlockReason: async (id: string): Promise<string | null> => {
+    const response = await httpClient.get<unknown>(`/products/${id}`);
+    return productBlockSchema.parse(response.data).blockReason ?? null;
   },
 
   deleteProduct: async (id: string): Promise<void> => {
