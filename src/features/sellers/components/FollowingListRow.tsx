@@ -30,7 +30,7 @@ export function FollowingListRow({ item, isFollowing, onUnfollowed }: FollowingL
       >
         <Avatar name={item.seller.fullName} size="md" className="size-[52px]" />
         <span className="flex min-w-0 items-center gap-1.5 font-medium text-foreground">
-          <span className="truncate">{item.seller.fullName}</span>
+          <span className="line-clamp-2 leading-[1.35]">{item.seller.fullName}</span>
           {item.seller.isVerified ? (
             <Icon
               name="seal-check"

@@ -106,7 +106,7 @@ export function AddressForm({ address, onDone }: AddressFormProps) {
         </p>
       ) : null}
       <div className="flex gap-2.5">
-        <Button type="submit" isFullWidth isLoading={mutation.isPending}>
+        <Button type="submit" className="min-w-0 flex-1" isLoading={mutation.isPending}>
           {t(address ? 'form.save' : 'form.add')}
         </Button>
         <Button variant="soft" onClick={cancel}>

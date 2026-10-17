@@ -74,7 +74,11 @@ export function NotificationsPage() {
                 {groupTitle(key, items[0]!)}
               </h2>
               {items.map((item) => (
-                <NotificationRow key={item.id} notification={item} isToday={key === 'today' || key === 'yesterday'} />
+                <NotificationRow
+                  key={item.id}
+                  notification={item}
+                  isToday={key === 'today' || key === 'yesterday'}
+                />
               ))}
             </section>
           ))
