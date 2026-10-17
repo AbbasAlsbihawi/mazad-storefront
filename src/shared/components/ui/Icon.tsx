@@ -152,10 +152,13 @@ export function IconButton({
   type = 'button',
   ...props
 }: IconButtonProps) {
+  // With a count, the name is read from the content ("Notifications 5"), so the visible number is
+  // part of the accessible name instead of contradicting an aria-label.
+  const hasBadge = badge != null && badge !== false && badge !== 0 && badge !== '';
   return (
     <button
       type={type}
-      aria-label={label}
+      aria-label={hasBadge ? undefined : label}
       style={{ width: size, height: size }}
       className={cn(
         'relative inline-flex shrink-0 items-center justify-center rounded-full',
@@ -172,7 +175,8 @@ export function IconButton({
         isFilled={isFilled}
         className={isDirectional ? 'rtl:-scale-x-100' : undefined}
       />
-      <CountBadge value={badge} />
+      {hasBadge ? <span className="sr-only">{label}</span> : null}
+      <CountBadge value={badge} isAnnounced={hasBadge} />
     </button>
   );
 }
@@ -181,17 +185,19 @@ export function IconButton({
 export function CountBadge({
   value,
   tone = 'gold',
+  isAnnounced = false,
   className,
 }: {
   value: ReactNode;
   tone?: 'gold' | 'alert';
+  /** Read as part of the control's name; otherwise visual only (the control says it in words). */
+  isAnnounced?: boolean;
   className?: string;
 }) {
   if (value == null || value === false || value === 0 || value === '') return null;
-  // Visual only: the control it sits on carries the count in its accessible name.
   return (
     <span
-      aria-hidden
+      aria-hidden={isAnnounced ? undefined : true}
       className={cn(
         'absolute -end-[3px] -top-[3px] grid h-[19px] min-w-[19px] place-items-center rounded-full px-[5px]',
         'border-2 border-background font-tabular text-[11px] leading-none font-semibold',

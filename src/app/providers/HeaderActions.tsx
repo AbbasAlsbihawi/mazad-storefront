@@ -29,7 +29,7 @@ function SignedInActions() {
     <>
       <IconButton
         name="bell"
-        label={unread > 0 ? `${t('nav.notifications')} (${unread})` : t('nav.notifications')}
+        label={t('nav.notifications')}
         badge={unread > 0 ? unread : undefined}
         onClick={() => router.push(ROUTES.notifications)}
       />
