@@ -1,5 +1,7 @@
 {
-  "app": { "name": "Mazad" },
+  "app": {
+    "name": "Bidoom"
+  },
   "nav": {
     "auctions": "Auctions",
     "signIn": "Sign in",
@@ -8,14 +10,18 @@
     "signOut": "Sign out",
     "back": "Back",
     "main": "Main navigation",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "breadcrumbs": "Breadcrumbs",
+    "skip": "Skip to content"
   },
   "tabs": {
     "home": "Home",
     "browse": "Browse",
     "bids": "My bids",
     "watchlist": "Watchlist",
-    "account": "Account"
+    "account": "Account",
+    "outbid_one": "Outbid on one auction",
+    "outbid_other": "Outbid on {{count, num}} auctions"
   },
   "search": {
     "label": "Search auctions",
@@ -23,8 +29,16 @@
     "clear": "Clear search",
     "filter": "Filters"
   },
-  "theme": { "light": "Light", "dark": "Dark", "label": "Appearance" },
-  "locale": { "en": "English", "ar": "العربية", "label": "Language" },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "label": "Appearance"
+  },
+  "locale": {
+    "en": "English",
+    "ar": "العربية",
+    "label": "Language"
+  },
   "password": {
     "show": "Show password",
     "hide": "Hide password"
@@ -45,12 +59,12 @@
     "empty": "Nothing here yet."
   },
   "notFound": {
-    "title": "Page not found",
-    "message": "This page doesn't exist or was moved. Head home or browse the auctions."
+    "title": "This page doesn’t exist",
+    "message": "The auction may have ended and been removed, or the link is incomplete."
   },
   "errorPage": {
-    "title": "Something went wrong",
-    "message": "This page couldn't be shown. Try again, or head home or to the auctions."
+    "title": "This page didn’t load",
+    "message": "Your bids are safe. Check your connection and try again."
   },
   "recovery": {
     "home": "Home",
@@ -73,5 +87,71 @@
     "ACCOUNT_DISABLED": "This account is no longer active.",
     "OTP_LOGIN_NOT_ALLOWED": "Administrator accounts can't reset their password here.",
     "PHONE_RECENTLY_DELETED": "An account with this number was deleted recently. The number can be used again later."
+  },
+  "header": {
+    "home": "Bidoom home",
+    "browse": "Browse",
+    "bids": "My bids",
+    "watchlist": "Watchlist",
+    "sell": "Sell on Bidoom",
+    "searchPlaceholder": "Search products, stores or categories"
+  },
+  "footer": {
+    "promise": "Live auctions from sellers across Iraq. Pay on delivery or by card.",
+    "shop": "Shop",
+    "allAuctions": "All auctions",
+    "endingSoon": "Ending soon",
+    "selling": "Selling",
+    "startSelling": "Start selling",
+    "createAuction": "Create an auction",
+    "sellingRules": "Selling rules",
+    "help": "Help",
+    "howAuctionsWork": "How auctions work",
+    "paymentsReturns": "Payments & returns",
+    "privacyTerms": "Privacy & terms",
+    "helpCentre": "Help centre",
+    "contact": "Contact us",
+    "copyright": "© {{year}} Bidoom.",
+    "country": "Iraq",
+    "currency": "IQD"
+  },
+  "card": {
+    "startsIn": "Starts in",
+    "bids_one": "{{count, num}} bid",
+    "bids_other": "{{count, num}} bids"
+  },
+  "time": {
+    "left": "Time left",
+    "days_one": "{{count}}d",
+    "days_other": "{{count}}d"
+  },
+  "rail": {
+    "previous": "Previous",
+    "next": "Next",
+    "seeAll": "See all"
+  },
+  "rating": {
+    "count_one": "rating",
+    "count_other": "ratings"
+  },
+  "dialog": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "slide": {
+    "hint": "Drag the handle all the way to confirm, or press to open a confirmation."
+  },
+  "reviewTags": {
+    "AS_DESCRIBED": "As described",
+    "FAST_DELIVERY": "Fast delivery",
+    "GOOD_PACKAGING": "Well packed",
+    "FRIENDLY_SELLER": "Easy to reach",
+    "GOOD_VALUE": "Good value",
+    "NOT_AS_DESCRIBED": "Not as described",
+    "LATE_DELIVERY": "Late delivery",
+    "POOR_PACKAGING": "Poor packaging",
+    "UNRESPONSIVE_SELLER": "Hard to reach",
+    "DAMAGED": "Arrived damaged"
   }
 }

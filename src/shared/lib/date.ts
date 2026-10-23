@@ -1,14 +1,32 @@
+import { numberLocale } from './money';
+
+/** Arabic dates use the Iraqi month names and Western digits: 17 تشرين الأول 2026, 4:05 م. */
+const DATE_TIME_OPTIONS: Record<'en' | 'ar', Intl.DateTimeFormatOptions> = {
+  en: { dateStyle: 'medium', timeStyle: 'short' },
+  ar: { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit' },
+};
+
+const DATE_OPTIONS: Record<'en' | 'ar', Intl.DateTimeFormatOptions> = {
+  en: { dateStyle: 'medium' },
+  ar: { day: 'numeric', month: 'long', year: 'numeric' },
+};
+
 export function formatDateTime(iso: string, locale: 'en' | 'ar'): string {
-  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar' : 'en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(iso));
+  return new Intl.DateTimeFormat(numberLocale(locale), DATE_TIME_OPTIONS[locale]).format(
+    new Date(iso),
+  );
 }
 
 export function formatDate(iso: string, locale: 'en' | 'ar'): string {
-  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar' : 'en-US', { dateStyle: 'medium' }).format(
-    new Date(iso),
-  );
+  return new Intl.DateTimeFormat(numberLocale(locale), DATE_OPTIONS[locale]).format(new Date(iso));
+}
+
+/** A clock time on its own (bid history rows, "today 9:31"). */
+export function formatTime(iso: string, locale: 'en' | 'ar'): string {
+  return new Intl.DateTimeFormat(numberLocale(locale), {
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(iso));
 }
 
 /**

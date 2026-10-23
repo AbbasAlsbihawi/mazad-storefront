@@ -15,7 +15,11 @@
     "rating_other": "{{average, num}} ({{count, num}} تقييم)",
     "noRating": "لا توجد تقييمات بعد",
     "stores": "المتاجر",
-    "notFound": "البائع غير موجود."
+    "notFound": "البائع غير موجود.",
+    "title": "البائع",
+    "crumbStores": "المتاجر",
+    "verified": "بائع موثّق",
+    "currentAuctions": "مزادات حالية"
   },
   "follow": {
     "follow": "متابعة",
@@ -32,5 +36,11 @@
   },
   "errors": {
     "CANNOT_FOLLOW_SELF": "لا يمكنك متابعة نفسك."
+  },
+  "followingList": {
+    "account": "الحساب",
+    "verified": "بائع موثّق",
+    "empty": "تابع بائعاً من صفحته لترى مزاداته الجديدة أولاً.",
+    "browse": "تصفّح المزادات"
   }
 }

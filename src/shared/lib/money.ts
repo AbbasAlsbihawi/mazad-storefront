@@ -2,10 +2,6 @@ import type { Locale } from '@shared/store';
 
 const CURRENCY_LABEL: Record<Locale, string> = { ar: 'د.ع', en: 'IQD' };
 
-// A string rather than an array so indexing is total — charAt never widens to `undefined` the
-// way an element access does under noUncheckedIndexedAccess.
-const ARABIC_INDIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
-
 /**
  * mazad-api serializes every price as a Decimal string (e.g. "1250.00"), never a JSON number
  * (see ADR-009). This is the only place that parses one.
@@ -49,44 +45,67 @@ export function roundMoney(value: number): number {
 }
 
 /**
- * Western numerals → Arabic-Indic. Every *quantity* the user reads in Arabic goes through this:
- * prices, bid counts, ratings, item counts. Countdowns deliberately don't — they stay Western
- * with tabular-nums so the digits don't jitter width while ticking (design system, "Money and
- * time").
+ * Bidoom reads numbers in Western digits in Arabic too (the design's NUMS = 'latn'): prices,
+ * counts, ratings, order numbers and countdowns all match the product names, codes and phone
+ * numbers around them. Arabic formats through ar-IQ with the latn numbering system, which keeps
+ * the Western comma for grouping.
  */
-export function toArabicDigits(value: string | number): string {
-  return String(value).replace(/\d/g, (digit) => ARABIC_INDIC_DIGITS.charAt(Number(digit)));
+export function numberLocale(locale: string | undefined): string {
+  return locale === 'ar' ? 'ar-IQ-u-nu-latn' : 'en-US';
+}
+
+/** The currency label after an amount: د.ع in Arabic, IQD in English. */
+export function currencyLabel(locale: Locale): string {
+  return CURRENCY_LABEL[locale];
 }
 
 /**
  * `{{count, num}}` inside translations (registered as the i18next `num` formatter): a quantity
- * embedded in a sentence follows the same digits as formatNumber — Arabic-Indic in Arabic. Keeps
- * up to two decimals (ratings) and passes non-numbers through, digits converted.
+ * embedded in a sentence gets the same grouping as formatNumber. Keeps up to two decimals
+ * (ratings) and passes non-numbers through unchanged.
  */
 export function formatQuantity(value: unknown, locale: string | undefined): string {
-  const text =
-    typeof value === 'number' && Number.isFinite(value)
-      ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value)
-      : String(value ?? '');
-  return locale === 'ar' ? toArabicDigits(text) : text;
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return new Intl.NumberFormat(numberLocale(locale), { maximumFractionDigits: 2 }).format(value);
+  }
+  return String(value ?? '');
 }
 
-/** Localizes a bare number — bid counts, follower counts — without a currency suffix. */
+/** Localizes a bare number (bid counts, follower counts) without a currency suffix. */
 export function formatNumber(value: number | null | undefined, locale: Locale): string {
   if (value == null || !Number.isFinite(value)) return '—';
-  const grouped = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
-  return locale === 'ar' ? toArabicDigits(grouped) : grouped;
+  return new Intl.NumberFormat(numberLocale(locale), { maximumFractionDigits: 0 }).format(value);
+}
+
+/** A star rating to one decimal: 4.8. */
+export function formatRating(value: number | null | undefined, locale: Locale): string {
+  if (value == null || !Number.isFinite(value)) return '—';
+  return new Intl.NumberFormat(numberLocale(locale), {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
 /**
- * Iraqi Dinar has no minor unit, so amounts never show decimals. Grouping is always the Western
- * comma (`١٢٥,٠٠٠ د.ع`) rather than Intl's `ar` group separator — that's what the design system
- * specifies, and it keeps the separator identical across both locales.
+ * The amount and its currency label separately, for the price display that sets the label
+ * smaller and muted (`1,325,000` + `د.ع`). The Iraqi Dinar has no minor unit: no decimals.
  */
-export function formatMoney(value: string | null | undefined, locale: Locale): string {
+export function formatMoneyParts(
+  value: string | null | undefined,
+  locale: Locale,
+): { amount: string; currency: string } | null {
   const amount = parseMoney(value);
-  if (amount == null) return '—';
-  const grouped = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount);
-  const digits = locale === 'ar' ? toArabicDigits(grouped) : grouped;
-  return `${digits} ${CURRENCY_LABEL[locale]}`;
+  if (amount == null) return null;
+  return {
+    amount: new Intl.NumberFormat(numberLocale(locale), { maximumFractionDigits: 0 }).format(
+      amount,
+    ),
+    currency: CURRENCY_LABEL[locale],
+  };
+}
+
+/** `1,325,000 د.ع` / `1,325,000 IQD`: the plain-text price, for labels and sentences. */
+export function formatMoney(value: string | null | undefined, locale: Locale): string {
+  const parts = formatMoneyParts(value, locale);
+  return parts ? `${parts.amount} ${parts.currency}` : '—';
 }

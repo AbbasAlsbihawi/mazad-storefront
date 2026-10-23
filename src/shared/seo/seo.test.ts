@@ -33,10 +33,10 @@ describe('auction metadata', () => {
     const meta = auctionMetadata('cauction1', auction);
     expect(meta.title).toBe('آيفون ١٥ برو — iPhone 15 Pro');
     expect(meta.description).toContain('مزاد مباشر');
-    expect(meta.description).toContain('١٢٥,٠٠٠ د.ع');
+    expect(meta.description).toContain('125,000 د.ع');
     expect(meta.description).toContain('بحالة ممتازة');
     expect(meta.openGraph).toMatchObject({
-      siteName: 'مزاد Mazad',
+      siteName: 'بيدوم Bidoom',
       url: '/auctions/cauction1',
       images: [{ url: expect.stringMatching(/\/images\/p1\/1\.webp$/) }],
     });
@@ -98,7 +98,7 @@ describe('store and seller metadata', () => {
       followerCount: 12,
       rating: { average: 4.5, count: 8 },
     });
-    expect(seller.description).toBe('بائع موثّق على مزاد · 12 متابع · التقييم 4.5 من 8');
+    expect(seller.description).toBe('بائع موثّق على بيدوم · 12 متابع · التقييم 4.5 من 8');
   });
 });
 

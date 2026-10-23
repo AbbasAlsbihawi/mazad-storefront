@@ -1,7 +1,15 @@
 export const ROUTES = {
   home: '/',
+  /** First run: the brand page with slide to start (Bidoom design `welcome`). */
+  welcome: '/welcome',
+  /** One-way reports and suggestions (shown only when the API has support reports). */
+  contact: '/contact',
+  /** The contact form opened from an order, as a problem report with the order attached. */
+  orderProblem: (orderId: string) => `/contact?orderId=${encodeURIComponent(orderId)}`,
   auctions: '/auctions',
   auctionDetail: (id: string) => `/auctions/${id}`,
+  /** The full bid history of one auction (design `history`). */
+  auctionBids: (id: string) => `/auctions/${id}/bids`,
   store: (id: string) => `/stores/${id}`,
   login: '/login',
   register: '/register',
@@ -29,4 +37,6 @@ export const ROUTES = {
   saleDetail: (id: string) => `/account/selling/sales/${id}`,
   sellingAuctionNew: (productId: string) =>
     `/account/selling/auctions?productId=${encodeURIComponent(productId)}`,
+  /** The in-app delete-account flow (the public how-to page is /account-deletion). */
+  deleteAccount: '/account/delete',
 } as const;

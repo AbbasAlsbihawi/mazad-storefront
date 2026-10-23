@@ -20,7 +20,7 @@ export const SELLER_AUCTION_STATUSES = [
 
 // Decimal fields arrive as strings from mazad-api and stay strings here (ADR-009) — parse them
 // with parseMoney at the point of arithmetic, never by coercing the schema to a number.
-export const storeSchema = z.object({
+const storeRowSchema = z.object({
   id: z.string(),
   nameEn: z.string(),
   nameAr: z.string(),
@@ -31,7 +31,17 @@ export const storeSchema = z.object({
   contactPhone: z.string().nullable(),
   deliveryFee: z.coerce.string(),
   isDefault: z.boolean(),
+  coverUrl: z.string().nullish(),
+  /** True when the API knows store covers (its rows carry a `coverUrl` key, even a null one). */
+  supportsCover: z.boolean(),
 });
+
+// An API with store covers sends `coverUrl` on every row (null without a cover); an older one
+// doesn't send the key at all, and the cover upload stays hidden.
+export const storeSchema = z.preprocess(
+  (raw) => (raw && typeof raw === 'object' ? { ...raw, supportsCover: 'coverUrl' in raw } : raw),
+  storeRowSchema,
+);
 
 export const storeListSchema = z.array(storeSchema);
 
@@ -67,11 +77,16 @@ export const sellerProductListSchema = z.object({
     .passthrough(),
 });
 
+/** GET /products/:id for the owner: only the block reason is read from it. */
+export const productBlockSchema = z.object({ blockReason: z.string().nullish() });
+
 export const sellerAuctionSchema = z.object({
   id: z.string(),
   status: z.enum(SELLER_AUCTION_STATUSES),
   startingPrice: z.coerce.string(),
   minIncrement: z.coerce.string(),
+  // false on new listings (the seller's fixed step); true on older ones on the platform ladder.
+  incrementLadder: z.boolean().optional(),
   currentPrice: z.coerce.string().nullable(),
   buyNowPrice: z.coerce.string().nullable(),
   bidCount: z.number(),
@@ -79,6 +94,7 @@ export const sellerAuctionSchema = z.object({
   endsAt: z.string(),
   antiSnipingMinutes: z.number().nullable().optional(),
   maxExtensions: z.number().nullable().optional(),
+  extensionMinutes: z.number().nullable().optional(),
   rejectionReason: z.string().nullable(),
   cancelReason: z.string().nullable(),
   // SOLD, but the order was cancelled: the product may be listed again (mazad-api saleCancelled).
@@ -174,7 +190,11 @@ export const auctionFormSchema = z
   .object({
     productId: z.string().min(1, 'errors.field.productRequired'),
     startingPrice: z.coerce.number('errors.field.startingPriceInvalid').min(0),
-    // No minIncrement: mazad-api sets the raise from its price ladder.
+    // The seller's step and extension (mazad-api sellerAuctionRules); buildAuctionPayload checks
+    // the bounds against the opening price, the API answers INVALID_BID_STEP / _EXTENSION_RULE.
+    minIncrement: z.coerce.number('errors.field.minIncrementInvalid').int().min(0),
+    antiSnipingMinutes: z.coerce.number().int().min(1).max(10),
+    maxExtensions: z.coerce.number().int().min(1).max(20),
     // datetime-local gives "2026-08-11T18:30" with no zone; toIsoFromLocalInput converts.
     startsAt: z.string().min(1, 'errors.field.startsAtRequired'),
     endsAt: z.string().min(1, 'errors.field.endsAtRequired'),

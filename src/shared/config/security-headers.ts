@@ -13,8 +13,8 @@
  *   executed, so script-src doesn't apply to it.
  *   The cost: every page is rendered per request (see docs/security.md).
  * - style-src keeps 'unsafe-inline': React style attributes and next/image set inline styles.
- *   Styles cannot run code; scripts stay nonce-only. Plus Google Fonts (globals.css imports the
- *   Cairo stylesheet, which loads its font files from fonts.gstatic.com).
+ *   Styles cannot run code; scripts stay nonce-only. No font host: next/font self-hosts the
+ *   Bidoom fonts (src/app/fonts.ts) under /_next/static, so style-src and font-src stay 'self'.
  * - connect-src: this origin plus mazad-api over https and wss (REST + Socket.IO).
  * - img-src: this origin (next/image), the API's asset host, and Unsplash (demo seed photos).
  * - worker-src 'self': public/sw.js. manifest-src 'self': the web app manifest.
@@ -60,8 +60,8 @@ export function contentSecurityPolicy({
     `script-src ${list(`'nonce-${nonce}'`, "'strict-dynamic'", "'self'", isDev && "'unsafe-eval'")}`,
     `connect-src ${list("'self'", api?.origin, socket, isDev && 'ws:')}`,
     `img-src ${list("'self'", 'data:', 'blob:', assets?.origin, 'https://images.unsplash.com')}`,
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' data: https://fonts.gstatic.com",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self' data:",
     "worker-src 'self'",
     "manifest-src 'self'",
     "object-src 'none'",

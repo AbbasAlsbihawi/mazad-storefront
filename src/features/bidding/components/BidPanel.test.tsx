@@ -24,12 +24,21 @@ vi.mock('../api/bidding.api', () => ({
   },
 }));
 
-function renderPanel(isOwnAuction: boolean) {
+/** Money never moves on a tap: the slide's tap path opens a confirmation, which places the bid. */
+async function placeBidBySlide() {
+  await userEvent.click(await screen.findByRole('button', { name: /^Slide to bid/ }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Place bid' }));
+}
+
+function renderPanel(
+  isOwnAuction: boolean,
+  extra: { hasAddress?: boolean; isBiddingPaused?: boolean } = {},
+) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(
     <QueryClientProvider client={client}>
       <I18nextProvider i18n={i18n}>
-        <BidPanel auctionId="auction-1" isOwnAuction={isOwnAuction} />
+        <BidPanel auctionId="auction-1" isOwnAuction={isOwnAuction} {...extra} />
       </I18nextProvider>
     </QueryClientProvider>,
   );
@@ -69,6 +78,48 @@ const standing = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+describe('BidPanel: an address first, and paused bidding', () => {
+  it('signed in with no saved address: "Bid" asks for an address instead of opening the sheet', async () => {
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
+    renderPanel(false, { hasAddress: false });
+    await userEvent.click(await screen.findByRole('button', { name: 'Bid' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Add an address first' });
+    expect(dialog).toHaveTextContent('You need at least one saved address before you can bid.');
+    expect(screen.queryByRole('button', { name: /^Slide to bid/ })).toBeNull();
+    expect(screen.getAllByTestId('bid-address-first-add')[0]?.getAttribute('href')).toBe(
+      '/account/addresses',
+    );
+  });
+
+  it('paused after two violations: says so, offers support, and no bid actions', async () => {
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
+    renderPanel(false, { isBiddingPaused: true, hasAddress: true });
+    expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
+      'Your bidding is paused after two refused deliveries.',
+    );
+    expect(screen.getByTestId('bidding-paused-support').getAttribute('href')).toBe('/contact');
+    expect(screen.queryByRole('button', { name: 'Bid' })).toBeNull();
+  });
+
+  it('a BIDDING_PAUSED refusal explains the pause and links to support', async () => {
+    vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
+    vi.mocked(biddingApi.placeBid).mockRejectedValue(
+      Object.assign(new Error('paused'), {
+        isAxiosError: true,
+        response: {
+          status: 403,
+          data: { errorCode: 'BIDDING_PAUSED', details: { violations: 2, limit: 2 } },
+        },
+      }),
+    );
+    renderPanel(false, { hasAddress: true });
+    await placeBidBySlide();
+    expect(
+      await screen.findByText(/Your bidding is paused after two refused deliveries\. Contact/),
+    ).toBeTruthy();
+  });
+});
+
 describe('BidPanel: the server says what happened', () => {
   it('uses the server minimum and shows the leader', async () => {
     vi.mocked(biddingApi.getAuctionPricing).mockResolvedValue({
@@ -87,7 +138,7 @@ describe('BidPanel: the server says what happened', () => {
     );
     renderPanel(false);
     expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
-      "You're the highest bidder",
+      'You are leading. We will alert you if someone outbids you.',
     );
     expect(screen.getAllByText(/100,000/).length).toBeGreaterThan(0);
   });
@@ -110,7 +161,7 @@ describe('BidPanel: the server says what happened', () => {
       },
     });
     renderPanel(false);
-    await userEvent.click(await screen.findByRole('button', { name: /Place bid/ }));
+    await placeBidBySlide();
     expect(useToastStore.getState().toasts).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -138,7 +189,7 @@ describe('BidPanel: the server says what happened', () => {
       },
     });
     renderPanel(false);
-    await userEvent.click(await screen.findByRole('button', { name: /Place bid/ }));
+    await placeBidBySlide();
     expect((await screen.findAllByText(/105,000/)).length).toBeGreaterThan(0);
     expect(screen.queryByText(/minimum bid rose/i)).toBeNull();
   });
@@ -158,7 +209,7 @@ describe('BidPanel: the server says what happened', () => {
 describe('BidPanel: who can bid', () => {
   it('offers a signed-in buyer the bid form', async () => {
     renderPanel(false);
-    expect(await screen.findByRole('button', { name: /Place bid/ })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: /^Slide to bid/ })).toBeTruthy();
   });
 
   it('offers the seller no bid on their own live auction, and says why', async () => {
@@ -166,7 +217,7 @@ describe('BidPanel: who can bid', () => {
     expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
       'This is your auction',
     );
-    expect(screen.queryByRole('button', { name: /Place bid/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Slide to bid/ })).toBeNull();
     expect(screen.queryByText(/Buy now/)).toBeNull();
   });
 });
@@ -197,7 +248,7 @@ describe('BidPanel: the winner of a closed auction', () => {
   it('takes the winner to the order the win became', async () => {
     await sold();
     renderWinner({ orderId: 'o1' });
-    const link = await screen.findByRole('link', { name: 'You won · View order' });
+    const link = await screen.findByRole('link', { name: 'View your order' });
     expect(link.getAttribute('href')).toBe('/account/orders/o1');
     expect(screen.queryByText(/Bidding is closed/)).toBeNull();
   });
@@ -205,7 +256,7 @@ describe('BidPanel: the winner of a closed auction', () => {
   it('points to the wins list while the order is still being created', async () => {
     await sold();
     renderWinner({ orderId: null });
-    const link = await screen.findByRole('link', { name: 'You won · See your wins' });
+    const link = await screen.findByRole('link', { name: 'See your wins' });
     expect(link.getAttribute('href')).toBe('/account/wins');
   });
 
@@ -213,7 +264,7 @@ describe('BidPanel: the winner of a closed auction', () => {
     await sold();
     renderWinner({ orderId: 'o1' });
     expect(await screen.findByTestId('auction-user-state')).toHaveTextContent(
-      'You won this auction',
+      'You won! Your order is created at your default address.',
     );
     expect(screen.getAllByTestId('auction-user-state')).toHaveLength(1);
   });
@@ -225,7 +276,7 @@ describe('BidPanel: the winner of a closed auction', () => {
       'Sold to another bidder',
     );
     expect(screen.queryByTestId('won-view-order')).toBeNull();
-    expect(screen.queryByRole('button', { name: /Place bid/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Slide to bid/ })).toBeNull();
   });
 });
 
@@ -251,13 +302,13 @@ describe('BidPanel: the one state line', () => {
     ['ENDED', 'This auction has ended'],
     ['UNSOLD', 'This auction has ended'],
     ['CANCELLED', 'This auction has ended'],
-    ['SCHEDULED', "The auction hasn't started yet"],
+    ['SCHEDULED', "The auction hasn't started yet."],
   ])('%s: "%s", and nothing to bid', async (status, text) => {
     pricing(status);
     vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
     renderPanel(false);
     expect(await stateLine()).toHaveTextContent(text);
-    expect(screen.queryByRole('button', { name: /Place bid/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Slide to bid/ })).toBeNull();
   });
 
   it('the seller sees their own auction even once it sold', async () => {
@@ -274,21 +325,25 @@ describe('BidPanel: the one state line', () => {
     await waitFor(async () =>
       expect(await stateLine()).toHaveTextContent('Auto-bid on up to 200,000 IQD'),
     );
-    expect(screen.queryByText(/highest bidder/)).toBeNull();
+    expect(screen.queryByText(/You are leading/)).toBeNull();
   });
 
   it('outbid, with no "leading" anywhere else on the panel', async () => {
     vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing({ myHighestBid: '120000.00' }));
     renderPanel(false);
-    await waitFor(async () => expect(await stateLine()).toHaveTextContent("You've been outbid"));
-    expect(screen.queryByText(/highest bidder/)).toBeNull();
+    await waitFor(async () =>
+      expect(await stateLine()).toHaveTextContent(
+        'You were outbid. The lowest bid to lead again: 100,000 IQD',
+      ),
+    );
+    expect(screen.queryByText(/leading/)).toBeNull();
   });
 
   it('a signed-in buyer with no bids can bid', async () => {
     vi.mocked(biddingApi.getMyStanding).mockResolvedValue(standing());
     renderPanel(false);
     expect(await stateLine()).toHaveTextContent('You can bid');
-    expect(await screen.findByRole('button', { name: /Place bid/ })).toBeTruthy();
+    expect(await screen.findByRole('button', { name: /^Slide to bid/ })).toBeTruthy();
   });
 
   it('a guest gets the sign-in button as the only state', async () => {

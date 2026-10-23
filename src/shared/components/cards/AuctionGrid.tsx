@@ -4,31 +4,59 @@ import { AuctionCard } from './AuctionCard';
 import type { AuctionSummary } from '@shared/types';
 
 const COLUMN_CLASSES = {
-  2: 'grid-cols-2',
-  3: 'grid-cols-2 sm:grid-cols-3',
+  /** two up on phones, four from 960px (design `.grid`) */
+  2: 'grid-cols-2 lg:grid-cols-4',
+  /** beside a filter column or a side panel (design `.grid.g3`) */
+  3: 'grid-cols-2 lg:grid-cols-3',
 } as const;
 
 export interface AuctionGridProps {
   auctions: AuctionSummary[];
-  /** 2-up is the phone default; the wider layouts are for tablet-width routes. */
   columns?: keyof typeof COLUMN_CLASSES;
+  /** How many leading cards load their photos eagerly. */
+  priorityCount?: number;
   className?: string;
 }
 
-export function AuctionGrid({ auctions, columns = 2, className }: AuctionGridProps) {
+export function AuctionGrid({
+  auctions,
+  columns = 2,
+  priorityCount = 0,
+  className,
+}: AuctionGridProps) {
   return (
-    <div className={cn('grid items-stretch gap-3', COLUMN_CLASSES[columns], className)}>
-      {auctions.map((auction) => (
-        <AuctionCard key={auction.id} auction={auction} />
+    <ul
+      className={cn(
+        'grid gap-x-3.5 gap-y-[18px] lg:gap-x-[22px] lg:gap-y-7',
+        COLUMN_CLASSES[columns],
+        className,
+      )}
+    >
+      {auctions.map((auction, index) => (
+        <li key={auction.id}>
+          <AuctionCard auction={auction} isPriority={index < priorityCount} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
 /** Matches AuctionGrid's footprint so the real cards don't shift in when the query resolves. */
-export function AuctionGridSkeleton({ count = 4 }: { count?: number }) {
+export function AuctionGridSkeleton({
+  count = 4,
+  columns = 2,
+}: {
+  count?: number;
+  columns?: keyof typeof COLUMN_CLASSES;
+}) {
   return (
-    <div className="grid grid-cols-2 items-stretch gap-3">
+    <div
+      aria-hidden
+      className={cn(
+        'grid gap-x-3.5 gap-y-[18px] lg:gap-x-[22px] lg:gap-y-7',
+        COLUMN_CLASSES[columns],
+      )}
+    >
       {Array.from({ length: count }, (_, index) => (
         <AuctionCardSkeleton key={index} />
       ))}
@@ -37,26 +65,29 @@ export function AuctionGridSkeleton({ count = 4 }: { count?: number }) {
 }
 
 /**
- * AuctionRail — the horizontally scrolling row that carries each home-feed section. Snaps so a
- * flick always lands on a card edge rather than mid-card.
+ * AuctionRail: the horizontally scrolling row of lot cards, without a header. Pages that want the
+ * header with "See all" and desktop arrows use Rail instead.
  */
 export function AuctionRail({ auctions }: { auctions: AuctionSummary[] }) {
   return (
-    <div className="no-scrollbar -mx-gutter flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter pb-1">
+    <ul className="no-scrollbar rail-fade -mx-5 flex snap-x snap-mandatory scroll-px-5 gap-3.5 overflow-x-auto px-5 lg:mx-0 lg:px-0">
       {auctions.map((auction) => (
-        <div key={auction.id} className="w-42 shrink-0 snap-start">
+        <li key={auction.id} className="w-44 shrink-0 snap-start lg:w-[210px]">
           <AuctionCard auction={auction} />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
 export function AuctionRailSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <div className="no-scrollbar -mx-gutter flex gap-3 overflow-x-auto px-gutter pb-1">
+    <div
+      aria-hidden
+      className="no-scrollbar -mx-5 flex gap-3.5 overflow-x-auto px-5 lg:mx-0 lg:px-0"
+    >
       {Array.from({ length: count }, (_, index) => (
-        <div key={index} className="w-42 shrink-0">
+        <div key={index} className="w-44 shrink-0 lg:w-[210px]">
           <AuctionCardSkeleton />
         </div>
       ))}

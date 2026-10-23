@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
+import { BrandSprite } from '@shared/components/brand';
 import { SITE_NAME, isNoIndex, siteUrl } from '@shared/seo';
+import { FONT_VARIABLES } from './fonts';
 import { AppProviders, AppShell } from './providers';
 import './styles/globals.css';
 
@@ -22,13 +24,14 @@ export const metadata: Metadata = {
     locale: 'ar_IQ',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: [{ url: '/icon-512.png', width: 512, height: 512, alt: SITE_NAME }],
+    images: [{ url: '/og.png', width: 1200, height: 630, alt: SITE_NAME }],
   },
-  applicationName: 'Mazad',
+  twitter: { card: 'summary_large_image', images: ['/og.png'] },
+  applicationName: 'Bidoom',
   manifest: '/manifest.webmanifest',
-  // iOS ignores the manifest entirely; these are what make an added-to-home-screen Mazad open
+  // iOS ignores the manifest entirely; these are what make an added-to-home-screen Bidoom open
   // without Safari's chrome.
-  appleWebApp: { capable: true, title: 'Mazad', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'Bidoom', statusBarStyle: 'black-translucent' },
   icons: {
     icon: [
       { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
@@ -43,28 +46,27 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   // Lets the layout extend under the notch and the home indicator, which is the only thing that
-  // makes env(safe-area-inset-*) report anything but 0 — the floating tab bar sits on it.
+  // makes env(safe-area-inset-*) report anything but 0: the floating tab bar sits on it.
   viewportFit: 'cover',
   // The theme is a stored preference rather than a media query, so the browser chrome can only
-  // follow the device. Matching --color-background in each theme keeps the status bar seamless
-  // for the common case where the two agree.
+  // follow the device. Each colour is that theme's --color-background.
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f6f7f9' },
-    { media: '(prefers-color-scheme: dark)', color: '#040405' },
+    { media: '(prefers-color-scheme: light)', color: '#f4eedf' },
+    { media: '(prefers-color-scheme: dark)', color: '#080706' },
   ],
 };
 
 // Reads the persisted locale/theme and stamps <html> before first paint, so neither the wrong
 // direction nor the wrong palette ever flashes (ADR-011). It is a plain inline script in <head>,
-// which the browser runs synchronously while parsing — not next/script's beforeInteractive, which
+// which the browser runs synchronously while parsing, not next/script's beforeInteractive, which
 // in the App Router is queued and only runs once the framework chunks have loaded. Vanilla JS
-// only — this runs before any bundled module, including Zustand, so it can't import the stores
-// it's reading.
+// only: this runs before any bundled module, including Zustand, so it can't import the stores
+// it's reading. Dark is the default; only a stored "light" stamps data-theme.
 const THEME_LOCALE_INIT_SCRIPT = `
 (function () {
   try {
     var locale = 'ar';
-    var theme = 'light';
+    var theme = 'dark';
     var localeRaw = localStorage.getItem('mazad.locale');
     if (localeRaw) {
       var parsedLocale = JSON.parse(localeRaw);
@@ -81,7 +83,7 @@ const THEME_LOCALE_INIT_SCRIPT = `
     }
     document.documentElement.lang = locale;
     document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
-    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
   } catch (e) {}
 })();
 `;
@@ -91,7 +93,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // per request: a nonce can't be baked into prerendered HTML (docs/security.md).
   const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" className={FONT_VARIABLES} suppressHydrationWarning>
       <head>
         <script
           id="theme-locale-init"
@@ -104,6 +106,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       {/* suppressHydrationWarning: some browser extensions (e.g. Grammarly) inject data-gr-*
           attributes into <body> before React hydrates; harmless, but noisy without this. */}
       <body suppressHydrationWarning>
+        <BrandSprite />
         <AppProviders>
           <AppShell>{children}</AppShell>
         </AppProviders>

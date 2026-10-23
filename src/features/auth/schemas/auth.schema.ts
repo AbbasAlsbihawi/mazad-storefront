@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { parsePhone } from '@shared/lib/phone';
+import { withIraqiPrefix } from '../lib/phone-prefix';
 
-// Anything mazad-api reads as a phone: 07…, +964…, Arabic digits, spaces and dashes included.
+// Anything mazad-api reads as a phone: 07…, +964…, Arabic digits, spaces and dashes included. The
+// field shows a fixed +964, so a number typed without its country code is read with it.
 const phoneSchema = z
   .string()
   .trim()
-  .refine((value) => parsePhone(value) !== null, 'errors.field.phoneInvalid');
+  .refine((value) => parsePhone(withIraqiPrefix(value)) !== null, 'errors.field.phoneInvalid');
 
 const passwordSchema = z.string().min(8, 'errors.field.passwordMin');
 
@@ -84,6 +86,14 @@ export const authUserSchema = z.object({
   isVerified: z.boolean(),
   // The language of notifications and pushes ("ar" | "en"); absent from older API builds.
   locale: z.string().nullish(),
+});
+
+// GET /me adds what the session user (AuthUserDto) doesn't carry: refused deliveries so far, the
+// limit, and whether bidding is paused at it (optional: older API builds).
+export const meSchema = authUserSchema.extend({
+  violations: z.number().optional(),
+  violationLimit: z.number().optional(),
+  biddingPaused: z.boolean().optional(),
 });
 
 export const authTokensSchema = z.object({

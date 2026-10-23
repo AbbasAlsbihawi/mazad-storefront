@@ -1,5 +1,6 @@
 import { createInstance } from 'i18next';
 import { describe, expect, it } from 'vitest';
+import { formatNumber, formatQuantity } from '@shared/lib/money';
 import sellingAr from '../../selling/i18n/ar.json';
 import sellingEn from '../../selling/i18n/en.json';
 import catalogAr from './ar.json';
@@ -9,7 +10,7 @@ import catalogEn from './en.json';
 describe('bid count copy', () => {
   const cases = {
     en: ['No bids yet', '1 bid', '2 bids', '3 bids', '11 bids'],
-    ar: ['لا مزايدات بعد', 'مزايدة واحدة', 'مزايدتان', '٣ مزايدات', '١١ مزايدة'],
+    ar: ['لا مزايدات بعد', 'مزايدة واحدة', 'مزايدتان', '3 مزايدات', '11 مزايدة'],
   } as const;
   const counts = [0, 1, 2, 3, 11];
 
@@ -25,10 +26,8 @@ describe('bid count copy', () => {
         },
         interpolation: { escapeValue: false },
       });
-      i18n.services.formatter?.add('num', (value: number) =>
-        lng === 'ar' ? value.toLocaleString('ar-EG') : String(value),
-      );
-      const number = (n: number) => (lng === 'ar' ? n.toLocaleString('ar-EG') : String(n));
+      i18n.services.formatter?.add('num', (value: number) => formatQuantity(value, lng));
+      const number = (n: number) => formatNumber(n, lng === 'ar' ? 'ar' : 'en');
       expect(
         counts.map((count) =>
           i18n.t('catalog:detail.bids', { count, formattedCount: number(count) }),

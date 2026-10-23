@@ -36,8 +36,8 @@ export function WatchlistToggle({ auctionId }: WatchlistToggleProps) {
     toggle.mutate(next, { onError: () => setOptimisticOverride(!next) });
   };
 
-  // A 32pt glass control inside a 44pt transparent hit area: the touch target clears the
-  // minimum without the visual crowding the card art (design system, AuctionCard anatomy).
+  // A 34px dark-glass disc (design .lot .fav) inside a 44px hit area, so the touch target clears
+  // the minimum without crowding the photo. Dark in both themes: it always sits on a photo.
   return (
     <button
       type="button"
@@ -48,13 +48,13 @@ export function WatchlistToggle({ auctionId }: WatchlistToggleProps) {
     >
       <span
         className={cn(
-          'inline-flex size-8 items-center justify-center rounded-full',
-          'bg-surface/82 shadow-card backdrop-blur-chrome',
-          'transition-opacity duration-fast ease-ios active:opacity-72',
-          isWatching ? 'text-primary' : 'text-foreground-soft',
+          'inline-flex size-[34px] items-center justify-center rounded-full',
+          'bg-[rgb(12_11_10/45%)] backdrop-blur-[8px]',
+          'transition-transform duration-fast ease-ios active:scale-90',
+          isWatching ? 'text-on-photo-gold' : 'text-on-photo',
         )}
       >
-        <Icon name="heart" size={16} isFilled={isWatching} />
+        <Icon name="heart" size={17} isFilled={isWatching} />
       </span>
     </button>
   );

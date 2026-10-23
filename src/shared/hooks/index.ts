@@ -7,3 +7,4 @@ export { useServerClock, recordServerTime } from './useServerClock';
 export { useCountdown } from './useCountdown';
 export { useToast } from './useToast';
 export { useSubmitGuard } from './useSubmitGuard';
+export { useApiFeature } from './useApiFeature';

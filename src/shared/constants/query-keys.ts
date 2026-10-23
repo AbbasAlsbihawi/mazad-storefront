@@ -4,6 +4,8 @@ export const QUERY_KEYS = {
   },
   home: {
     feed: ['home', 'feed'] as const,
+    /** GET /stores: the home rail of verified stores (shown only when the API has it). */
+    stores: ['home', 'stores'] as const,
   },
   catalog: {
     categories: ['catalog', 'categories'] as const,
@@ -61,5 +63,12 @@ export const QUERY_KEYS = {
     // A static key, not a filters factory — GET /me/following has no pagination UI in this pass,
     // same call shape as watchlist.list.
     following: ['sellers', 'following'] as const,
+  },
+  // The contact screen: my reports, and my orders for the "about an order" picker (its own key and
+  // schema, not orders.list: one key per queryFn).
+  support: {
+    reports: ['support', 'reports'] as const,
+    orders: ['support', 'orders'] as const,
+    order: (id: string) => ['support', 'order', id] as const,
   },
 } as const;
