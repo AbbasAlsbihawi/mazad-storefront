@@ -106,41 +106,14 @@ const SUPPORT_TBC = {
   en: until(tbc('OD-2', 'Support contact: to be announced.')),
 };
 
-const LADDER = {
-  ar: ul(
-    'أقل من 100,000 د.ع: خطوة 1,000 د.ع',
-    'من 100,000 حتى أقل من مليون: خطوة 5,000 د.ع',
-    'من مليون حتى أقل من 10 ملايين: خطوة 25,000 د.ع',
-    '10 ملايين فما فوق: خطوة 100,000 د.ع',
-  ),
-  en: ul(
-    'Under 100,000 IQD: 1,000 IQD',
-    '100,000 to under 1 million: 5,000 IQD',
-    '1 million to under 10 million: 25,000 IQD',
-    '10 million and above: 100,000 IQD',
-  ),
-};
-
 /**
- * The price ladder the bid step comes from (mazad-api `auction-rules.ts`): below each bound, its
- * step; at or above the last bound, TOP_STEP. The worked example below is computed from it.
+ * The worked example (design `how-auctions`): a top bid and the step its seller set; the lowest
+ * bid accepted is one step above. The seller sets the step per auction (mazad-api minIncrement).
  */
-export const STEP_LADDER: readonly (readonly [below: number, step: number])[] = [
-  [100_000, 1_000],
-  [1_000_000, 5_000],
-  [10_000_000, 25_000],
-];
-const TOP_STEP = 100_000;
+export const EXAMPLE_TOP_BID = 1_325_000;
+export const EXAMPLE_STEP = 25_000;
 
-/** The bid step at a price, by the ladder (what the API sends as `bidIncrement`). */
-export function stepFor(price: number): number {
-  return STEP_LADDER.find(([below]) => price < below)?.[1] ?? TOP_STEP;
-}
-
-const EXAMPLE_TOP_BID = 1_325_000;
-const EXAMPLE_STEP = stepFor(EXAMPLE_TOP_BID);
-
-/** One price worked through the ladder: the top bid, its step, the lowest bid accepted. */
+/** One auction's numbers worked through: the top bid, the seller's step, the lowest bid accepted. */
 function stepExample(caption: string, labels: [string, string, string]): HelpBlock {
   return {
     type: 'example',
@@ -203,14 +176,18 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           heading: 'المزايدة',
           blocks: [
             p(
-              'كل مزايدة جديدة يجب أن تكون أعلى من السعر الحالي بخطوة على الأقل، وبالدينار الكامل دون كسور. تحدد بيدوم الخطوة حسب السعر:',
+              'يحدد البائع خطوة المزايدة لكل مزاد، وتظهر في صفحة المزاد قبل أن تزايد. كل مزايدة يجب أن تزيد على أعلى مزايدة بخطوة واحدة على الأقل، وبالدينار الكامل دون كسور.',
             ),
-            LADDER.ar,
-            stepExample('مثال', ['أعلى مزايدة الآن', 'الخطوة عند هذا السعر', 'أقل مزايدة تُقبل']),
+            stepExample('مثال', [
+              'أعلى مزايدة الآن',
+              'الخطوة التي حددها البائع',
+              'أقل مزايدة تُقبل',
+            ]),
+            p('يمكنك كتابة أي مبلغ أعلى، ونقرّبه للأعلى إلى أقرب خطوة.'),
             p(
               'يمكن أن تكون المزايدة الأولى بسعر الافتتاح. المزايدة التزام: لا يمكنك سحبها، وإذا فزت فأنت ملزم بإكمال الشراء. ولا يستطيع البائع المزايدة على مزاده.',
             ),
-            p('يظهر في سجل المزايدات اسم مستعار لكل مزايد، ولا يظهر اسمك أبدًا.'),
+            p('يظهر اسمك الكامل في سجل المزايدات ليتأكد الجميع من نزاهة المزاد.'),
           ],
         },
         {
@@ -236,10 +213,10 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           heading: 'التمديد عند المزايدة المتأخرة',
           blocks: [
             p(
-              'إذا وصلت مزايدة في الدقائق الأخيرة يُمدَّد المزاد بضع دقائق حتى يتمكن الآخرون من الرد. تحدد بيدوم هذه المدد، ولا تزيد أي منها على 10 دقائق، ويمكن تمديد المزاد 10 مرات على الأكثر. يظهر وقت الانتهاء الجديد على صفحة المزاد.',
+              'إذا وصلت مزايدة في الدقائق الأخيرة يُمدَّد المزاد حتى يتمكن الآخرون من الرد. يحدد البائع أيضاً مدة التمديد وأقصى عدد لمراته، وتظهر في قواعد المزاد. يظهر وقت الانتهاء الجديد على صفحة المزاد.',
             ),
             p(
-              'مثلًا بمدة 5 دقائق وحد 10 مرات: كل مزايدة في آخر 5 دقائق تمدد المزاد، حتى 10 مرات. هكذا يحصل الجميع على فرصة للرد.',
+              'مثلاً بمدة 5 دقائق وحد 10 مرات: كل مزايدة في آخر 5 دقائق تمدد المزاد 5 دقائق، حتى 10 مرات. هكذا يحصل الجميع على فرصة للرد.',
             ),
           ],
         },
@@ -270,7 +247,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
               'إذا تعذّر إنشاء الطلب للفائز، كأن لا يكون لديه عنوان توصيل أو لم يعد حسابه نشطًا، ينتقل الفوز إلى صاحب المزايدة الأعلى التالية، مرتين على الأكثر. والمزاد الذي لا مزايدات عليه ينتهي دون بيع.',
             ),
             p(
-              'خسارة الفوز بسبب عدم وجود عنوان توصيل تُحتسب على حسابك، وتكرارها يؤدي إلى حظر الحساب تلقائيًا.',
+              'لا يمكن إلغاء الفوز لأن مزايدتك أخذت فرصة غيرك. رفض استلام طلب فزت به يُسجَّل مخالفة، ومخالفتان توقفان قدرتك على المزايدة.',
             ),
           ],
         },
@@ -308,18 +285,20 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           heading: 'Bidding',
           blocks: [
             p(
-              'Each new bid must beat the current price by at least one step, in whole dinars. Bidoom sets the step by price:',
+              'The seller sets the bid step for each auction, and it is shown on the auction page before you bid. Each bid must beat the top bid by at least one step, in whole dinars.',
             ),
-            LADDER.en,
             stepExample('For example', [
               'Top bid now',
-              'Step at this price',
+              'Step set by the seller',
               'Lowest bid accepted',
             ]),
+            p('You can type any higher amount; we round it up to the next step.'),
             p(
               'The first bid can be the opening price. A bid is a commitment: you can’t withdraw it, and if you win you are expected to complete the purchase. Sellers can’t bid on their own auctions.',
             ),
-            p('The bid history shows an anonymous label for each bidder, never your name.'),
+            p(
+              'Your full name appears in the bid history so everyone can check the auction is fair.',
+            ),
           ],
         },
         {
@@ -345,10 +324,10 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           heading: 'Late bids extend the auction',
           blocks: [
             p(
-              'If a bid arrives in the last few minutes, the auction is extended by a few minutes so others can answer. Bidoom sets these times, never more than 10 minutes, and an auction can be extended at most 10 times. The new end time shows on the auction page.',
+              'If a bid arrives in the last few minutes, the auction is extended so others can answer. The seller also sets how long an extension lasts and how many times it can happen, shown in the auction’s rules. The new end time shows on the auction page.',
             ),
             p(
-              'For example, with 5 minutes and 10 times: every bid in the last 5 minutes extends the auction, up to 10 times. Everyone gets a chance to respond.',
+              'With 5 minutes and 10 times, every bid in the last 5 minutes adds 5 minutes, up to 10 times. Everyone gets a chance to respond.',
             ),
           ],
         },
@@ -379,7 +358,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
               'If the order can’t be created for the winner, for example because they have no delivery address or their account is no longer active, the win passes to the next-highest bidder, at most twice. An auction with no bids ends unsold.',
             ),
             p(
-              'Losing a win because you have no delivery address counts against your account, and repeated cases lead to an automatic ban.',
+              'A win can’t be cancelled, because your bid took someone else’s chance. Refusing delivery of an order you won counts as a violation, and two violations pause your bidding.',
             ),
           ],
         },
@@ -804,7 +783,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           heading: 'لماذا لا أستطيع المزايدة؟',
           blocks: [
             p(
-              'تأكد أنك مسجّل الدخول ولديك عنوان توصيل محفوظ، وأن المزاد ما زال مباشرًا، وأن مزايدتك تساوي الحد الأدنى المعروض أو أكثر. لا يمكنك المزايدة على مزاداتك، ولا إذا كان حسابك موقوفًا.',
+              'تأكد أنك مسجّل الدخول ولديك عنوان توصيل محفوظ، وأن المزاد ما زال مباشرًا، وأن مزايدتك تساوي الحد الأدنى المعروض أو أكثر. لا يمكنك المزايدة على مزاداتك، ولا إذا كان حسابك موقوفًا، ولا بعد مخالفتين: رفض استلام طلبين فزت بهما يوقف مزايداتك حتى يستأنفها الدعم.',
             ),
           ],
         },
@@ -895,7 +874,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           heading: 'Why can’t I bid?',
           blocks: [
             p(
-              'Check that you are signed in and have a saved delivery address, that the auction is still live, and that your bid is at least the minimum shown. You can’t bid on your own auctions, or while your account is suspended.',
+              'Check that you are signed in and have a saved delivery address, that the auction is still live, and that your bid is at least the minimum shown. You can’t bid on your own auctions, while your account is suspended, or after two violations: refusing delivery of two orders you won pauses your bidding until support resumes it.',
             ),
           ],
         },
@@ -957,7 +936,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
       summary: 'ما نجمعه، ولماذا، ومن يراه، وكم نحتفظ به.',
       isDraft: true,
       tldr: [
-        'تظهر مزايداتك باسم مستعار، وتقييماتك باسم مختصر.',
+        'يظهر اسمك الكامل في سجل المزايدات وعلى تقييماتك.',
         'لا يرى هاتفك وعنوانك إلا بائع طلبك وفريق بيدوم.',
         'لا نبيع بياناتك، ولا نرى بيانات بطاقتك ولا نخزنها.',
       ],
@@ -1010,7 +989,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           review: 'LR-6',
           blocks: [
             ul(
-              'الجميع: الإعلانات وصور المنتجات وأسماء المتاجر ومدنها، والتقييمات باسم مختصر للمقيّم مثل «أحمد ك.»، والمزايدات باسم مستعار للمزايد.',
+              'الجميع: الإعلانات وصور المنتجات وأسماء المتاجر ومدنها، واسمك الكامل على تقييماتك وفي سجلات المزايدات. ولا يصل هاتفك وعنوانك إلا إلى بائع الطلب والمندوب.',
               'بائع طلبك: اسمك وعنوان التوصيل وموقع الخريطة وهاتف التوصيل، للطلبات وطلبات الإرجاع التي بينكما فقط.',
               'فريق بيدوم: تفاصيل الحسابات والطلبات والمدفوعات والإرجاع، لتشغيل الخدمة ومراجعة المحتوى وحل المشكلات.',
             ),
@@ -1125,7 +1104,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
       summary: 'What we collect, why, who sees it and how long we keep it.',
       isDraft: true,
       tldr: [
-        'Your bids show an anonymous label, and your reviews a short form of your name.',
+        'Your full name in bid histories and on your ratings.',
         'Only your order’s seller and Bidoom’s staff see your phone and address.',
         'We never sell your data, and we never see or store your card details.',
       ],
@@ -1184,7 +1163,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
           review: 'LR-6',
           blocks: [
             ul(
-              'Everyone: listings, product photos, store names and cities, reviews (with a short version of the reviewer’s name, like "Ahmed K.") and bids (with an anonymous bidder label).',
+              'Everyone: listings, product photos, store names and cities, and your full name on your reviews and in bid histories. Your phone and address go only to the order’s seller and the courier.',
               'The seller of your order: your name, delivery address, map pin and delivery phone, only for orders and returns between you.',
               'Bidoom’s staff: account, order, payment and return details, to run the service, review content and resolve problems.',
             ),
@@ -1341,7 +1320,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
               'المزايدة عرض ملزم بالشراء بسعرها إذا فزت، ولا يمكن سحبها.',
               'المزايدات التي تقدمها المزايدة التلقائية عنك ملزمة بالطريقة نفسها.',
               'الشراء الفوري ينهي المزاد، وتشتري بسعر الشراء الفوري.',
-              'قد يُمدَّد المزاد عند وصول مزايدة متأخرة.',
+              'يحدد البائع خطوة المزايدة والتمديد لكل مزاد، وقد يُمدَّد المزاد عند وصول مزايدة متأخرة.',
               'عند فوزك يُنشأ الطلب تلقائيًا إلى عنوانك الافتراضي، وتدفع السعر مع رسوم التوصيل.',
               'يمكنك إلغاء الطلب فقط قبل أن يؤكده البائع.',
             ),
@@ -1425,7 +1404,9 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
             p(
               'عند حظر منتج أو تعليق متجر أو حظر بائع تُسحب إعلاناته من البيع، ومنها المزادات الجارية، ويُبلَّغ المزايدون عليها. وتُلغى الطلبات التي لم يؤكدها البائع بعد، وتتولى بيدوم الطلبات التي في طريقها إلى المشتري.',
             ),
-            p('يُحظر الحساب تلقائيًا عند تكرار خسارة الفوز بسبب عدم وجود عنوان توصيل.'),
+            p(
+              'رفض استلام طلب فزت به يُسجَّل مخالفة، ومخالفتان توقفان قدرتك على المزايدة. ونوقف الحساب عند الاحتيال أو المزايدة الوهمية، ونخبرك بالسبب.',
+            ),
           ],
         },
         {
@@ -1530,7 +1511,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
               'A bid is a binding offer to buy at that price if you win, and it can’t be withdrawn.',
               'Bids that automatic bidding places for you are binding in the same way.',
               'Buy now ends the auction, and you buy at the buy-now price.',
-              'A late bid can extend the auction.',
+              'The seller sets the bid step and the extension for each auction, and a late bid can extend it.',
               'When you win, an order is created automatically to your default address, and you pay the price plus the delivery fee.',
               'You can cancel an order only before the seller confirms it.',
             ),
@@ -1615,7 +1596,7 @@ export const HELP_CONTENT: Record<HelpTopic, Bilingual> = {
               'When a product is blocked, a store suspended or a seller banned, their listings are withdrawn from sale, including running auctions, and bidders are told. Orders the seller hasn’t confirmed yet are cancelled, and Bidoom handles orders already on their way.',
             ),
             p(
-              'An account is banned automatically after repeated lost wins because the winner had no delivery address.',
+              'Refusing delivery of an order you won counts as a violation, and two violations pause your bidding. We suspend accounts for fraud or fake bidding, and we tell you why.',
             ),
           ],
         },

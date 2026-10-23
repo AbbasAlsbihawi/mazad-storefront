@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useLocaleStore } from '@shared/store';
-import { HELP_CONTENT, HELP_TOPICS, STEP_LADDER, stepFor } from './content';
+import { EXAMPLE_STEP, EXAMPLE_TOP_BID, HELP_CONTENT, HELP_TOPICS } from './content';
 import { HELP_COPY } from './copy';
 import { searchHelp } from './lib/search';
 import { HelpIndexPage } from './pages/HelpIndexPage';
@@ -19,44 +19,45 @@ describe('the Bidoom brand in help copy', () => {
     const text = JSON.stringify(HELP_CONTENT);
     expect(text).not.toMatch(/Mazad/);
     expect(text).toMatch(/بيدوم/);
-    // A bare مزاد (not المزاد, مزادات, مزادك…) that is left must be "an auction": لكل مزاد.
+    // A bare مزاد (not المزاد, مزادات, مزادك…) that is left must be "an auction": لكل مزاد
+    // ("for each auction": the seller sets the step and the extension for each one).
     const bare = [...text.matchAll(/مزاد/g)].filter((match) => {
       const before = text[match.index - 1] ?? '';
       const after = text[match.index + 4] ?? '';
       const isPrefixed = before === 'ل' && text[match.index - 2] === 'ا';
       return !isPrefixed && !ARABIC_LETTER.test(after) && !ARABIC_LETTER.test(before);
     });
-    expect(bare.map((match) => text.slice(match.index - 4, match.index + 4))).toEqual(['لكل مزاد']);
+    expect(new Set(bare.map((match) => text.slice(match.index - 4, match.index + 4)))).toEqual(
+      new Set(['لكل مزاد']),
+    );
   });
 });
 
 describe('the bid step, worked through', () => {
-  it('follows the price ladder the API uses for bidIncrement', () => {
-    expect(STEP_LADDER).toEqual([
-      [100_000, 1_000],
-      [1_000_000, 5_000],
-      [10_000_000, 25_000],
-    ]);
-    expect(stepFor(99_999)).toBe(1_000);
-    expect(stepFor(100_000)).toBe(5_000);
-    expect(stepFor(1_325_000)).toBe(25_000);
-    expect(stepFor(10_000_000)).toBe(100_000);
-  });
-
-  it("shows an auction's numbers from that rule, never a seller-chosen step", () => {
+  it("is the seller's step, shown before you bid, with a worked example", () => {
     const blocks = HELP_CONTENT['how-auctions-work'].en.sections.find(
       (section) => section.id === 'bidding',
     )?.blocks;
+    expect(EXAMPLE_TOP_BID + EXAMPLE_STEP).toBe(1_350_000);
     expect(blocks?.find((block) => block.type === 'example')).toMatchObject({
       rows: [
         { label: 'Top bid now', amount: '1325000' },
-        { label: 'Step at this price', amount: '25000' },
+        { label: 'Step set by the seller', amount: '25000' },
         { label: 'Lowest bid accepted', amount: '1350000', isResult: true },
       ],
     });
-    expect(JSON.stringify(HELP_CONTENT['how-auctions-work'])).not.toMatch(
-      /seller sets|set by the seller|يحدد البائع/i,
-    );
+    const text = JSON.stringify(HELP_CONTENT['how-auctions-work']);
+    expect(text).toMatch(/The seller sets the bid step for each auction/);
+    expect(text).toMatch(/يحدد البائع خطوة المزايدة لكل مزاد/);
+    // No platform ladder, and no "Bidoom sets these times".
+    expect(text).not.toMatch(/Bidoom sets the step|Bidoom sets these times|تحدد بيدوم/);
+    expect(blocks?.some((block) => block.type === 'bullets')).toBe(false);
+  });
+
+  it('the seller sets the extension too: N minutes, up to M times', () => {
+    const text = JSON.stringify(HELP_CONTENT['how-auctions-work'].en);
+    expect(text).toMatch(/The seller also sets how long an extension lasts/);
+    expect(text).toMatch(/every bid in the last 5 minutes adds 5 minutes, up to 10 times/i);
   });
 
   it('lists the four real steps after a win, in order', () => {
