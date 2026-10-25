@@ -1,8 +1,10 @@
 {
   "panel": {
-    "notLive": "Bidding is closed for this auction.",
+    "wonViewOrder": "View your order",
+    "wonViewWins": "See your wins",
     "loadError": "Couldn't load bidding details.",
-    "signInToBid": "Sign in to place a bid"
+    "signInToBid": "Sign in to place a bid",
+    "contactSupport": "Contact support"
   },
   "form": {
     "amount": "Your bid",
@@ -12,14 +14,45 @@
     "cancel": "Cancel",
     "decrease": "Decrease amount",
     "increase": "Increase amount",
-    "minimumHint": "Minimum bid {{amount}}"
+    "minimumHint": "Minimum bid {{amount}}",
+    "priceMoved": "The minimum bid rose to {{amount}} while you were deciding. Tap again to bid that amount.",
+    "confirmNewAmount": "Use {{amount}}",
+    "bidBuysNow": "This amount reaches the buy-now price: placing it buys the item now.",
+    "confirmBuyNow": "Confirm purchase for {{amount}}",
+    "buyNowConfirmHint": "Buying now ends the auction. You pay {{amount}} plus delivery.",
+    "slideToBid": "Slide to bid {{amount}}",
+    "bidPlaced": "Bid placed",
+    "confirmTitle": "Place a bid of {{amount}}?",
+    "binding": "A bid is a promise to buy: it can't be withdrawn, and a win can't be cancelled.",
+    "bindingLong": "A bid is a promise to buy: it can't be withdrawn, and if you win the order is created at your default address automatically.",
+    "largeTitle": "That's over three times the top bid",
+    "largeBody": "You're about to bid {{amount}}, more than three times the top bid of {{top}}. Bids can't be withdrawn.",
+    "largeConfirm": "Bid {{amount}}",
+    "buyNowShort": "Buy now"
   },
   "autoBid": {
     "setUp": "Set up auto-bid",
-    "maxAmount": "Maximum bid",
+    "maxAmount": "Your maximum (private)",
     "submit": "Start auto-bid",
     "cancel": "Turn off",
-    "active": "Auto-bid active up to {{amount}}"
+    "change": "Change",
+    "exhausted": "The price passed your auto-bid limit of {{amount}}.",
+    "label": "Your auto-bid",
+    "title": "Automatic bidding",
+    "short": "Auto-bid",
+    "rowHint": "We bid for you up to a maximum you set",
+    "onHint": "We bid for you, one step at a time, up to your maximum",
+    "offHint": "Optional: set a maximum and we bid while you are away",
+    "reachesBuyNow": "Your maximum reaches the buy-now price. You can end the auction now for {{amount}}.",
+    "howNow": "We bid {{amount}} now, not your maximum.",
+    "howLeading": "You're leading, so nothing is bid now.",
+    "howStep": "Each time someone outbids you, we go one step above them, up to {{amount}}.",
+    "howPrivate": "Nobody sees your maximum. On equal maximums the earlier one wins, and we alert you if someone passes it.",
+    "belowMinimum": "Your maximum needs to be at least {{amount}}.",
+    "slide": "Slide to start auto-bid up to {{amount}}",
+    "slideUpdate": "Slide to change auto-bid to {{amount}}",
+    "confirmTitle": "Auto-bid up to {{amount}}?",
+    "confirmBody": "We may bid for you at once. Bids made for you are binding like your own."
   },
   "myBids": {
     "title": "My bids",
@@ -31,14 +64,19 @@
     "emptyTitle": "No bids yet",
     "segments": {
       "active": "Active",
-      "won": "Winning",
+      "won": "Won",
       "ended": "Ended"
-    }
+    },
+    "autoUpTo": "Auto up to",
+    "wonAt": "Won at",
+    "yourBest": "Your best",
+    "bidAgain": "Bid",
+    "account": "Account",
+    "recentlyEnded": "Recently ended"
   },
   "standing": {
-    "WINNING": "Winning",
+    "WINNING": "Leading",
     "OUTBID": "Outbid",
-    "AWAITING_CONFIRMATION": "Awaiting confirmation",
     "WON": "Won",
     "LOST": "Lost"
   },
@@ -46,17 +84,23 @@
     "bidPlaced": "Bid placed",
     "boughtNow": "Purchase confirmed.",
     "autoBidSet": "Auto-bid set.",
-    "autoBidCancelled": "Auto-bid turned off."
+    "autoBidCancelled": "Auto-bid turned off.",
+    "outbidByAutoBid": "Another bidder's automatic bid is higher — you were outbid.",
+    "nextMinimum": "Next bid: at least {{amount}}",
+    "extended_one": "Extended by {{count, num}} minute because of a late bid.",
+    "extended_other": "Extended by {{count, num}} minutes because of a late bid."
   },
   "errors": {
     "field": {
       "amountRequired": "Enter an amount.",
       "amountStep": "Amounts can have at most 2 decimal places.",
+      "amountTooHigh": "That amount is above the maximum allowed.",
       "belowMinimum": "Minimum bid is {{amount}}."
     },
     "ADDRESS_REQUIRED": "You need a saved delivery address before you can bid.",
     "addAddressLink": "Add an address",
     "BID_TOO_LOW": "Someone else already bid that much or more.",
+    "BID_AMOUNT_TOO_HIGH": "That bid is above the maximum allowed amount.",
     "BIDDER_NOT_ALLOWED": "Your account can't place bids right now.",
     "OWN_AUCTION_BID": "You can't bid on your own auction.",
     "AUCTION_NOT_LIVE": "This auction isn't live anymore.",
@@ -64,6 +108,66 @@
     "BID_AMOUNT_TAKEN": "That exact amount was just taken — try a higher bid.",
     "BUY_NOW_NOT_AVAILABLE": "Buy-now isn't available for this auction.",
     "AUTO_BID_TOO_LOW": "Your maximum needs to be higher than the current price.",
-    "AUTO_BID_NOT_FOUND": "You don't have an active auto-bid to cancel."
+    "AUTO_BID_NOT_FOUND": "You don't have an active auto-bid to cancel.",
+    "INVALID_AMOUNT": "Bids are in whole dinars.",
+    "AUCTION_NOT_AVAILABLE": "This auction is no longer available.",
+    "BIDDING_PAUSED": "Your bidding is paused after two refused deliveries. Contact support to resume.",
+    "contactSupportLink": "Contact support"
+  },
+  "state": {
+    "own": "This is your auction",
+    "won": "You won! Your order is created at your default address.",
+    "soldToOther": "Sold to another bidder",
+    "ended": "This auction has ended",
+    "notStarted": "The auction hasn't started yet. Turn on a reminder to be told when it opens.",
+    "autoBid": "Auto-bid on up to {{amount}}",
+    "leading": "You are leading. We will alert you if someone outbids you.",
+    "outbid": "You were outbid.",
+    "canBid": "You can bid",
+    "outbidTo": "You were outbid. The lowest bid to lead again:",
+    "paused": "Your bidding is paused after two refused deliveries."
+  },
+  "sheet": {
+    "title": "Place your bid",
+    "topBidNow": "Top bid now {{amount}}",
+    "openingPrice": "Opening price {{amount}}",
+    "typeHint": "Your bid, tap to type",
+    "currency": "IQD",
+    "stepDown": "One step less",
+    "stepUp": "One step more",
+    "rule": "The seller set this auction's step at {{step}}. Type any amount from {{minimum}} up; anything between steps is rounded up.",
+    "roundedUp": "Rounded up to {{amount}}, the next valid step.",
+    "raisedToMinimum": "Raised to {{amount}}, the lowest bid now.",
+    "deliversTo": "Delivers to: {{place}}",
+    "noAddress": "Add a delivery address before you bid",
+    "changeAddress": "Change",
+    "addAddress": "Add an address",
+    "ruleLadder": "The step at this price is {{step}}. Type any amount from {{minimum}} up; anything between steps is rounded up."
+  },
+  "buyNow": {
+    "title": "Buy now",
+    "endsNow": "Ends the auction for you immediately",
+    "price": "Buy-now price",
+    "delivery": "Delivery",
+    "total": "Total",
+    "payLater": "You choose how to pay after buying: on delivery or by card.",
+    "slide": "Slide to buy",
+    "done": "Purchased",
+    "confirm": "Buy now",
+    "back": "Back to auction",
+    "cardKicker": "Don't want to wait?",
+    "cardTitle": "Buy it now for"
+  },
+  "bar": {
+    "lowestNext": "Lowest next bid",
+    "bid": "Bid"
+  },
+  "won": {
+    "stamp": "Sold"
+  },
+  "addressFirst": {
+    "title": "Add an address first",
+    "body": "You need at least one saved address before you can bid.",
+    "add": "Add an address"
   }
 }

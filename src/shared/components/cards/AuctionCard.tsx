@@ -4,110 +4,105 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@shared/constants';
-import { useCountdown, useLocale, useMoney } from '@shared/hooks';
+import { useCountdown, useLocale } from '@shared/hooks';
 import {
   cn,
   formatDuration,
   getAuctionStatusLabelKey,
   getAuctionStatusTone,
-  getImageTintStyle,
   pickLocalizedName,
   resolveAssetUrl,
 } from '@shared/lib';
-import { Badge, Card, Icon } from '@shared/components/ui';
+import { Badge, GoldTile, Price } from '@shared/components/ui';
 import type { AuctionSummary } from '@shared/types';
 import { useAuctionCardAction } from './AuctionCardActionSlot';
 
 export interface AuctionCardProps {
   auction: AuctionSummary;
+  /** Above-the-fold cards load their photo eagerly. */
+  isPriority?: boolean;
 }
 
-export function AuctionCard({ auction }: AuctionCardProps) {
+/**
+ * The full-photo lot card (design `.lot.fp`): the photo is the card. Status and time sit on top,
+ * the heart in the corner, the name and price on a dark fade at the foot, light text in both
+ * themes. Ended lots are dimmed rather than removed.
+ */
+export function AuctionCard({ auction, isPriority = false }: AuctionCardProps) {
   const { t } = useTranslation('common');
   const { locale } = useLocale();
-  const { money, number } = useMoney();
   const renderAction = useAuctionCardAction();
 
-  // Re-renders the whole card once a second, not just the digits: the badge tone and label are
-  // derived from the same remaining time, so ticking only the clock would leave a card reading
-  // "ending soon" against a timer that had already run out.
+  // Re-renders the whole card once a second: the badge is derived from the same remaining time,
+  // so ticking only the clock would leave "ending soon" against a timer that had run out.
   const endsInMs = useCountdown(auction.endsAt);
+  const startsInMs = useCountdown(auction.startsAt);
 
   const name = pickLocalizedName(auction.product, locale);
   const coverImage = resolveAssetUrl(auction.product.coverImage);
-  const isCountingDown = auction.status === 'LIVE' && endsInMs > 0;
-  const price = auction.currentPrice ?? auction.startingPrice;
+  const isLive = auction.status === 'LIVE';
+  const isUpcoming = auction.status === 'SCHEDULED';
+  const isEnded = !isLive && !isUpcoming;
   const tone = getAuctionStatusTone(auction.status, endsInMs);
-  const label = t(getAuctionStatusLabelKey(auction.status, endsInMs));
+  const label = isUpcoming
+    ? t('card.startsIn')
+    : t(getAuctionStatusLabelKey(auction.status, endsInMs));
+  const clock = isLive && endsInMs > 0 ? endsInMs : isUpcoming && startsInMs > 0 ? startsInMs : 0;
+  const price = auction.currentPrice ?? auction.startingPrice;
 
   return (
-    <div className="relative h-full">
-      <Link href={ROUTES.auctionDetail(auction.id)} className="block h-full">
-        <Card className="flex h-full flex-col overflow-hidden transition-transform duration-fast ease-ios active:scale-[0.985]">
-          <div
-            className="relative aspect-square w-full"
-            style={coverImage ? undefined : getImageTintStyle(auction.product.id)}
-          >
-            {coverImage ? (
-              <Image
-                src={coverImage}
-                alt={name}
-                fill
-                sizes="(min-width: 768px) 25vw, 50vw"
-                className="object-cover"
-              />
-            ) : (
-              <span className="absolute inset-0 flex items-center justify-center text-foreground/22">
-                <Icon name="package" size={64} />
-              </span>
-            )}
+    <div className="relative">
+      <Link
+        href={ROUTES.auctionDetail(auction.id)}
+        className="group block rounded-[22px] focus-visible:outline-offset-4"
+      >
+        <span className="relative block aspect-[3/4] overflow-hidden rounded-[22px] border border-border bg-surface-raised">
+          {coverImage ? (
+            <Image
+              src={coverImage}
+              alt=""
+              fill
+              priority={isPriority}
+              sizes="(min-width: 960px) 260px, 50vw"
+              className={cn(
+                'object-cover transition-transform duration-[600ms] ease-ios group-hover:scale-[1.04]',
+                isEnded && 'brightness-[0.72] grayscale-[0.8]',
+              )}
+            />
+          ) : (
+            <span className="absolute inset-0 grid place-items-center bg-tile pb-16">
+              <GoldTile icon="package" size="lg" />
+            </span>
+          )}
+          <span aria-hidden className="absolute inset-0 bg-lot-shade" />
 
-            <Badge tone={tone} hasDot={tone === 'live'} className="absolute start-2 top-2">
+          <span className="absolute start-2.5 end-[52px] top-2.5 flex flex-wrap items-center gap-1.5 text-on-photo">
+            <Badge tone="photo" hasDot={tone === 'live' || tone === 'warning'}>
               {label}
             </Badge>
-
-            {isCountingDown ? (
-              <span
-                className={cn(
-                  'absolute inset-x-2 bottom-2 inline-flex items-center justify-center gap-[5px]',
-                  'rounded-sm bg-foreground/72 px-2 py-[5px] backdrop-blur-chrome',
-                  // Western digits with tabular figures — Arabic-Indic here would jitter width
-                  // on every tick (design system, "Money and time").
-                  'text-caption-2 font-semibold text-surface tabular-nums',
-                )}
-              >
-                <Icon name="clock" size={12} />
-                {formatDuration(endsInMs)}
+            {clock > 0 ? (
+              <span className="inline-block rounded-full bg-[rgb(12_11_10/55%)] px-[9px] py-[3px] font-tabular text-[12.5px] font-semibold backdrop-blur-[8px] [unicode-bidi:isolate]">
+                {formatDuration(clock, locale)}
               </span>
             ) : null}
-          </div>
+          </span>
 
-          <div className="flex flex-1 flex-col gap-1 px-3 pt-2.5 pb-3">
-            <p className="line-clamp-2 text-footnote leading-[1.35] font-medium text-foreground">
+          <span className="absolute inset-x-3 bottom-3 grid gap-0.5 text-on-photo">
+            <span className="line-clamp-2 text-sm leading-[1.45] [text-shadow:0_1px_8px_rgb(0_0_0/50%)] en:font-medium">
               {name}
-            </p>
-            <div className="mt-auto flex flex-wrap items-baseline gap-1.5">
-              {/* Never the brand blue — the accent always means "tap me". */}
-              <span className="text-callout font-bold text-foreground tabular-nums">
-                {money(price)}
+            </span>
+            <span className="mt-0.5 flex items-center justify-between gap-1.5">
+              <Price value={price} tone={isEnded ? 'photoPlain' : 'photo'} size="md" />
+              <span className="text-xs whitespace-nowrap text-on-photo/72">
+                {t('card.bids', { count: auction.bidCount })}
               </span>
-            </div>
-            {auction.bidCount > 0 ? (
-              <div className="flex items-center gap-2 text-caption-2 text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <Icon name="gavel" size={12} />
-                  {number(auction.bidCount)}
-                </span>
-              </div>
-            ) : null}
-          </div>
-        </Card>
+            </span>
+          </span>
+        </span>
       </Link>
 
-      {/* 32pt glass control inside a 44pt hit area — the visual size and the touch target are
-          deliberately decoupled so the card art isn't crowded. */}
       {renderAction ? (
-        <div className="absolute end-0.5 top-0.5 z-10">{renderAction(auction.id)}</div>
+        <div className="absolute end-[5px] top-[5px] z-10">{renderAction(auction.id)}</div>
       ) : null}
     </div>
   );

@@ -1,91 +1,116 @@
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
 import { ROUTES } from '@shared/constants';
 import { EmptyState, ErrorState, PageLoader } from '@shared/components/feedback';
-import { ScreenHeader } from '@shared/components/layout';
-import { Badge, Card, Icon, Skeleton } from '@shared/components/ui';
-import { useLocale, useMoney } from '@shared/hooks';
-import { formatDate, pickLocalizedName } from '@shared/lib';
-import { useOrders } from '../hooks/useOrders';
+import { PageContainer, ScreenHeader } from '@shared/components/layout';
+import { SegmentedControl } from '@shared/components/ios';
+import { Button, Skeleton } from '@shared/components/ui';
+import { OrderCard } from '../components/OrderCard';
+import { useOrders, useSales } from '../hooks/useOrders';
 import { useOrdersTranslation } from '../hooks/useOrdersTranslation';
-import type { Order, OrderStatus } from '../types/orders.types';
+import { isOpenOrder } from '../lib/order-status';
+import type { Order } from '../types/orders.types';
 
-const STATUS_TONE: Record<OrderStatus, 'live' | 'upcoming' | 'warning' | 'neutral'> = {
-  CREATED: 'upcoming',
-  CONFIRMED: 'upcoming',
-  OUT_FOR_DELIVERY: 'warning',
-  DELIVERED: 'live',
-  CANCELLED: 'neutral',
+export type OrdersMode = 'buyer' | 'seller';
+type Filter = 'all' | 'open' | 'done';
+
+const FILTERS: Record<Filter, (order: Order) => boolean> = {
+  all: () => true,
+  open: isOpenOrder,
+  done: (order) => !isOpenOrder(order),
 };
 
-export function OrdersPage() {
+/**
+ * The buyer's orders, one card per store order with status, total and payment state, or (mode
+ * "seller", the Selling hub's incoming orders) GET /me/sales with the buyer and the next step the
+ * seller owes. Newest first; no cart exists, a win or a buy-now creates the order.
+ */
+export function OrdersPage({ mode = 'buyer' }: { mode?: OrdersMode }) {
   const { t, isReady } = useOrdersTranslation();
-  const orders = useOrders();
+  const isSeller = mode === 'seller';
+  const [filter, setFilter] = useState<Filter>('all');
+  // Only the list on screen is fetched.
+  const buyerOrders = useOrders(!isSeller);
+  const sales = useSales(isSeller);
+  const orders = isSeller ? sales : buyerOrders;
+  const list = orders.data?.pages.flat() ?? [];
+  const shown = list.filter(FILTERS[filter]);
 
   if (!isReady) return <PageLoader />;
 
+  const title = t(isSeller ? 'sales.title' : 'page.title');
   return (
     <>
-      <ScreenHeader title={t('page.title')} backHref={ROUTES.account} />
-
-      <div className="flex flex-col gap-3 px-gutter pb-6">
+      <ScreenHeader
+        title={title}
+        backHref={isSeller ? ROUTES.selling : ROUTES.account}
+        crumbs={[
+          isSeller
+            ? { label: t('sales.hub'), href: ROUTES.selling }
+            : { label: t('page.account'), href: ROUTES.account },
+        ]}
+      />
+      <PageContainer className="grid gap-4 pb-10">
+        {list.length > 0 ? (
+          <SegmentedControl
+            label={t('filters.label')}
+            value={filter}
+            onChange={setFilter}
+            className="max-w-[420px]"
+            segments={(['all', 'open', 'done'] as const).map((id) => ({
+              id,
+              label: t(`filters.${id}`),
+            }))}
+          />
+        ) : null}
         {orders.isPending ? (
-          Array.from({ length: 3 }, (_, index) => (
-            <Skeleton key={index} radius="lg" className="h-24 w-full" />
-          ))
+          <div className="grid gap-3 lg:grid-cols-2">
+            {Array.from({ length: 4 }, (_, index) => (
+              <Skeleton key={index} radius="lg" className="h-52 w-full" />
+            ))}
+          </div>
         ) : orders.isError ? (
           <ErrorState onRetry={() => void orders.refetch()} />
-        ) : orders.data.length === 0 ? (
-          <EmptyState icon="package" title={t('page.emptyTitle')} message={t('page.empty')} />
+        ) : list.length === 0 ? (
+          <EmptyState
+            icon="package"
+            title={t(isSeller ? 'sales.emptyTitle' : 'page.emptyTitle')}
+            message={t(isSeller ? 'sales.empty' : 'page.empty')}
+          />
         ) : (
-          orders.data.map((order) => <OrderRow key={order.id} order={order} />)
+          <>
+            {shown.length === 0 ? (
+              <p className="py-8 text-center text-sm text-foreground-soft">
+                {t(filter === 'open' ? 'filters.emptyOpen' : 'filters.emptyDone')}
+              </p>
+            ) : (
+              <div className="grid gap-3 lg:grid-cols-2 lg:gap-4">
+                {shown.map((order) => (
+                  <OrderCard key={order.id} order={order} isSeller={isSeller} />
+                ))}
+              </div>
+            )}
+            {/* The next page, on request: older orders are never cut off at the first 50. */}
+            {orders.hasNextPage ? (
+              <Button
+                variant="soft"
+                isFullWidth
+                isLoading={orders.isFetchingNextPage}
+                onClick={() => void orders.fetchNextPage()}
+                data-testid="orders-load-more"
+              >
+                {t('list.loadMore')}
+              </Button>
+            ) : null}
+          </>
         )}
-      </div>
+      </PageContainer>
     </>
   );
 }
 
-function OrderRow({ order }: { order: Order }) {
-  const { t } = useOrdersTranslation();
-  const { locale } = useLocale();
-  const { money, number } = useMoney();
-
-  return (
-    <Link href={ROUTES.orderDetail(order.id)}>
-      <Card
-        isInset
-        className="flex flex-col gap-2 transition-transform duration-fast ease-ios active:scale-[0.985]"
-      >
-        <div className="flex items-center justify-between gap-3">
-          <span className="truncate text-subhead font-semibold text-foreground">
-            {pickLocalizedName(order.store, locale)}
-          </span>
-          <Badge tone={STATUS_TONE[order.status]} hasDot={order.status === 'OUT_FOR_DELIVERY'}>
-            {t(`status.${order.status}`)}
-          </Badge>
-        </div>
-
-        <p className="truncate text-footnote text-muted-foreground">
-          {order.items
-            .map((item) => pickLocalizedName(item.product, locale))
-            .slice(0, 2)
-            .join('، ')}
-          {order.items.length > 2 ? ' …' : ''}
-        </p>
-
-        <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 text-caption text-muted-foreground">
-            <Icon name="package" size={14} />
-            {number(order.items.length)}
-            <span className="mx-1">·</span>
-            {formatDate(order.createdAt, locale)}
-          </span>
-          <span className="text-callout font-bold text-foreground tabular-nums">
-            {money(order.total)}
-          </span>
-        </div>
-      </Card>
-    </Link>
-  );
+/** Seller route: the received orders. */
+export function SalesPage() {
+  return <OrdersPage mode="seller" />;
 }

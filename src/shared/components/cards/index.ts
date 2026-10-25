@@ -7,3 +7,4 @@ export {
   type AuctionGridProps,
 } from './AuctionGrid';
 export { AuctionCardActionProvider } from './AuctionCardActionSlot';
+export { Rail, type RailProps } from './Rail';

@@ -8,7 +8,7 @@ import type {
   storePageSchema,
 } from '../schemas/catalog.schema';
 
-export type { CategoryNode } from '../schemas/catalog.schema';
+export type { CategoryNode, GalleryImage } from '../schemas/catalog.schema';
 export type AuctionStatus = z.infer<typeof auctionStatusSchema>;
 export type ProductCondition = z.infer<typeof productConditionSchema>;
 export type Auction = z.infer<typeof auctionSchema>;
@@ -29,5 +29,8 @@ export interface AuctionListParams {
   endingSoon?: boolean;
   page?: number;
   limit?: number;
-  sort?: 'endsAt' | 'startsAt' | 'currentPrice';
+  /** endingSoon (the server's default browse order), newest, priceLow; the rest are legacy. */
+  sort?: CatalogSort | 'endsAt' | 'startsAt' | 'currentPrice';
 }
+
+export type CatalogSort = 'endingSoon' | 'newest' | 'priceLow';

@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@shared/constants';
 import { useToast } from '@shared/hooks';
+import { getErrorStatus } from '@shared/lib';
 import { sellingApi } from '../api/selling.api';
 import { useSellingTranslation } from './useSellingTranslation';
 import type { AuctionFormValues } from '../types/selling.types';
@@ -20,10 +21,12 @@ export function useCreateAuction() {
   const { t } = useSellingTranslation();
 
   return useMutation({
-    mutationFn: (values: AuctionFormValues) => sellingApi.createAuction(values),
-    onSuccess: () => {
+    // `silent`: publishing goes on to submit, whose toast says what happened.
+    mutationFn: ({ values }: { values: AuctionFormValues; silent?: boolean }) =>
+      sellingApi.createAuction(values),
+    onSuccess: (_auction, { silent }) => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
-      toast.success(t('toast.auctionCreated'));
+      if (!silent) toast.success(t('toast.auctionDraftSaved'));
     },
   });
 }
@@ -34,11 +37,11 @@ export function useUpdateAuction() {
   const { t } = useSellingTranslation();
 
   return useMutation({
-    mutationFn: ({ id, values }: { id: string; values: AuctionFormValues }) =>
+    mutationFn: ({ id, values }: { id: string; values: AuctionFormValues; silent?: boolean }) =>
       sellingApi.updateAuction(id, values),
-    onSuccess: () => {
+    onSuccess: (_auction, { silent }) => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
-      toast.success(t('toast.auctionUpdated'));
+      if (!silent) toast.success(t('toast.auctionUpdated'));
     },
   });
 }
@@ -50,9 +53,16 @@ export function useSubmitAuction() {
 
   return useMutation({
     mutationFn: (id: string) => sellingApi.submitAuction(id),
-    onSuccess: () => {
+    onSuccess: (auction) => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
-      toast.success(t('toast.auctionSubmitted'));
+      // Published at once, or waiting for Mazad's review: say which.
+      toast.success(
+        t(
+          auction.status === 'PENDING_APPROVAL'
+            ? 'toast.auctionSentForReview'
+            : 'toast.auctionPublished',
+        ),
+      );
     },
   });
 }
@@ -63,13 +73,21 @@ export function useCancelAuction() {
   const { t } = useSellingTranslation();
 
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
+    // `isWithdraw`: the listing was awaiting approval, so the toast says "withdrawn".
+    mutationFn: ({ id, reason }: { id: string; reason?: string; isWithdraw?: boolean }) =>
       sellingApi.cancelAuction(id, reason),
-    onSuccess: () => {
+    onSuccess: (_auction, { isWithdraw }) => {
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
       // Cancelling frees the product to be auctioned again, which the product list reflects.
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.products });
-      toast.success(t('toast.auctionCancelled'));
+      toast.success(t(isWithdraw ? 'toast.auctionWithdrawn' : 'toast.auctionCancelled'));
+    },
+    // 409 AUCTION_NOT_CANCELLABLE: the listing moved on (an admin approved it first, or an older
+    // API refuses a withdrawal). The card shows the error; the list refreshes to the real status.
+    onError: (error) => {
+      if (getErrorStatus(error) === 409) {
+        void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.selling.auctions });
+      }
     },
   });
 }

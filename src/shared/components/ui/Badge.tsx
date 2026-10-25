@@ -1,38 +1,64 @@
 import type { HTMLAttributes } from 'react';
 import { cn } from '@shared/lib';
+import { Icon, type IconName } from './Icon';
 
-// Status hues are solid, not tinted (Mazad Design System) — a colored fill with a matching
-// foreground, not a soft 15%-opacity wash. `discount` is the one exception: it flags a price,
-// not a state, so it reads as the quieter tinted pill.
+/*
+ * Status pills (design `.badge`): a soft wash of the state colour with the state colour as text.
+ * Gold only for wins, sales and your own lead. `photo` is the dark glass pill over a lot photo.
+ */
 const TONE_CLASSES = {
-  live: 'bg-live text-live-foreground',
-  upcoming: 'bg-info text-info-foreground',
-  warning: 'bg-warning text-warning-foreground',
-  neutral: 'bg-foreground/55 text-surface',
-  primary: 'bg-primary text-primary-foreground',
-  discount: 'bg-primary-tint text-primary',
+  live: 'bg-live-soft text-live',
+  ending: 'bg-warning-soft text-warning',
+  upcoming: 'bg-info-soft text-info',
+  done: 'bg-surface-high text-foreground-soft',
+  bad: 'bg-destructive-soft text-destructive',
+  gold: 'bg-gold-soft text-gold light:text-gold-lo',
+  photo: 'bg-[rgb(12_11_10/55%)] text-on-photo backdrop-blur-[8px]',
+  // legacy names
+  warning: 'bg-warning-soft text-warning',
+  neutral: 'bg-surface-high text-foreground-soft',
+  primary: 'bg-gold-soft text-gold light:text-gold-lo',
+  discount: 'bg-gold-soft text-gold light:text-gold-lo',
 } as const;
 
+export type BadgeTone = keyof typeof TONE_CLASSES;
+
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  tone?: keyof typeof TONE_CLASSES;
-  /** The pulsing indicator that marks a genuinely live auction. */
+  tone?: BadgeTone;
+  /** The pulsing green dot that marks a genuinely live auction. */
   hasDot?: boolean;
+  icon?: IconName;
+  isIconFilled?: boolean;
 }
 
-export function Badge({ tone = 'neutral', hasDot = false, className, children, ...props }: BadgeProps) {
+export function Badge({
+  tone = 'done',
+  hasDot = false,
+  icon,
+  isIconFilled = false,
+  className,
+  children,
+  ...props
+}: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-[5px] whitespace-nowrap rounded-full px-2.5 py-1',
-        'text-caption-2 leading-[1.4] font-semibold',
+        'inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold whitespace-nowrap',
         TONE_CLASSES[tone],
         className,
       )}
       {...props}
     >
       {hasDot ? (
-        <span className="size-1.5 shrink-0 animate-pulse-dot rounded-full bg-current" aria-hidden />
+        <span
+          className={cn(
+            'size-[7px] shrink-0 animate-pulse-dot rounded-full',
+            tone === 'photo' ? 'bg-[#7bd39a]' : 'bg-live',
+          )}
+          aria-hidden
+        />
       ) : null}
+      {icon ? <Icon name={icon} size={13} isFilled={isIconFilled} /> : null}
       {children}
     </span>
   );

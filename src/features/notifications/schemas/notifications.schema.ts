@@ -17,6 +17,17 @@ export const notificationTypeSchema = z.enum([
   'WATCHED_AUCTION_STARTING',
   'ADMIN_AUCTION_PENDING',
   'ADMIN_RETURN_REQUESTED',
+  'PAYMENT_STATUS_CHANGED',
+  'AUCTION_CANCELLED',
+  'AUCTION_LOST',
+  'AUCTION_LIVE',
+  'AUCTION_UNSOLD',
+  // Bidoom API: store ratings and support reports.
+  'REVIEW_RECEIVED',
+  'REVIEW_REPLIED',
+  'SUPPORT_REPORT_RESOLVED',
+  // Any type a newer API adds: shown with a neutral bell, never mistaken for an outbid.
+  'OTHER',
 ]);
 
 /**
@@ -27,7 +38,7 @@ export const notificationTypeSchema = z.enum([
  */
 export const notificationSchema = z.object({
   id: z.string(),
-  type: notificationTypeSchema.catch('OUTBID'),
+  type: notificationTypeSchema.catch('OTHER'),
   titleEn: z.string(),
   titleAr: z.string(),
   bodyEn: z.string(),

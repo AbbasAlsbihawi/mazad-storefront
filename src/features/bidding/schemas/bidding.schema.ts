@@ -1,23 +1,24 @@
 import { z } from 'zod';
+import { MAX_MONEY_AMOUNT } from '@shared/lib';
 
-export const bidStandingSchema = z.enum([
-  'WINNING',
-  'OUTBID',
-  'AWAITING_CONFIRMATION',
-  'WON',
-  'LOST',
-]);
+// A win becomes an order at once: there is no "awaiting confirmation" standing any more.
+export const bidStandingSchema = z.enum(['WINNING', 'OUTBID', 'WON', 'LOST']);
 
 const bidAuctionSummarySchema = z.object({
   currentPrice: z.string(),
   bidCount: z.number(),
   endsAt: z.string(),
   status: z.string(),
+  // The server's rule for the next bid (optional: older API builds don't send them).
+  minNextBid: z.string().optional(),
+  bidIncrement: z.string().optional(),
+  // The leader's full name (leaderMaskedName carries the same name for older clients).
+  leaderName: z.string().nullable().optional(),
+  leaderMaskedName: z.string().nullable().optional(),
 });
 
-// mazad-api can silently substitute another bidder's auto-bid counter-offer into this response's
-// top-level id/amount when proxy bidding resolves in the same transaction — only `auction.*` is
-// guaranteed to reflect the caller's own action. See usePlaceBid's onSuccess.
+// id/amount are the caller's own bid. `leading` false with `outbidByAutoBid` means another
+// bidder's auto-bid countered it in the same transaction (auction.* shows the result).
 export const bidResponseSchema = z.object({
   id: z.string(),
   auctionId: z.string(),
@@ -25,6 +26,20 @@ export const bidResponseSchema = z.object({
   createdAt: z.string(),
   auction: bidAuctionSummarySchema,
   buyNow: z.boolean().optional(),
+  leading: z.boolean().optional(),
+  outbidByAutoBid: z.boolean().optional(),
+  extended: z.boolean().optional(),
+  extensionMinutes: z.number().nullable().optional(),
+});
+
+/** GET /auctions/:id/me: the signed-in user's standing, so a reopened page shows the same. */
+export const myStandingSchema = z.object({
+  auctionId: z.string(),
+  status: z.string(),
+  leading: z.boolean(),
+  myHighestBid: z.string().nullable(),
+  minNextBid: z.string(),
+  autoBid: z.object({ maxAmount: z.string(), exhausted: z.boolean() }).nullable(),
 });
 
 export const autoBidResponseSchema = z.object({
@@ -50,13 +65,21 @@ export const auctionPricingSchema = z.object({
   currentPrice: z.string().nullable(),
   buyNowPrice: z.string().nullable(),
   endsAt: z.string(),
+  minNextBid: z.string().optional(),
+  bidIncrement: z.string().optional(),
+  // true: an older auction on the platform ladder; otherwise the step is the seller's.
+  incrementLadder: z.boolean().optional(),
+  // For the buy-now sheet: what is bought and the total with delivery (optional: older builds).
+  deliveryFee: z.string().optional(),
+  store: z.object({ deliveryFee: z.string() }).optional(),
+  product: z.object({ nameEn: z.string(), nameAr: z.string() }).optional(),
 });
 
 const myBidWinSchema = z.object({
   id: z.string(),
-  status: z.enum(['PENDING_CONFIRMATION', 'CONFIRMED', 'DECLINED', 'EXPIRED']),
+  // CONFIRMED: the order exists; PASSED_OVER: the winner couldn't receive it (shown as lost).
+  status: z.enum(['CONFIRMED', 'PASSED_OVER']),
   amount: z.string(),
-  confirmationDeadline: z.string(),
 });
 
 export const myBidItemSchema = z.object({
@@ -102,12 +125,14 @@ export const placeBidFormSchema = z.object({
   amount: z
     .number({ error: 'errors.field.amountRequired' })
     .positive('errors.field.amountRequired')
-    .multipleOf(0.01, 'errors.field.amountStep'),
+    .multipleOf(0.01, 'errors.field.amountStep')
+    .max(MAX_MONEY_AMOUNT, 'errors.field.amountTooHigh'),
 });
 
 export const autoBidFormSchema = z.object({
   maxAmount: z
     .number({ error: 'errors.field.amountRequired' })
     .positive('errors.field.amountRequired')
-    .multipleOf(0.01, 'errors.field.amountStep'),
+    .multipleOf(0.01, 'errors.field.amountStep')
+    .max(MAX_MONEY_AMOUNT, 'errors.field.amountTooHigh'),
 });

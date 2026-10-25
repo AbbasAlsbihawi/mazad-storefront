@@ -9,7 +9,7 @@ export interface StepperProps {
   max?: number;
   step: number;
   onChange: (value: number) => void;
-  /** Pre-formatted display value — the caller owns locale digits and grouping. */
+  /** Pre-formatted display value: the caller owns digits and grouping. */
   displayValue: string;
   decrementLabel: string;
   incrementLabel: string;
@@ -18,9 +18,8 @@ export interface StepperProps {
 }
 
 /**
- * Stepper — the bid-increment control: minus, value, plus on a fill pill. Clamping lives here so
- * a caller can't put an out-of-range amount on screen, but the *meaning* of the bounds (minimum
- * next bid, wallet ceiling) stays with the caller.
+ * Stepper (design `.stepper2`): minus, value, plus on a pill. Clamping lives here so a caller
+ * can't put an out-of-range amount on screen, but the meaning of the bounds stays with the caller.
  */
 export function Stepper({
   value,
@@ -37,17 +36,22 @@ export function Stepper({
   const set = (next: number) => onChange(Math.min(max, Math.max(min, next)));
 
   return (
-    <div className={cn('inline-flex items-center gap-0.5 rounded-full bg-fill p-[3px]', className)}>
+    <div
+      className={cn(
+        'inline-flex items-center gap-2.5 rounded-full border border-border-strong bg-surface p-2',
+        className,
+      )}
+    >
       <StepButton
         icon="minus"
         label={decrementLabel}
         onClick={() => set(value - step)}
         isDisabled={value <= min}
       />
-      <span className="min-w-13 text-center text-callout font-semibold text-foreground tabular-nums">
+      <span className="min-w-13 flex-1 text-center font-tabular text-[17px] font-medium text-foreground">
         {displayValue}
         {suffix ? (
-          <span className="ms-[3px] text-caption font-medium text-muted-foreground">{suffix}</span>
+          <span className="ms-1 text-xs font-normal text-muted-foreground">{suffix}</span>
         ) : null}
       </span>
       <StepButton
@@ -78,12 +82,12 @@ function StepButton({
       onClick={onClick}
       disabled={isDisabled}
       className={cn(
-        'inline-flex size-[38px] items-center justify-center rounded-full bg-surface text-foreground shadow-card',
-        'transition-colors duration-fast ease-ios active:bg-surface-raised',
-        'disabled:pointer-events-none disabled:opacity-45 disabled:shadow-none',
+        'inline-flex size-10 items-center justify-center rounded-full border border-border bg-surface-raised text-foreground',
+        'transition-transform duration-fast ease-ios active:scale-94',
+        'disabled:pointer-events-none disabled:opacity-35',
       )}
     >
-      <Icon name={icon} size={16} />
+      <Icon name={icon} size={17} />
     </button>
   );
 }

@@ -2,69 +2,83 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cn } from '@shared/lib';
 import { Spinner } from './Spinner';
 
-// Press feedback changes color or opacity only — never geometry — so a tap can't reflow the row
-// it sits in. `hover:` is safe here: Tailwind v4 only emits it under `@media (hover: hover)`.
+/*
+ * Pill buttons (design `.btn`). Gold is for the one primary action per screen; everything else is
+ * soft (raised surface), line (gold outline), danger or plain. The older variant names map onto
+ * these so every screen picks up the Bidoom look.
+ */
+const GOLD =
+  'gold-sheen bg-grad text-gold-ink shadow-gold hover:brightness-105 disabled:bg-none disabled:bg-gold-soft disabled:text-gold disabled:shadow-none disabled:opacity-60';
+const SOFT =
+  'border border-border-strong bg-surface-raised text-foreground hover:border-gold-line disabled:text-muted-foreground disabled:opacity-60';
+const LINE =
+  'border border-gold-line bg-transparent text-gold hover:bg-gold-soft light:text-gold-lo disabled:opacity-45';
+const DANGER =
+  'bg-destructive-soft text-destructive hover:brightness-110 disabled:border disabled:border-border-strong disabled:bg-surface-raised disabled:text-muted-foreground';
+const DANGER_LINE =
+  'border border-destructive bg-transparent text-destructive hover:bg-destructive-soft disabled:border-border-strong disabled:text-muted-foreground';
+const PLAIN = 'bg-transparent text-gold hover:bg-gold-soft disabled:opacity-45';
+
 const VARIANT_CLASSES = {
-  filled: 'bg-primary text-primary-foreground hover:bg-primary-pressed active:bg-primary-pressed',
-  tinted: 'bg-primary-tint text-primary-text hover:opacity-75 active:opacity-75',
-  gray: 'bg-fill text-foreground hover:opacity-70 active:opacity-70',
-  outline: 'border border-border bg-transparent text-foreground hover:bg-fill active:bg-fill',
-  destructive:
-    'bg-destructive text-destructive-foreground hover:opacity-85 active:opacity-85',
-  plain: 'bg-transparent text-primary-text hover:bg-fill active:bg-fill',
+  gold: GOLD,
+  soft: SOFT,
+  line: LINE,
+  danger: DANGER,
+  dangerLine: DANGER_LINE,
+  plain: PLAIN,
+  // legacy names
+  filled: GOLD,
+  tinted: LINE,
+  gray: SOFT,
+  outline: SOFT,
+  destructive: DANGER,
 } as const;
 
-// Every size clears the 44pt touch target except `sm`, which is only for chips-in-cards and
-// other controls that already sit inside a padded 44pt row.
 const SIZE_CLASSES = {
-  sm: 'h-9 px-3.5 text-footnote rounded-sm',
-  md: 'h-touch px-[18px] text-subhead rounded-md',
-  lg: 'h-13 px-6 text-headline rounded-md',
-  icon: 'size-touch rounded-full',
+  sm: 'h-10 px-4 text-[13.5px] gap-2',
+  md: 'h-[52px] px-6 text-[15px] gap-2.5',
+  lg: 'h-[52px] px-7 text-[15px] gap-2.5',
+  icon: 'size-11',
 } as const;
+
+export type ButtonVariant = keyof typeof VARIANT_CLASSES;
 
 export interface ButtonVariantProps {
-  variant?: keyof typeof VARIANT_CLASSES;
+  variant?: ButtonVariant;
   size?: keyof typeof SIZE_CLASSES;
   isFullWidth?: boolean;
-  /** The blue glow under the one primary CTA on a screen. Filled variant only. */
+  /** Kept for older call sites; the gold variant always carries its glow. */
   hasShadow?: boolean;
 }
 
 /** Shares Button's visual style with plain `<Link>`s that navigate rather than act. */
 export function buttonVariants({
-  variant = 'filled',
+  variant = 'gold',
   size = 'md',
   isFullWidth = false,
-  hasShadow = false,
 }: ButtonVariantProps = {}) {
   return cn(
-    'inline-flex shrink-0 items-center justify-center gap-2 font-semibold',
-    'transition-[background-color,opacity,box-shadow] duration-fast ease-ios',
-    'disabled:pointer-events-none disabled:bg-fill disabled:text-foreground-disabled disabled:shadow-none',
+    'inline-flex shrink-0 items-center justify-center rounded-full font-semibold whitespace-nowrap',
+    'transition-[transform,filter,background-color,border-color] duration-fast ease-ios active:scale-98',
+    'disabled:pointer-events-none',
     SIZE_CLASSES[size],
     VARIANT_CLASSES[variant],
-    // Filled and destructive keep the 14px button radius at every size; the quieter variants
-    // take their size's own radius.
-    (variant === 'filled' || variant === 'destructive') && size !== 'icon' && 'rounded-md',
     isFullWidth && 'w-full',
-    hasShadow && variant === 'filled' && 'shadow-button',
   );
 }
 
 export interface ButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>,
-    ButtonVariantProps {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>, ButtonVariantProps {
   isLoading?: boolean;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     className,
-    variant = 'filled',
+    variant = 'gold',
     size = 'md',
     isFullWidth = false,
-    hasShadow = false,
+    hasShadow: _hasShadow,
     isLoading = false,
     disabled,
     type = 'button',
@@ -79,7 +93,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       aria-busy={isLoading}
       disabled={disabled || isLoading}
-      className={cn(buttonVariants({ variant, size, isFullWidth, hasShadow }), className)}
+      className={cn(buttonVariants({ variant, size, isFullWidth }), className)}
       {...props}
     >
       {isLoading ? <Spinner size={16} /> : null}

@@ -1,5 +1,7 @@
 {
-  "app": { "name": "مزاد" },
+  "app": {
+    "name": "بيدوم"
+  },
   "nav": {
     "auctions": "المزادات",
     "signIn": "تسجيل الدخول",
@@ -8,14 +10,18 @@
     "signOut": "تسجيل الخروج",
     "back": "رجوع",
     "main": "التنقل الرئيسي",
-    "notifications": "الإشعارات"
+    "notifications": "الإشعارات",
+    "breadcrumbs": "مسار التنقل",
+    "skip": "تخطَّ إلى المحتوى"
   },
   "tabs": {
     "home": "الرئيسية",
     "browse": "تصفّح",
     "bids": "مزايداتي",
     "watchlist": "المفضلة",
-    "account": "الحساب"
+    "account": "الحساب",
+    "outbid_one": "تمت مجاوزتك في مزاد واحد",
+    "outbid_other": "تمت مجاوزتك في {{count, num}} مزادات"
   },
   "search": {
     "label": "ابحث في المزادات",
@@ -23,13 +29,27 @@
     "clear": "مسح البحث",
     "filter": "تصفية"
   },
-  "theme": { "light": "فاتح", "dark": "داكن", "label": "المظهر" },
-  "locale": { "en": "English", "ar": "العربية", "label": "اللغة" },
+  "theme": {
+    "light": "فاتح",
+    "dark": "داكن",
+    "label": "المظهر"
+  },
+  "locale": {
+    "en": "English",
+    "ar": "العربية",
+    "label": "اللغة"
+  },
+  "password": {
+    "show": "إظهار كلمة المرور",
+    "hide": "إخفاء كلمة المرور"
+  },
   "auctionStatus": {
     "live": "مباشر",
     "endingSoon": "ينتهي قريبًا",
     "upcoming": "قادم",
-    "ended": "منتهٍ"
+    "ended": "منتهٍ",
+    "sold": "مُباع",
+    "cancelled": "ملغى"
   },
   "state": {
     "loading": "جارٍ التحميل…",
@@ -38,11 +58,112 @@
     "retry": "إعادة المحاولة",
     "empty": "لا يوجد شيء هنا بعد."
   },
+  "notFound": {
+    "title": "هذه الصفحة غير موجودة",
+    "message": "ربما انتهى المزاد وحُذف، أو أن الرابط غير مكتمل."
+  },
+  "errorPage": {
+    "title": "تعذّر تحميل الصفحة",
+    "message": "مزايداتك محفوظة. تحقق من الاتصال ثم أعد المحاولة."
+  },
+  "recovery": {
+    "home": "الرئيسية",
+    "browse": "تصفّح المزادات"
+  },
   "errors": {
     "generic": "حدث خطأ ما. حاول مرة أخرى.",
     "INVALID_CREDENTIALS": "رقم الهاتف أو كلمة المرور غير صحيحة.",
     "USER_BANNED": "تم إيقاف هذا الحساب.",
     "PHONE_EXISTS": "رقم الهاتف هذا مسجّل بالفعل.",
-    "USER_NOT_FOUND": "لا يوجد حساب مرتبط بهذا الرقم."
+    "USER_NOT_FOUND": "لا يوجد حساب مرتبط بهذا الرقم.",
+    "OTP_INVALID": "الرمز غير صحيح. تحقّق منه وحاول مرة أخرى.",
+    "OTP_EXPIRED_OR_MISSING": "انتهت صلاحية هذا الرمز أو تم استخدامه. اطلب رمزًا جديدًا.",
+    "OTP_EXHAUSTED": "محاولات خاطئة كثيرة لهذا الرمز. اطلب رمزًا جديدًا.",
+    "OTP_RESEND_COOLDOWN": "انتظر دقيقة قبل طلب رمز آخر.",
+    "OTP_RATE_LIMITED": "تم طلب رموز كثيرة لهذا الرقم. حاول بعد ساعة.",
+    "TOO_MANY_REQUESTS": "محاولات كثيرة. انتظر دقيقة ثم حاول مجددًا.",
+    "TELEGRAM_NOT_CONFIGURED": "رموز التحقق غير متاحة حاليًا. حاول لاحقًا.",
+    "RESET_TOKEN_INVALID": "انتهت صلاحية إعادة التعيين أو استُخدمت من قبل. ابدأ من جديد لتحصل على رمز جديد.",
+    "ACCOUNT_DISABLED": "هذا الحساب لم يعد نشطًا.",
+    "OTP_LOGIN_NOT_ALLOWED": "لا يمكن لحسابات المشرفين إعادة تعيين كلمة المرور من هنا.",
+    "PHONE_RECENTLY_DELETED": "حُذف حساب بهذا الرقم مؤخرًا. يمكن استخدام الرقم مجددًا لاحقًا."
+  },
+  "header": {
+    "home": "بيدوم، الرئيسية",
+    "browse": "تصفّح",
+    "bids": "مزايداتي",
+    "watchlist": "المفضلة",
+    "sell": "بِع على بيدوم",
+    "searchPlaceholder": "ابحث عن منتج، متجر أو فئة"
+  },
+  "footer": {
+    "promise": "مزادات مباشرة من بائعين في كل العراق. ادفع عند الاستلام أو بالبطاقة.",
+    "shop": "تسوّق",
+    "allAuctions": "كل المزادات",
+    "endingSoon": "ينتهي قريبًا",
+    "selling": "البيع",
+    "startSelling": "ابدأ البيع",
+    "createAuction": "أنشئ مزاداً",
+    "sellingRules": "رسوم وقواعد البيع",
+    "help": "المساعدة",
+    "howAuctionsWork": "كيف تعمل المزادات",
+    "paymentsReturns": "الدفع والإرجاع",
+    "privacyTerms": "الخصوصية والشروط",
+    "helpCentre": "مركز المساعدة",
+    "contact": "تواصل معنا",
+    "copyright": "© {{year}} بيدوم.",
+    "country": "العراق",
+    "currency": "IQD"
+  },
+  "card": {
+    "startsIn": "يبدأ بعد",
+    "bids_zero": "{{count, num}} مزايدة",
+    "bids_one": "{{count, num}} مزايدة",
+    "bids_two": "{{count, num}} مزايدة",
+    "bids_few": "{{count, num}} مزايدات",
+    "bids_many": "{{count, num}} مزايدة",
+    "bids_other": "{{count, num}} مزايدة"
+  },
+  "time": {
+    "left": "الوقت المتبقي",
+    "days_zero": "{{count}} يوم",
+    "days_one": "{{count}} يوم",
+    "days_two": "{{count}} يوم",
+    "days_few": "{{count}} أيام",
+    "days_many": "{{count}} يوم",
+    "days_other": "{{count}} يوم"
+  },
+  "rail": {
+    "previous": "السابق",
+    "next": "التالي",
+    "seeAll": "عرض الكل"
+  },
+  "rating": {
+    "count_zero": "تقييم",
+    "count_one": "تقييم",
+    "count_two": "تقييم",
+    "count_few": "تقييمات",
+    "count_many": "تقييمًا",
+    "count_other": "تقييم"
+  },
+  "dialog": {
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد"
+  },
+  "slide": {
+    "hint": "اسحب المقبض حتى النهاية للتأكيد، أو اضغط لفتح نافذة تأكيد."
+  },
+  "reviewTags": {
+    "AS_DESCRIBED": "مطابق للوصف",
+    "FAST_DELIVERY": "توصيل سريع",
+    "GOOD_PACKAGING": "تغليف ممتاز",
+    "FRIENDLY_SELLER": "تواصل جيد",
+    "GOOD_VALUE": "يستحق سعره",
+    "NOT_AS_DESCRIBED": "لا يطابق الوصف",
+    "LATE_DELIVERY": "تأخر التوصيل",
+    "POOR_PACKAGING": "تغليف سيئ",
+    "UNRESPONSIVE_SELLER": "صعوبة التواصل",
+    "DAMAGED": "وصل متضرراً"
   }
 }

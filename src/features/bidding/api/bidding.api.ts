@@ -5,6 +5,7 @@ import {
   autoBidCancelResponseSchema,
   auctionPricingSchema,
   myBidsListSchema,
+  myStandingSchema,
 } from '../schemas/bidding.schema';
 import type {
   BidResponse,
@@ -13,6 +14,7 @@ import type {
   AuctionPricing,
   MyBidsList,
   MyBidsParams,
+  MyStanding,
 } from '../types/bidding.types';
 
 export const biddingApi = {
@@ -21,13 +23,26 @@ export const biddingApi = {
     return auctionPricingSchema.parse(response.data);
   },
 
-  placeBid: async (auctionId: string, amount: number): Promise<BidResponse> => {
-    const response = await httpClient.post<unknown>(`/auctions/${auctionId}/bids`, { amount });
+  /** `idempotencyKey` identifies one bid intent: a retry with the same key never bids twice. */
+  placeBid: async (
+    auctionId: string,
+    amount: number,
+    idempotencyKey?: string,
+  ): Promise<BidResponse> => {
+    const response = await httpClient.post<unknown>(
+      `/auctions/${auctionId}/bids`,
+      { amount },
+      idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined,
+    );
     return bidResponseSchema.parse(response.data);
   },
 
-  buyNow: async (auctionId: string): Promise<BidResponse> => {
-    const response = await httpClient.post<unknown>(`/auctions/${auctionId}/buy-now`);
+  buyNow: async (auctionId: string, idempotencyKey?: string): Promise<BidResponse> => {
+    const response = await httpClient.post<unknown>(
+      `/auctions/${auctionId}/buy-now`,
+      undefined,
+      idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined,
+    );
     return bidResponseSchema.parse(response.data);
   },
 
@@ -41,6 +56,12 @@ export const biddingApi = {
   cancelAutoBid: async (auctionId: string): Promise<AutoBidCancelResponse> => {
     const response = await httpClient.delete<unknown>(`/auctions/${auctionId}/auto-bid`);
     return autoBidCancelResponseSchema.parse(response.data);
+  },
+
+  /** The signed-in user's standing on one auction: leading, highest bid, auto-bid. */
+  getMyStanding: async (auctionId: string): Promise<MyStanding> => {
+    const response = await httpClient.get<unknown>(`/auctions/${auctionId}/me`);
+    return myStandingSchema.parse(response.data);
   },
 
   listMyBids: async (params: MyBidsParams): Promise<MyBidsList> => {

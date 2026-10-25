@@ -4,6 +4,8 @@ export const QUERY_KEYS = {
   },
   home: {
     feed: ['home', 'feed'] as const,
+    /** GET /stores: the home rail of verified stores (shown only when the API has it). */
+    stores: ['home', 'stores'] as const,
   },
   catalog: {
     categories: ['catalog', 'categories'] as const,
@@ -24,6 +26,7 @@ export const QUERY_KEYS = {
     // TanStack Query footgun (see the composition-seam note in the interactive-features plan).
     auctionPricing: (id: string) => ['bidding', 'auctionPricing', id] as const,
     myBids: <T>(filters: T) => ['bidding', 'myBids', filters] as const,
+    myStanding: (id: string) => ['bidding', 'myStanding', id] as const,
   },
   watchlist: {
     list: ['watchlist', 'list'] as const,
@@ -34,6 +37,15 @@ export const QUERY_KEYS = {
   orders: {
     list: ['orders', 'list'] as const,
     detail: (id: string) => ['orders', 'detail', id] as const,
+    // Prefix of every sales query below, so invalidating it refreshes the count too.
+    sales: ['orders', 'sales'] as const,
+    salesSummary: ['orders', 'sales', 'summary'] as const,
+    salesFirstPage: ['orders', 'sales', 'firstPage'] as const,
+  },
+  payments: {
+    methods: ['payments', 'methods'] as const,
+    order: (orderId: string) => ['payments', 'order', orderId] as const,
+    mine: ['payments', 'mine'] as const,
   },
   notifications: {
     list: ['notifications', 'list'] as const,
@@ -51,5 +63,12 @@ export const QUERY_KEYS = {
     // A static key, not a filters factory — GET /me/following has no pagination UI in this pass,
     // same call shape as watchlist.list.
     following: ['sellers', 'following'] as const,
+  },
+  // The contact screen: my reports, and my orders for the "about an order" picker (its own key and
+  // schema, not orders.list: one key per queryFn).
+  support: {
+    reports: ['support', 'reports'] as const,
+    orders: ['support', 'orders'] as const,
+    order: (id: string) => ['support', 'order', id] as const,
   },
 } as const;

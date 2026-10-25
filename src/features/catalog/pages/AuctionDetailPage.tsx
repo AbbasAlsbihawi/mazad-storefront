@@ -1,230 +1,149 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { useState, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+import type { ReactNode } from 'react';
 import { ROUTES } from '@shared/constants';
-import { PageLoader, ErrorState } from '@shared/components/feedback';
-import { Badge, Card, CardContent, Icon, IconButton, SectionHeader } from '@shared/components/ui';
-import { SegmentedControl } from '@shared/components/ios';
-import { AuctionRail } from '@shared/components/cards';
-import { useLocale, useMoney, useServerClock } from '@shared/hooks';
-import {
-  formatDuration,
-  getAuctionStatusLabelKey,
-  getAuctionStatusTone,
-  getImageTintStyle,
-  pickLocalizedName,
-  resolveAssetUrl,
-} from '@shared/lib';
+import { EmptyState, PageLoader, ErrorState } from '@shared/components/feedback';
+import { Breadcrumbs, PageContainer } from '@shared/components/layout';
+import { AuctionCard, Rail } from '@shared/components/cards';
+import { Icon, buttonVariants } from '@shared/components/ui';
+import { useLocale } from '@shared/hooks';
+import { getErrorCode, getErrorStatus, pickLocalizedName } from '@shared/lib';
 import { useCatalogTranslation } from '../hooks/useCatalogTranslation';
 import { useAuction } from '../hooks/useAuction';
 import { useAuctionBids } from '../hooks/useAuctionBids';
 import { useSimilarAuctions } from '../hooks/useSimilarAuctions';
-import { BidHistoryList } from '../components/BidHistoryList';
-
-type DetailTab = 'details' | 'bids' | 'seller';
+import { AboutItemCard, productSpecs } from '../components/auction/AboutItemCard';
+import { AuctionGallery } from '../components/auction/AuctionGallery';
+import { BidHistoryCard } from '../components/auction/BidHistoryCard';
+import { DeliveryPaymentCard } from '../components/auction/DeliveryPaymentCard';
+import { GalleryTools } from '../components/auction/GalleryTools';
+import { PriceBox } from '../components/auction/PriceBox';
+import { RulesCard } from '../components/auction/RulesCard';
+import { SellerCard } from '../components/auction/SellerCard';
 
 export interface AuctionDetailPageProps {
   id: string;
-  biddingPanel?: ReactNode;
+  /**
+   * The viewer's standing and what they can do (the bidding feature): the state banner, the bid
+   * panel and the phone bid bar. Given the seller (a seller can't bid on their own auction) and
+   * the status (a closed auction may have been won by the viewer).
+   */
+  renderBiddingPanel?: (auction: { sellerId: string; status: string }) => ReactNode;
   watchlistToggle?: ReactNode;
   renderSellerFollowToggle?: (sellerId: string) => ReactNode;
+  /** The viewer was outbid: the clock turns amber with the banner. */
+  isOutbid?: boolean;
 }
 
+/**
+ * The auction page (design `auction`): price and time first, the viewer's standing second, then
+ * everything that earns trust: the item, the seller, delivery and payment, the bids and the
+ * rules. Phones stack it under a full-width gallery with the bid bar pinned; from 960px the bid
+ * panel stays beside the gallery while the details scroll.
+ */
 export function AuctionDetailPage({
   id,
-  biddingPanel,
+  renderBiddingPanel,
   watchlistToggle,
   renderSellerFollowToggle,
+  isOutbid = false,
 }: AuctionDetailPageProps) {
   const { t, isReady } = useCatalogTranslation();
-  const { t: tCommon } = useTranslation('common');
   const { locale } = useLocale();
-  const { now } = useServerClock();
-  const { money, number } = useMoney();
-  const [tab, setTab] = useState<DetailTab>('details');
-
   const auction = useAuction(id);
   const bids = useAuctionBids(id, auction.data?.status === 'LIVE');
   const similar = useSimilarAuctions(id);
 
   if (!isReady || auction.isPending) return <PageLoader />;
   if (auction.isError || !auction.data) {
-    return <ErrorState message={t('detail.notFound')} onRetry={() => void auction.refetch()} />;
+    // A definite 404 won't change on retry: offer a way on instead. Retry stays for network and
+    // server failures, which can.
+    const isNotFound =
+      getErrorCode(auction.error) === 'AUCTION_NOT_FOUND' || getErrorStatus(auction.error) === 404;
+    if (isNotFound) {
+      return (
+        <EmptyState
+          icon="search-minus"
+          title={t('detail.notFound')}
+          message={t('detail.notFoundMessage')}
+          titleAs="h1"
+          action={
+            <Link href={ROUTES.auctions} className={`mt-2 ${buttonVariants({ variant: 'gold' })}`}>
+              {t('detail.browseAuctions')}
+            </Link>
+          }
+        />
+      );
+    }
+    return <ErrorState message={t('detail.loadError')} onRetry={() => void auction.refetch()} />;
   }
 
   const data = auction.data;
   const name = pickLocalizedName(data.product, locale);
-  const coverImage = resolveAssetUrl(data.product.coverImage);
-  const price = data.currentPrice ?? data.startingPrice;
-  const endsInMs = new Date(data.endsAt).getTime() - now();
-  const tone = getAuctionStatusTone(data.status, endsInMs);
-  const isLive = data.status === 'LIVE';
+  const storeName = pickLocalizedName(data.store, locale);
+  const category = data.product.category?.parent ?? data.product.category;
+  const callouts = productSpecs(data, locale).map((spec) => `${spec.name} ${spec.value}`);
 
   return (
-    // Clears the pinned bottom action bar the bidding panel renders.
-    <div className="pb-28">
-      {/* Image well — full-bleed pastel tint with the glass controls floating over it. */}
-      <div
-        className="relative h-52 w-full"
-        style={coverImage ? undefined : getImageTintStyle(data.product.id)}
-      >
-        {coverImage ? (
-          <Image src={coverImage} alt={name} fill sizes="100vw" className="object-cover" priority />
-        ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-foreground/22">
-            <Icon name="package" size={92} />
-          </span>
-        )}
-
-        <div className="absolute inset-x-3 top-3 flex items-center justify-between">
-          <BackButton label={tCommon('nav.back')} />
-          <div className="flex items-center gap-2">
-            <ShareButton label={t('detail.share')} />
-            {watchlistToggle}
-          </div>
+    <PageContainer className="pb-36 lg:pb-16">
+      <Breadcrumbs
+        className="hidden lg:block"
+        items={[
+          { label: t('crumbs.home'), href: ROUTES.home },
+          ...(category
+            ? [
+                {
+                  label: pickLocalizedName(category, locale),
+                  href: `${ROUTES.auctions}?categoryId=${category.id}`,
+                },
+              ]
+            : []),
+          { label: name },
+        ]}
+      />
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-[18px] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-start lg:gap-x-11 lg:gap-y-[22px] lg:pt-1">
+        <div className="lg:col-start-1 lg:row-start-1">
+          <AuctionGallery
+            images={data.product.gallery}
+            name={name}
+            callouts={callouts}
+            tools={<GalleryTools watchlistToggle={watchlistToggle} />}
+          />
         </div>
-      </div>
 
-      {/* Content sheet — lifted over the image well with 28pt top corners. */}
-      <div className="relative -mt-6 rounded-t-[28px] bg-background px-gutter pt-5">
-        <div className="flex items-center gap-2">
-          <Badge tone={tone} hasDot={tone === 'live'}>
-            {tCommon(getAuctionStatusLabelKey(data.status, endsInMs))}
-          </Badge>
-          {isLive && endsInMs > 0 ? (
-            <span className="inline-flex items-center gap-1 text-footnote text-muted-foreground tabular-nums">
-              <Icon name="clock" size={14} />
-              {formatDuration(endsInMs)}
+        <div className="grid gap-4 lg:sticky lg:top-[100px] lg:col-start-2 lg:row-span-2 lg:row-start-1">
+          <div className="grid gap-2">
+            <span className="flex items-center gap-2 text-[13px] text-foreground-soft">
+              <Icon name="store" size={16} />
+              {storeName} · {data.store.city}
             </span>
-          ) : null}
-        </div>
-
-        <h1 className="mt-3 text-title-2 font-extrabold text-foreground">{name}</h1>
-
-        <div className="mt-4 flex items-end justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-caption text-muted-foreground">
-              {data.currentPrice ? t('detail.currentBid') : t('detail.startingPrice')}
-            </p>
-            {/* Prices are bold near-black, never the accent. */}
-            <p className="text-large-title font-extrabold text-foreground tabular-nums">
-              {money(price)}
-            </p>
+            <h1 className="text-[26px] leading-[1.3] font-medium text-foreground">{name}</h1>
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 pb-1 text-footnote text-muted-foreground">
-            <Icon name="gavel" size={16} />
-            {t('detail.bids', { count: data.bidCount, formattedCount: number(data.bidCount) })}
-          </span>
+          <PriceBox auction={data} isUrgent={isOutbid} />
+          {renderBiddingPanel?.({ sellerId: data.seller.id, status: data.status })}
         </div>
 
-        {biddingPanel ? <div className="mt-4">{biddingPanel}</div> : null}
-
-        <SegmentedControl
-          className="mt-5"
-          label={t('detail.title')}
-          value={tab}
-          onChange={setTab}
-          segments={[
-            { id: 'details', label: t('detail.tabs.details') },
-            { id: 'bids', label: t('detail.tabs.bids') },
-            { id: 'seller', label: t('detail.tabs.seller') },
-          ]}
-        />
-
-        <Card className="mt-3">
-          <CardContent className="flex flex-col gap-3 text-subhead">
-            {tab === 'details' ? (
-              <>
-                <DetailRow
-                  label={t('detail.condition')}
-                  value={t(`condition.${data.product.condition}`)}
-                />
-                <DetailRow
-                  label={t('detail.deliveryFee')}
-                  value={money(data.store.deliveryFee)}
-                />
-              </>
-            ) : tab === 'bids' ? (
-              bids.data ? (
-                <BidHistoryList bids={bids.data} />
-              ) : (
-                <PageLoader />
-              )
-            ) : (
-              <>
-                <DetailRow
-                  label={t('detail.seller')}
-                  value={
-                    <span className="flex items-center gap-2">
-                      <Link
-                        href={ROUTES.sellerProfile(data.seller.id)}
-                        className="font-semibold text-primary-text"
-                      >
-                        {data.seller.fullName}
-                      </Link>
-                      {renderSellerFollowToggle?.(data.seller.id)}
-                    </span>
-                  }
-                />
-                <DetailRow
-                  label={t('detail.store')}
-                  value={
-                    <Link
-                      href={ROUTES.store(data.store.id)}
-                      className="font-semibold text-primary-text"
-                    >
-                      {pickLocalizedName(data.store, locale)}
-                    </Link>
-                  }
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {similar.data && similar.data.length > 0 ? (
-          <section className="mt-6">
-            <SectionHeader title={t('detail.similar')} />
-            <AuctionRail auctions={similar.data} />
-          </section>
-        ) : null}
+        <div className="grid gap-[18px] lg:col-start-1 lg:row-start-2">
+          <AboutItemCard auction={data} />
+          <SellerCard auction={data} followToggle={renderSellerFollowToggle?.(data.seller.id)} />
+          <DeliveryPaymentCard auction={data} />
+          <BidHistoryCard
+            auctionId={data.id}
+            bids={bids.data}
+            isUpcoming={data.status === 'SCHEDULED'}
+          />
+          <RulesCard auction={data} />
+        </div>
       </div>
-    </div>
+
+      {similar.data && similar.data.length > 0 ? (
+        <Rail title={t('detail.similar')} className="mt-8 lg:mt-12">
+          {similar.data.map((item) => (
+            <AuctionCard key={item.id} auction={item} />
+          ))}
+        </Rail>
+      ) : null}
+    </PageContainer>
   );
-}
-
-function DetailRow({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">{value}</span>
-    </div>
-  );
-}
-
-function BackButton({ label }: { label: string }) {
-  return (
-    <IconButton
-      name="chevron-left"
-      className="rtl:[&>svg]:-scale-x-100"
-      label={label}
-      tone="glass"
-      onClick={() => window.history.back()}
-    />
-  );
-}
-
-function ShareButton({ label }: { label: string }) {
-  const handleShare = () => {
-    if (typeof navigator !== 'undefined' && 'share' in navigator) {
-      void navigator.share({ url: window.location.href }).catch(() => {
-        // The user dismissing the sheet rejects the promise — not an error worth surfacing.
-      });
-    }
-  };
-
-  return <IconButton name="share-2" label={label} tone="glass" onClick={handleShare} />;
 }
